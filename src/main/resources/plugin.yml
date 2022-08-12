@@ -1,0 +1,11 @@
+name: ZetaCommons
+version: 0.0.1
+author: YeetManLord
+main: com.github.yeetmanlord.zeta_commons.ZetaCommons
+description: All Zeta series plugins rely on this for functioning and code consistentcy
+depend: [ReflectionApi]
+
+   
+        
+            
+ 
