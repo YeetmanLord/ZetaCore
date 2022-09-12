@@ -41,6 +41,7 @@ public abstract class AbstractSQLTableHandler<PrimaryKeyType> implements ISQLTab
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<PrimaryKeyType, ISQL<?>> getData() {
 

@@ -1,5 +1,6 @@
 package com.github.yeetmanlord.zeta_core.menus;
 
+import com.github.yeetmanlord.reflection_api.VersionMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -7,7 +8,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.github.yeetmanlord.zeta_core.CommonEventFactory;
 import com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu.MenuSetItemsEvent;
 
@@ -43,7 +43,7 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
 	public void setItems() {
 
 		makeBoarder();
-		this.inv.setItem(4, this.makeItemFromExisting(XMaterial.RED_STAINED_GLASS_PANE.parseItem(), "&cSelect An Item!"));
+		this.inv.setItem(4, this.makeItemFromExisting(VersionMaterial.RED_WOOL.getItem(), "&cSelect An Item!"));
 		this.inv.setItem(7, makeItem(Material.BARRIER, "&cClose"));
 
 	}

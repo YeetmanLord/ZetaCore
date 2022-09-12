@@ -10,7 +10,7 @@ import com.github.yeetmanlord.zeta_core.sql.values.Row;
  * @author YeetManLord
  *
  * @param <SuperType> The SuperType is the class that implements ISQL. For
- *                    example: class SuperClass implements ISQL<SuperClass>
+ *                    example: class SuperClass implements ISQL
  */
 public interface ISQLObjectHandler<SuperType extends ISQL<?>> {
 
@@ -28,8 +28,8 @@ public interface ISQLObjectHandler<SuperType extends ISQL<?>> {
 	 * row from a SQL table, reads its data, then returns an instance of this
 	 * class's SuperType.
 	 * 
-	 * @param data
-	 * @return
+	 * @param data Row data from the SQL Table
+	 * @return An instance of the SuperType based off a row of data
 	 */
 	SuperType load(Row data);
 

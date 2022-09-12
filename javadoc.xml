@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="private" additionalparam=" -tag zeta.usage:a:&quot;Plugin Usage&quot;&#13;&#10;-tag apiNote:a:&quot;API Note&quot;&#13;&#10;-tag implNote:a:&quot;Implementation Note&quot;" author="true" classpath="X:\Coding\BedwarsPlugin\Server\server.jar;X:\Coding\BedwarsPlugin\Server\plugins\reflection_api.jar" destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="com.github.yeetmanlord.zeta_core.logging,com.github.yeetmanlord.zeta_core,com.github.yeetmanlord.zeta_core.commands,com.github.yeetmanlord.zeta_core.menus,com.github.yeetmanlord.zeta_core.events,com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu,com.github.yeetmanlord.zeta_core.api.uitl,com.github.yeetmanlord.zeta_core.sql.impl,com.github.yeetmanlord.zeta_core.sql.connection,com.github.yeetmanlord.zeta_core.sql.types,com.github.yeetmanlord.zeta_core.data,com.github.yeetmanlord.zeta_core.sql.values,com.github.yeetmanlord.zeta_core.sql" source="1.8" sourcepath="src/main/java;src/main/resources" splitindex="true" use="true" version="true">
+            <link href="file:/X:/Coding/BedwarsPlugin/ZetaCore/ZetaCore/doc/"/>
+        </javadoc>
+    </target>
+</project>

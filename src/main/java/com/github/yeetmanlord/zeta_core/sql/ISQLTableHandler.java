@@ -40,7 +40,12 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 	public ISQL<?> get(PrimaryKeyType primaryKey);
 
 	/**
+	 * 
+	 * @param primaryKeyValue The value of the of the primary key in the row to grab
+	 *                        the column value from
+	 * @param columnName      The column to grab the value from
 	 * @see SQLColumn#get(Object)
+	 * @return Get datas in a column with a primary key and column name
 	 */
 	public default SQLValue<?> getDataInColumn(PrimaryKeyType primaryKeyValue, String columnName) {
 
@@ -57,7 +62,7 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 	ISQLObjectHandler<?> getHandler();
 
 	/**
-	 * @param valueToCheck
+	 * @param valueToCheck The {@link SQLValue} to use to get the list
 	 * @return Gets all the translated rows where the value in a specific column
 	 *         match the given value. The key is gotten from the {@link SQLValue}
 	 *         passed in

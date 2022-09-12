@@ -128,7 +128,7 @@ public class SQLTable implements ISQLTable {
 			x++;
 		}
 
-		params.strip();
+		params.trim();
 		this.handler.replaceInto(tableName, params, args);
 
 	}
@@ -156,7 +156,7 @@ public class SQLTable implements ISQLTable {
 
 		}
 
-		params.strip();
+		params.trim();
 		this.handler.replaceInto(tableName, params, values);
 
 	}

@@ -8,7 +8,7 @@ import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
 
 /**
  * 
- * This type extends {@link HashMap HashMap<String, SQLValue<?>>} and is here
+ * This type extends {@link HashMap} and is here
  * just to condense that into an easier form just for ease of use. {@link Row}
  * also contains {@link #createRow(Map)} just to convert normal maps into rows
  * more quickly. I am not sure if you would use this in your extention APIs, but
@@ -24,8 +24,8 @@ public class Row extends HashMap<String, SQLValue<?>> {
 	/**
 	 * Converts a {@link Map} into a Row. Ease of use function
 	 * 
-	 * @param map
-	 * @return
+	 * @param map Generic map of String key, and {@link SQLValue} value
+	 * @return A map converted to a {@link Row row}
 	 */
 	public static Row createRow(Map<String, SQLValue<?>> map) {
 
@@ -36,6 +36,55 @@ public class Row extends HashMap<String, SQLValue<?>> {
 		}
 
 		return row;
+
+	}
+
+	public <T> void put(String key, T value) {
+
+		this.put(key, SQLValue.create(key, value));
+
+	}
+
+	public Object getValue(String key) {
+
+		return this.get(key).getValue();
+
+	}
+
+	@Override
+	public Row clone() {
+
+		return Row.createRow(this);
+
+	}
+
+	public double getDouble(String key) {
+
+		return this.get(key).getDouble();
+
+	}
+
+	public int getInt(String key) {
+
+		return this.get(key).getInt();
+
+	}
+
+	public String getString(String key) {
+
+		return this.get(key).getString();
+
+	}
+
+	public boolean getBoolean(String key) {
+
+		return this.get(key).getBoolean();
+
+	}
+
+	public float getFloat(String key) {
+
+		return this.get(key).getFloat();
 
 	}
 

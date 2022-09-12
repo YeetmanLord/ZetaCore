@@ -7,7 +7,7 @@ package com.github.yeetmanlord.zeta_core.sql;
  * @author YeetManLord
  *
  * @param <SuperType> The SuperType is the class that implements ISQL. For
- *                    example: class SuperClass implements ISQL<SuperClass>
+ *                    example: class SuperClass implements ISQL
  */
 public interface ISQL<SuperType extends ISQL<?>> {
 

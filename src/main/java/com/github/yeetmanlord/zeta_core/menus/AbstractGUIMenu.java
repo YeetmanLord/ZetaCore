@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.github.yeetmanlord.reflection_api.VersionMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.github.yeetmanlord.reflection_api.chat_components.NMSChatSerializerReflection;
 import com.github.yeetmanlord.reflection_api.entity.players.NMSPlayerReflection;
 import com.github.yeetmanlord.reflection_api.entity.players.player_connection.NMSPlayerConnectionReflection;
@@ -55,7 +55,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 		menuUtil = helper;
 		this.owner = helper.getOwner();
 		this.slots = slots;
-		FILLER = XMaterial.GRAY_STAINED_GLASS_PANE.parseItem();
+		FILLER = VersionMaterial.GRAY_STAINED_GLASS_PANE.getItem();
 		ItemMeta meta = FILLER.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6"));
 		FILLER.setItemMeta(meta);
@@ -120,7 +120,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
 	public ItemStack makeSkullWithCustomTexture(String name, @Nullable String[] loreArray, String textureURL) {
 
-		ItemStack stack = XMaterial.PLAYER_HEAD.parseItem();
+		ItemStack stack = VersionMaterial.PLAYER_HEAD.getItem();
 		SkullMeta meta = (SkullMeta) stack.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
 

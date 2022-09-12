@@ -40,7 +40,7 @@ public interface ISQLTable {
 			String indexes = "";
 
 			for (SQLColumn<?> col : getColumns().values()) {
-				params += (col.initialize() + " " + col.addSettings()).strip() + ", ";
+				params += (col.initialize() + " " + col.addSettings()).trim() + ", ";
 				String i = col.createIndex();
 
 				if (!i.isEmpty()) {

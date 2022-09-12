@@ -35,6 +35,7 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<PrimaryKeyType, ISQL<?>> getData() {
 

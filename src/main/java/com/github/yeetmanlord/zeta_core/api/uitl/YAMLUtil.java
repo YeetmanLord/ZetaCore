@@ -16,6 +16,7 @@ import com.github.yeetmanlord.zeta_core.data.DataStorer;
  *
  * @zeta.usage INTERNAL This is only for storing and reading data from database
  */
+@SuppressWarnings("unchecked")
 public class YAMLUtil {
 
 	public static JSONObject getJSONFromYAML(FileConfiguration config, @Nullable String path) {

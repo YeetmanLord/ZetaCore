@@ -13,15 +13,18 @@ import com.github.yeetmanlord.zeta_core.menus.AbstractGUIMenu;
  * customize built-in menus as well as add custom functionality to menus and
  * items.
  * 
- * @example public void event (MenuSetItemsEvent event) {<br>
- *          <br><ul>
+ * @zeta.example <code> public void event (MenuSetItemsEvent event) {<br>
+ *          <br>
+ *          <ul>
  *          if (event.getMenu() instanceof MenuYouWantToModify) { <br>
- *          <br><ul>
+ *          <br>
+ *          <ul>
  *          event.setItem(12, new ItemStack(Material.DIAMOND)); <br>
- *          <br></ul>
- *          } 
- *          <br></ul>
- * }
+ *          <br>
+ *          </ul>
+ *          } <br>
+ *          </ul>
+ *          } </code>
  * 
  * @author YeetManLord
  *
