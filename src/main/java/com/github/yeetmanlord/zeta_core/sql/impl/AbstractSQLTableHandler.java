@@ -65,10 +65,6 @@ public abstract class AbstractSQLTableHandler<PrimaryKeyType> implements ISQLTab
 		this.table.setColumns(getColumns(handler));
 		this.table.initializeTable(handler);
 
-		if (handler.getEntrySize(tableName) <= 0) {
-			this.writeDB();
-		}
-
 	}
 
 	public abstract List<SQLColumn<?>> getColumns(SQLHandler handler);

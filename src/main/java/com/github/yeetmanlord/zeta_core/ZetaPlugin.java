@@ -9,85 +9,95 @@ import com.github.yeetmanlord.zeta_core.logging.Logger;
  * Extention of {@link JavaPlugin} and is used to add some ease of use
  * functionality to all Zeta series plugins. As well as ensure standard and
  * default behaviors.
- * 
- * @author YeetManLord
  *
+ * @author YeetManLord
  */
 public abstract class ZetaPlugin extends JavaPlugin {
 
-	private Logger logger;
+    private Logger logger;
 
-	@Override
-	public void onEnable() {
+    @Override
+    public void onEnable() {
 
-		super.onEnable();
-		logger = new Logger(this);
-		ZetaCore.registerPlugin(this);
-		this.registerDataStorers();
-		this.initDB();
-		this.readData();
+        super.onEnable();
+        logger = new Logger(this);
+        ZetaCore.registerPlugin(this);
+        if (ZetaCore.INSTANCE.localSettings.disabled_plugins.contains(this.getName())) {
+            this.setEnabled(false);
+            return;
+        }
+        this.registerDataStorers();
+        this.initDB();
+        this.readData();
 
-	}
+    }
 
-	private void initDB() {
+    private void initDB() {
 
-		if (ZetaCore.INSTANCE.dataBase.client != null) {
+        if (ZetaCore.INSTANCE.dataBase.client != null) {
 
-			ZetaCore.getDatabaseDataHandlers(this).forEach(d -> {
-				d.initializeDB(ZetaCore.INSTANCE.dataBase.client.handler);
-			});
+            ZetaCore.getDatabaseDataHandlers(this).forEach(d -> {
+                d.initializeDB(ZetaCore.INSTANCE.dataBase.client.handler);
+            });
 
-		}
+        }
 
-	}
+    }
 
-	@Override
-	public void onDisable() {
+    @Override
+    public void onDisable() {
 
-		super.onDisable();
+        super.onDisable();
 
-		if (ZetaCore.INSTANCE.dataBase.initialized && ZetaCore.INSTANCE.dataBase.client != null) {
-			ZetaCore.INSTANCE.dataBase.client.writeData(this);
-		}
-		else {
+        if (ZetaCore.INSTANCE.dataBase.initialized && ZetaCore.INSTANCE.dataBase.client != null) {
+            ZetaCore.INSTANCE.dataBase.client.writeData(this);
+        } else {
 
-			ZetaCore.getDataHandlers(this).forEach((handler) -> {
+            ZetaCore.getDataHandlers(this).forEach((handler) -> {
 
-				handler.write();
+                handler.write();
 
-			});
+            });
 
-		}
+        }
 
-	}
+    }
 
-	public abstract String getPluginName();
+    public abstract String getPluginName();
 
-	public Logger getPluginLogger() {
+    public Logger getPluginLogger() {
 
-		return this.logger;
+        return this.logger;
 
-	}
+    }
 
-	protected abstract void registerDataStorers();
+    protected abstract void registerDataStorers();
 
-	protected void readData() {
+    protected void readData() {
 
-		DataBase db = ZetaCore.INSTANCE.dataBase;
+        DataBase db = ZetaCore.INSTANCE.dataBase;
+        this.logger.info("Reading data for " + this.getPluginName());
 
-		if (db.initialized) {
-			db.client.readData(this);
-		}
-		else {
-			ZetaCore.getDataHandlers(this).forEach(d -> {
-				d.read();
-			});
-		}
+        if (db.initialized) {
+            db.client.readData(this);
+        } else {
+            ZetaCore.getDataHandlers(this).forEach(d -> {
+                d.read();
+            });
+        }
 
-	}
+    }
 
-	protected void writeData() {
+    protected void writeData() {
+        DataBase db = ZetaCore.INSTANCE.dataBase;
 
-	}
+        if (db.initialized) {
+            db.client.writeData(this);
+        } else {
+            ZetaCore.getDataHandlers(this).forEach(d -> {
+                d.write();
+            });
+        }
+    }
 
 }

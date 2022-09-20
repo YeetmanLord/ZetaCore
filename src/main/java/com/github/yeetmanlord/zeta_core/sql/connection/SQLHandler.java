@@ -10,8 +10,6 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import org.bukkit.Bukkit;
-
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
@@ -19,288 +17,251 @@ import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 
 /**
- * 
- * @zeta.usage INTERNAL
- * 
- *             Handles all SQL interactions in this plugin.
- * 
  * @author YeetManLord
- *
+ * @zeta.usage INTERNAL
+ * <p>
+ * Handles all SQL interactions in this plugin.
  */
 public class SQLHandler {
 
-	private Connection sqlConnection;
+    private SQLClient client;
 
-	private ZetaCore instance;
+    public SQLHandler(SQLClient client) {
 
-	public SQLHandler(ZetaCore main) {
+        this.client = client;
 
-		if (main.dataBase.client != null && main.dataBase.client.isConnected()) {
-			this.sqlConnection = main.dataBase.client.getClient();
-		}
-		else {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> {
-				retryConnection();
-			}, 1L);
-		}
+    }
 
-	}
+    public void createTable(String name, String parameters) {
 
-	private void retryConnection() {
+        if (this.client.isConnected()) {
+            executeStatement("CREATE TABLE IF NOT EXISTS " + name + " (" + parameters + ");");
+        }
 
-		if (instance.dataBase.client != null && instance.dataBase.client.isConnected()) {
-			this.sqlConnection = instance.dataBase.client.getClient();
-		}
+    }
 
-		if (this.sqlConnection == null) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
-				retryConnection();
-			}, 1L);
-		}
+    public void replaceInto(String tableName, String tableParams, @Nonnull Object... values) {
 
-	}
+        if (this.client.isConnected()) {
+            String value = "";
 
-	public void createTable(String name, String parameters) {
+            for (int x = 0; x < values.length; x++) {
+                Object obj = values[x];
 
-		if (this.instance.dataBase.client.isConnected()) {
-			executeStatement("CREATE TABLE IF NOT EXISTS " + name + " (" + parameters + ");");
-		}
+                if (obj == null) {
+                    obj = "null";
+                }
 
-	}
+                if (x < values.length - 1) {
 
-	public void replaceInto(String tableName, String tableParams, @Nonnull Object... values) {
+                    if (obj instanceof String) {
+                        value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\", ";
+                    } else {
+                        value += obj.toString().replaceAll("\"", "\\\\\\\"") + ", ";
+                    }
 
-		if (this.instance.dataBase.client.isConnected()) {
-			String value = "";
+                } else {
 
-			for (int x = 0; x < values.length; x++) {
-				Object obj = values[x];
+                    if (obj instanceof String) {
+                        value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
+                    } else {
+                        value += obj.toString().replaceAll("\"", "\\\\\\\"");
+                    }
 
-				if (obj == null) {
-					obj = "null";
-				}
+                }
 
-				if (x < values.length - 1) {
+            }
 
-					if (obj instanceof String) {
-						value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\", ";
-					}
-					else {
-						value += obj.toString().replaceAll("\"", "\\\\\\\"") + ", ";
-					}
+            value = value.trim();
+            executeStatement("REPLACE INTO " + tableName + " (" + tableParams + ") VALUES (" + value + ");");
 
-				}
-				else {
+        }
 
-					if (obj instanceof String) {
-						value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
-					}
-					else {
-						value += obj.toString().replaceAll("\"", "\\\\\\\"");
-					}
+    }
 
-				}
+    public void insertIntoIgnore(String tableName, String tableParams, @Nonnull Object... values) {
 
-			}
+        if (this.client.isConnected()) {
+            String value = "";
 
-			value = value.trim();
-			executeStatement("REPLACE INTO " + tableName + " (" + tableParams + ") VALUES (" + value + ");");
+            for (int x = 0; x < values.length; x++) {
+                Object obj = values[x];
 
-		}
+                if (obj == null) {
+                    obj = "null";
+                }
 
-	}
+                if (x < values.length - 1) {
 
-	public void insertIntoIgnore(String tableName, String tableParams, @Nonnull Object... values) {
+                    if (obj instanceof String) {
+                        value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\", ";
+                    } else {
+                        value += obj.toString().replaceAll("\"", "\\\\\\\"") + ", ";
+                    }
 
-		if (this.instance.dataBase.client.isConnected()) {
-			String value = "";
+                } else {
 
-			for (int x = 0; x < values.length; x++) {
-				Object obj = values[x];
+                    if (obj instanceof String) {
+                        value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
+                    } else {
+                        value += obj.toString().replaceAll("\"", "\\\\\\\"");
+                    }
 
-				if (obj == null) {
-					obj = "null";
-				}
+                }
 
-				if (x < values.length - 1) {
+            }
 
-					if (obj instanceof String) {
-						value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\", ";
-					}
-					else {
-						value += obj.toString().replaceAll("\"", "\\\\\\\"") + ", ";
-					}
+            value = value.trim();
 
-				}
-				else {
+            executeStatement("INSERT IGNORE INTO " + tableName + " (" + tableParams + ") VALUES (" + value + ");");
+        }
 
-					if (obj instanceof String) {
-						value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
-					}
-					else {
-						value += obj.toString().replaceAll("\"", "\\\\\\\"");
-					}
+    }
 
-				}
+    public void executeStatement(String sqlCode) {
+        ZetaCore.LOGGER.info("Executing SQL statement: " + sqlCode);
+        if (this.client.isConnected()) {
 
-			}
+            try {
 
-			value = value.trim();
+                if (client != null) {
+                    PreparedStatement statement = client.getClient().prepareStatement(sqlCode);
+                    statement.executeUpdate();
+                }
 
-			executeStatement("INSERT IGNORE INTO " + tableName + " (" + tableParams + ") VALUES (" + value + ");");
-		}
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+            }
 
-	}
+        }
 
-	public void executeStatement(String sqlCode) {
+    }
 
-		if (this.instance.dataBase.client.isConnected()) {
+    public Connection getClient() {
 
-			try {
+        return client.getClient();
 
-				if (sqlConnection != null) {
-					PreparedStatement statement = sqlConnection.prepareStatement(sqlCode);
-					statement.executeUpdate();
-				}
+    }
 
-			}
-			catch (SQLException exc) {
-				exc.printStackTrace();
-			}
+    public SQLValue<?> query(String mainColumnName, Object mainColumnValue, String table, String queryColumn) {
 
-		}
+        Object defaultValue = null;
 
-	}
+        if (this.client.isConnected()) {
 
-	public Connection getSqlConnection() {
+            try {
+                PreparedStatement ps = this.client.getClient().prepareStatement("SELECT " + queryColumn + " FROM " + table + " WHERE " + mainColumnName + "=?");
+                ps.setObject(1, mainColumnValue);
+                ResultSet queryResult = ps.executeQuery();
 
-		return sqlConnection;
+                if (queryResult.next()) {
+                    defaultValue = queryResult.getObject(queryColumn);
+                }
 
-	}
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+            }
 
-	public SQLValue<?> query(String mainColumnName, Object mainColumnValue, String table, String queryColumn) {
+        }
 
-		Object defaultValue = null;
+        return SQLValue.create(queryColumn, defaultValue);
 
-		if (this.instance.dataBase.client.isConnected()) {
+    }
 
-			try {
-				PreparedStatement ps = this.sqlConnection.prepareStatement("SELECT " + queryColumn + " FROM " + table + " WHERE " + mainColumnName + "=?");
-				ps.setObject(1, mainColumnValue);
-				ResultSet queryResult = ps.executeQuery();
+    public int getEntrySize(String table) {
 
-				if (queryResult.next()) {
-					defaultValue = queryResult.getObject(queryColumn);
-				}
+        int count = 0;
 
-			}
-			catch (SQLException exc) {
-				exc.printStackTrace();
-			}
+        if (this.client.isConnected()) {
 
-		}
+            try {
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT count(*) FROM " + table);
+                ResultSet queryResult = statement.executeQuery();
 
-		return SQLValue.create(queryColumn, defaultValue);
+                if (queryResult.next()) {
+                    count = queryResult.getInt(1);
+                }
 
-	}
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+            }
 
-	public int getEntrySize(String table) {
+        }
 
-		int count = 0;
+        return count;
 
-		if (this.instance.dataBase.client.isConnected()) {
+    }
 
-			try {
-				PreparedStatement statement = sqlConnection.prepareStatement("SELECT count(*) FROM " + table);
-				ResultSet queryResult = statement.executeQuery();
+    public ArrayList<SQLValue<?>> getColumnEntries(String table, String columnName) {
 
-				if (queryResult.next()) {
-					count = queryResult.getInt(1);
-				}
+        ArrayList<SQLValue<?>> list = new ArrayList<>();
 
-			}
-			catch (SQLException exc) {
-				exc.printStackTrace();
-			}
+        if (this.client.isConnected()) {
 
-		}
+            try {
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + columnName + " FROM " + table);
+                ResultSet queryResult = statement.executeQuery();
 
-		return count;
+                if (queryResult.next()) {
+                    list.add(SQLValue.create(columnName, queryResult.getObject(columnName)));
+                }
 
-	}
+                while (queryResult.next()) {
+                    list.add(SQLValue.create(columnName, queryResult.getObject(columnName)));
+                }
 
-	public ArrayList<SQLValue<?>> getColumnEntries(String table, String columnName) {
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+            }
 
-		ArrayList<SQLValue<?>> list = new ArrayList<>();
+        }
 
-		if (this.instance.dataBase.client.isConnected()) {
+        return list;
 
-			try {
-				PreparedStatement statement = sqlConnection.prepareStatement("SELECT " + columnName + " FROM " + table);
-				ResultSet queryResult = statement.executeQuery();
+    }
 
-				if (queryResult.next()) {
-					list.add(SQLValue.create(columnName, queryResult.getObject(columnName)));
-				}
+    public <PrimaryColumnValue> Row getRow(ISQLTable table, PrimaryColumnValue prim) {
 
-				while (queryResult.next()) {
-					list.add(SQLValue.create(columnName, queryResult.getObject(columnName)));
-				}
+        HashMap<String, SQLValue<?>> row = new HashMap<>();
 
-			}
-			catch (SQLException exc) {
-				exc.printStackTrace();
-			}
+        if (this.client.isConnected()) {
 
-		}
+            for (SQLColumn<?> val : table.getColumns().values()) {
+                row.put(val.getKey(), val.get(prim));
+            }
 
-		return list;
+        }
 
-	}
+        return Row.createRow(row);
 
-	public <PrimaryColumnValue> Row getRow(ISQLTable table, PrimaryColumnValue prim) {
+    }
 
-		HashMap<String, SQLValue<?>> row = new HashMap<>();
+    public <RowValue> List<Row> getRowsWhere(String primaryKey, ISQLTable table, String column, RowValue whereEquals) {
 
-		if (this.instance.dataBase.client.isConnected()) {
+        List<Row> list = new ArrayList<>();
 
-			for (SQLColumn<?> val : table.getColumns().values()) {
-				row.put(val.getKey(), val.get(prim));
-			}
+        if (this.client.isConnected()) {
 
-		}
+            try {
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + primaryKey + " FROM " + table.getName() + " WHERE " + column + "=\"" + whereEquals.toString() + "\"");
+                ResultSet queryResult = statement.executeQuery();
 
-		return Row .createRow(row);
+                if (queryResult.next()) {
+                    list.add(getRow(table, queryResult.getObject(primaryKey)));
+                }
 
-	}
+                while (queryResult.next()) {
+                    list.add(getRow(table, queryResult.getObject(primaryKey)));
+                }
 
-	public <RowValue> List<Row> getRowsWhere(String primaryKey, ISQLTable table, String column, RowValue whereEquals) {
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+            }
 
-		List<Row> list = new ArrayList<>();
-		
-		if (this.instance.dataBase.client.isConnected()) {
+        }
 
-			try {
-				PreparedStatement statement = sqlConnection.prepareStatement("SELECT " + primaryKey + " FROM " + table.getName() + " WHERE " + column + "=\"" + whereEquals.toString() + "\"");
-				ResultSet queryResult = statement.executeQuery();
+        return list;
 
-				if (queryResult.next()) {
-					list.add(getRow(table, queryResult.getObject(primaryKey)));
-				}
-
-				while (queryResult.next()) {
-					list.add(getRow(table, queryResult.getObject(primaryKey)));
-				}
-
-			}
-			catch (SQLException exc) {
-				exc.printStackTrace();
-			}
-
-		}
-		
-		return list;
-
-	}
+    }
 
 }

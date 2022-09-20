@@ -70,6 +70,18 @@ public abstract class SQLColumn<Type> {
 
 	}
 
+	public void applySettings(ColumnSettings settings) {
+
+		this.settings = settings;
+
+	}
+
+	public ColumnSettings getSettings() {
+
+		return this.settings;
+
+	}
+
 	public String createIndex() {
 
 		String index = "";

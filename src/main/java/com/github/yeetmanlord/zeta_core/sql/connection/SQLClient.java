@@ -40,7 +40,6 @@ public class SQLClient {
 
 		try {
 			this.connect();
-			handler = new SQLHandler(ZetaCore.INSTANCE);
 		}
 		catch (SQLException e) {
 			ZetaCore.LOGGER.info("&cDatabase not connected");
@@ -58,6 +57,7 @@ public class SQLClient {
 
 		if (!isConnected()) {
 			client = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?useSSL=false&characterEncoding=UTF-8", username, password);
+			handler = new SQLHandler(this);
 			ZetaCore.LOGGER.info("&aDatabase is connected!");
 		}
 

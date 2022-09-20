@@ -1,6 +1,7 @@
 package com.github.yeetmanlord.zeta_core.sql.values;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
@@ -17,7 +18,7 @@ import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
  * 
  * @author YeetManLord
  */
-public class Row extends HashMap<String, SQLValue<?>> {
+public class Row extends LinkedHashMap<String, SQLValue<?>> {
 
 	private static final long serialVersionUID = -2488093439597381250L;
 
