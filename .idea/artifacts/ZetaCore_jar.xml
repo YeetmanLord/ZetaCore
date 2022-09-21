@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ZetaCore:jar">
+    <output-path>$PROJECT_DIR$/../../Server/plugins</output-path>
+    <root id="archive" name="ZetaCore.jar">
+      <element id="module-output" name="ZetaCore" />
+      <element id="module-source" name="ZetaCore" />
+    </root>
+  </artifact>
+</component>
