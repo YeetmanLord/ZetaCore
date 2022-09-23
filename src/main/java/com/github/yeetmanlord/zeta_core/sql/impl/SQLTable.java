@@ -118,7 +118,6 @@ public class SQLTable implements ISQLTable {
             this.columns.put(sqlColumn.getKey(), sqlColumn);
         }
 
-        ZetaCore.LOGGER.info(this.columns);
 
     }
 

@@ -53,7 +53,7 @@ public class SQLInteger extends SQLColumn<Integer> {
 	@Override
 	public <PrimaryKeyValue> SQLValue<Integer> get(PrimaryKeyValue value) {
 
-		return new SQLValue<Integer>(getTable().getName(), (Integer) getTable().get(value, getKey()).getValue());
+		return new SQLValue<Integer>(this.getKey(), (Integer) getTable().get(value, getKey()).getValue());
 
 	}
 

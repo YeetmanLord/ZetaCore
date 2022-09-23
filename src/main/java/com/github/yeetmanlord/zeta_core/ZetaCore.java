@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.github.yeetmanlord.zeta_core.api.uitl.raytrace.RayTraceResult;
+import com.github.yeetmanlord.zeta_core.api.uitl.raytrace.RayTraceUtility;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
 import org.bukkit.ChatColor;
@@ -154,6 +156,14 @@ public class ZetaCore extends ZetaPlugin {
                 } else {
                     commandSender.sendMessage(ChatColor.AQUA + "Usage: /enable_plugin <plugin>");
                 }
+            }
+            return true;
+        });
+
+        getCommand("test_raytrace").setExecutor((commandSender, command, s, args) -> {
+            if (commandSender instanceof Player) {
+                Player player = (Player) commandSender;
+                RayTraceUtility.rayTraceBlocks(player, 10D);
             }
             return true;
         });

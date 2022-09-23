@@ -14,7 +14,7 @@ import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
  * also contains {@link #createRow(Map)} just to convert normal maps into rows
  * more quickly. I am not sure if you would use this in your extention APIs, but
  * I just use it when dealing with more raw rows in {@link SQLHandler} as well
- * as {@link ISQLTableHandler#writeDB() writing to tables}
+ * as {@link ISQLTableHandler#writeDB() writing to tables}-
  * 
  * @author YeetManLord
  */
@@ -86,6 +86,12 @@ public class Row extends LinkedHashMap<String, SQLValue<?>> {
 	public float getFloat(String key) {
 
 		return this.get(key).getFloat();
+
+	}
+
+	public long getLong(String key) {
+
+		return this.get(key).getLong();
 
 	}
 

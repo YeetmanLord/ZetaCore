@@ -58,7 +58,7 @@ public class SQLText extends SQLColumn<String> {
 	@Override
 	public <PrimaryKeyValue> SQLValue<String> get(PrimaryKeyValue value) {
 
-		return new SQLValue<String>(getTable().getName(), (String) getTable().get(value, getKey()).getValue());
+		return new SQLValue<String>(this.getKey(), (String) getTable().get(value, getKey()).getValue());
 
 	}
 

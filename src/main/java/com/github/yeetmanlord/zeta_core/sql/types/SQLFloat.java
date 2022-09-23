@@ -53,7 +53,7 @@ public class SQLFloat extends SQLColumn<Float> {
 	@Override
 	public <PrimaryKeyValue> SQLValue<Float> get(PrimaryKeyValue value) {
 
-		return new SQLValue<Float>(getTable().getName(), (Float) getTable().get(value, getKey()).getValue());
+		return new SQLValue<Float>(this.getKey(), (Float) getTable().get(value, getKey()).getValue());
 
 	}
 

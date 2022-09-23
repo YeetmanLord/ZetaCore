@@ -36,7 +36,7 @@ public class SQLBool extends SQLColumn<Boolean> {
 	@Override
 	public <PrimaryKeyValue> SQLValue<Boolean> get(PrimaryKeyValue value) {
 
-		return new SQLValue<Boolean>(getTable().getName(), (Boolean) getTable().get(value, getKey()).getValue());
+		return new SQLValue<Boolean>(this.getKey(), (Boolean) getTable().get(value, getKey()).getValue());
 
 	}
 

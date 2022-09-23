@@ -52,7 +52,7 @@ public class SQLValue<Type> {
 
         }
 
-        throw new IllegalArgumentException("Value is not an integer!");
+        throw new IllegalArgumentException("Value is not a double!");
     }
 
     public int getInt() {
@@ -75,7 +75,7 @@ public class SQLValue<Type> {
 
         }
 
-        throw new IllegalArgumentException("Value is not an integer!");
+        throw new IllegalArgumentException("Value is not a boolean!");
     }
 
     public String getString() {
@@ -86,7 +86,7 @@ public class SQLValue<Type> {
 
         }
 
-        throw new IllegalArgumentException("Value is not an integer!");
+        throw new IllegalArgumentException("Value is not a string!");
     }
 
     public float getFloat() {
@@ -98,6 +98,24 @@ public class SQLValue<Type> {
     	}
 
     	throw new IllegalArgumentException("Value is not an integer!");
+
+    }
+
+    public long getLong() {
+
+    	if (value instanceof Long) {
+
+    		return (long) (Object) value;
+
+    	}
+
+    	throw new IllegalArgumentException("Value is not a long!");
+
+    }
+
+    public String toString() {
+
+    	return "SQLValue:{" + key + ": " + value + "}";
 
     }
 

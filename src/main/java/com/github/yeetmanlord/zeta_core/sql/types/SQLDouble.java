@@ -57,7 +57,7 @@ public class SQLDouble extends SQLColumn<Double> {
 	@Override
 	public <PrimaryKeyValue> SQLValue<Double> get(PrimaryKeyValue value) {
 
-		return new SQLValue<Double>(getTable().getName(), (Double) getTable().get(value, getKey()).getValue());
+		return new SQLValue<Double>(this.getKey(), (Double) getTable().get(value, getKey()).getValue());
 
 	}
 

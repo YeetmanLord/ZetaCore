@@ -65,6 +65,11 @@ public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataS
 		this.table.setColumns(getColumns(handler));
 		this.table.initializeTable(handler);
 
+		if (this.table.getRows().isEmpty()) {
+			this.read();
+			this.writeDB();
+		}
+
 	}
 
 	public abstract List<SQLColumn<?>> getColumns(SQLHandler handler);

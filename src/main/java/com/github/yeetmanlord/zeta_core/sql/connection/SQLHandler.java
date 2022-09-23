@@ -119,7 +119,6 @@ public class SQLHandler {
     }
 
     public void executeStatement(String sqlCode) {
-        ZetaCore.LOGGER.info("Executing SQL statement: " + sqlCode);
         if (this.client.isConnected()) {
 
             try {
@@ -201,9 +200,9 @@ public class SQLHandler {
             try {
                 PreparedStatement statement = client.getClient().prepareStatement("SELECT " + columnName + " FROM " + table);
                 ResultSet queryResult = statement.executeQuery();
-
                 if (queryResult.next()) {
-                    list.add(SQLValue.create(columnName, queryResult.getObject(columnName)));
+                    Object obj = queryResult.getObject(columnName);
+                    list.add(SQLValue.create(columnName, obj));
                 }
 
                 while (queryResult.next()) {
@@ -231,7 +230,6 @@ public class SQLHandler {
             }
 
         }
-
         return Row.createRow(row);
 
     }

@@ -59,6 +59,11 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 		this.table.setColumns(getColumns(handler));
 		this.table.initializeTable(handler);
 
+		if (this.table.getRows().isEmpty()) {
+			this.read();
+			this.writeDB();
+		}
+
 	}
 
 	public abstract List<SQLColumn<?>> getColumns(SQLHandler handler);

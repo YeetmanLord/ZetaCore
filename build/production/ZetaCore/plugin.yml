@@ -52,3 +52,9 @@ commands:
     usage: /<command>
     permission: zetacore.admin
     aliases: [local_settings_gui]
+
+  test_raytrace:
+    description: Tests the raytrace
+    usage: /<command>
+    permission: zetacore.admin
+    aliases: [raytrace]
