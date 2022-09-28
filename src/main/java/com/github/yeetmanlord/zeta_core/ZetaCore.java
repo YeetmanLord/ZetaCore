@@ -184,7 +184,7 @@ public class ZetaCore extends ZetaPlugin {
         dataBase.write();
         localSettings.write();
 
-        if (dataBase.initialized) {
+        if (dataBase.initialized && dataBase.client.isConnected()) {
             dataBase.client.disconnect();
         }
 
@@ -382,7 +382,7 @@ public class ZetaCore extends ZetaPlugin {
         ZetaPlugin plugin = storer.getPlugin();
         LOGGER.debug("Registering data handler for file, " + storer.getFileName() + ", for " + plugin.getName());
 
-        if (storer instanceof ISQLTableHandler && ZetaCore.INSTANCE.dataBase.initialized && ZetaCore.INSTANCE.dataBase.client != null) {
+        if (storer instanceof ISQLTableHandler && ZetaCore.INSTANCE.dataBase.initialized && ZetaCore.INSTANCE.dataBase.client != null && ZetaCore.INSTANCE.dataBase.client.isConnected()) {
 
             if (!databaseDataHandlers.containsKey(plugin)) {
                 databaseDataHandlers.put(plugin, new ArrayList<>());
@@ -440,7 +440,7 @@ public class ZetaCore extends ZetaPlugin {
 
     public void readAll() {
 
-        if (dataBase.initialized && dataBase.client != null) {
+        if (dataBase.initialized && dataBase.client != null && dataBase.client.isConnected()) {
 
             databaseDataHandlers.values().forEach(list -> {
 
@@ -474,7 +474,7 @@ public class ZetaCore extends ZetaPlugin {
 
     public void saveAll() {
 
-        if (dataBase.initialized && dataBase.client != null) {
+        if (dataBase.initialized && dataBase.client != null && dataBase.client.isConnected()) {
 
             databaseDataHandlers.values().forEach(list -> {
 
