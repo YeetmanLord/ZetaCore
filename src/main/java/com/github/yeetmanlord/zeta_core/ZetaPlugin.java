@@ -16,11 +16,15 @@ public abstract class ZetaPlugin extends JavaPlugin {
 
     private Logger logger;
 
+    public ZetaPlugin() {
+        super();
+        this.logger = new Logger(this);
+    }
+
     @Override
     public void onEnable() {
 
         super.onEnable();
-        logger = new Logger(this);
         ZetaCore.registerPlugin(this);
         if (ZetaCore.INSTANCE.localSettings.disabled_plugins.contains(this.getName())) {
             this.setEnabled(false);
@@ -51,15 +55,14 @@ public abstract class ZetaPlugin extends JavaPlugin {
 
         if (ZetaCore.INSTANCE.dataBase.initialized && ZetaCore.INSTANCE.dataBase.client != null && ZetaCore.INSTANCE.dataBase.client.isConnected()) {
             ZetaCore.INSTANCE.dataBase.client.writeData(this);
-        } else {
-
-            ZetaCore.getDataHandlers(this).forEach((handler) -> {
-
-                handler.write();
-
-            });
-
         }
+
+        ZetaCore.getDataHandlers(this).forEach((handler) -> {
+
+            handler.write();
+
+        });
+
 
     }
 

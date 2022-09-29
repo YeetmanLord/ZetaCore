@@ -68,9 +68,6 @@ public class SQLClient {
 		if (isConnected()) {
 
 			try {
-
-				writeData();
-
 				client.close();
 				this.client = null;
 			}

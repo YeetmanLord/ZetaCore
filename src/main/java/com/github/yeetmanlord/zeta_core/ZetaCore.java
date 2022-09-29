@@ -163,7 +163,7 @@ public class ZetaCore extends ZetaPlugin {
         getCommand("test_raytrace").setExecutor((commandSender, command, s, args) -> {
             if (commandSender instanceof Player) {
                 Player player = (Player) commandSender;
-                RayTraceUtility.rayTraceBlocks(player, 10D);
+                RayTraceUtility.rayTraceEntities(player, 10D);
             }
             return true;
         });
@@ -390,16 +390,16 @@ public class ZetaCore extends ZetaPlugin {
 
             List<ISQLTableHandler<?>> dbHandlers = databaseDataHandlers.get(plugin);
             dbHandlers.add((ISQLTableHandler<?>) storer);
-        } else {
-
-            if (!dataHandlers.containsKey(plugin)) {
-                dataHandlers.put(plugin, new ArrayList<>());
-            }
-
-            List<DataStorer> handlers = dataHandlers.get(plugin);
-
-            handlers.add(storer);
         }
+
+        if (!dataHandlers.containsKey(plugin)) {
+            dataHandlers.put(plugin, new ArrayList<>());
+        }
+
+        List<DataStorer> handlers = dataHandlers.get(plugin);
+
+        handlers.add(storer);
+
 
     }
 

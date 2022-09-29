@@ -184,4 +184,16 @@ public class SQLTable implements ISQLTable {
 
     }
 
+    public <PrimaryKeyType> void removeRow(String primaryKeyValue) {
+    	this.handler.removeRow(this.tableName, this.primaryKey, primaryKeyValue);
+    }
+
+    public <PrimaryKeyType> void removeRow(String column, String value) {
+    	this.handler.removeRow(this.tableName, column, value);
+    }
+
+    public void drop() {
+    	this.handler.dropTable(this.tableName);
+    }
+
 }

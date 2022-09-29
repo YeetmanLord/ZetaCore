@@ -23,4 +23,11 @@ public class BlockRayTraceResult extends RayTraceResult {
         return face;
     }
 
+    @Override
+    public String toString() {
+        return "BlockRayTraceResult{" +
+                "block: " + block +
+                ", face: " + face +
+                '}';
+    }
 }

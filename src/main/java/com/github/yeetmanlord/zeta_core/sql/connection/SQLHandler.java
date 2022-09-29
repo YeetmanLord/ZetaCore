@@ -79,6 +79,22 @@ public class SQLHandler {
 
     }
 
+    public void dropTable(String tableName) {
+
+        if (this.client.isConnected()) {
+            executeStatement("DROP TABLE " + tableName + ";");
+        }
+
+    }
+
+    public <PrimaryKeyValue> void removeRow(String tableName, String checkColumn, String value) {
+
+        if (this.client.isConnected()) {
+            executeStatement("DELETE FROM " + tableName + " WHERE " + checkColumn + " = " + value + ";");
+        }
+
+    }
+
     public void insertIntoIgnore(String tableName, String tableParams, @Nonnull Object... values) {
 
         if (this.client.isConnected()) {
