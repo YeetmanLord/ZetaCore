@@ -48,9 +48,10 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
 	private InputType type;
 
-	public AbstractGUIMenu(PlayerUtil helper, String title, int slots) {
+	public AbstractGUIMenu(PlayerUtil helper, String title, int slots, boolean shouldFill) {
 
 		this.setInputType(InputType.NONE);
+		this.shouldFill = shouldFill;
 		this.title = title;
 		menuUtil = helper;
 		this.owner = helper.getOwner();
@@ -60,6 +61,10 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6"));
 		FILLER.setItemMeta(meta);
 
+	}
+
+	public AbstractGUIMenu(PlayerUtil helper, String title, int slots) {
+		this(helper, title, slots, false);
 	}
 
 	public ItemStack[] getItems() {
