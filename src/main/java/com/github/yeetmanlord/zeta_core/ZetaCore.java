@@ -163,7 +163,8 @@ public class ZetaCore extends ZetaPlugin {
         getCommand("test_raytrace").setExecutor((commandSender, command, s, args) -> {
             if (commandSender instanceof Player) {
                 Player player = (Player) commandSender;
-                RayTraceUtility.rayTraceEntities(player, 10D);
+                RayTraceResult result = RayTraceUtility.raytrace(player, 10D);
+                player.sendMessage(result.toString());
             }
             return true;
         });
@@ -265,14 +266,16 @@ public class ZetaCore extends ZetaPlugin {
                 if (x == 0) {
                     builder.append(String.valueOf(c).toUpperCase());
                 } else {
-                    builder.append(c);
+                    builder.append(String.valueOf(c).toLowerCase());
                 }
 
             }
 
+            builder.append(" ");
+
         }
 
-        return builder.toString();
+        return builder.toString().trim();
 
     }
 

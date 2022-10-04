@@ -24,4 +24,11 @@ public class RayTraceResult {
         return type == ResultType.EMPTY;
     }
 
+    @Override
+    public String toString() {
+        return "RayTraceResult{" +
+                "type: " + type +
+                ", object: " + object +
+                '}';
+    }
 }

@@ -34,7 +34,7 @@ public class RayTraceUtility {
         double distanceTraveled = 0;
         while (distanceTraveled < maxDistance) {
             last = check.clone();
-            check = getRayTraceLocation(check, direction, 0.05D);
+            check = getRayTraceLocation(check, direction, 0.25D);
             if (check.getBlock().getType() != Material.AIR) {
                 break;
             }
@@ -52,7 +52,6 @@ public class RayTraceUtility {
     }
 
     public static EntityRayTraceResult rayTraceEntities(LivingEntity entity, double maxDistance) {
-        ZetaCore.LOGGER.info(new NMSEntityReflection(entity).getBoundingBox());
         Location starting = entity.getEyeLocation();
         Vector direction = starting.getDirection();
         Location check = starting.clone();
@@ -60,7 +59,7 @@ public class RayTraceUtility {
         Entity hitResult = null;
         double distanceTraveled = 0;
         while (distanceTraveled < maxDistance) {
-            check = getRayTraceLocation(check, direction, 0.05D);
+            check = getRayTraceLocation(check, direction, 0.01D);
             if (check.getBlock().getType() != Material.AIR) {
                 break;
             }
@@ -86,13 +85,23 @@ public class RayTraceUtility {
             distanceTraveled = DistanceUtils.getDistance(starting, check);
         }
 
-        entity.sendMessage(ChatColor.RED + "Hit: " + hitResult);
-
         if (hitResult == null) {
             return new EntityRayTraceResult(ResultType.EMPTY, null);
         }
-        return new EntityRayTraceResult(ResultType.BLOCK, hitResult);
+        return new EntityRayTraceResult(ResultType.ENTITY, hitResult);
 
+    }
+
+    public static RayTraceResult raytrace(LivingEntity entity, double maxDistance) {
+        EntityRayTraceResult entityResult = rayTraceEntities(entity, maxDistance);
+        BlockRayTraceResult blockResult = rayTraceBlocks(entity, maxDistance);
+        if (entityResult.getType() != ResultType.EMPTY) {
+            return entityResult;
+        }
+        if (blockResult.getType() != ResultType.EMPTY) {
+            return blockResult;
+        }
+        return new RayTraceResult(ResultType.EMPTY, null);
     }
 
     public static Location getRayTraceLocation(Location starting, Vector direction, double distance) {

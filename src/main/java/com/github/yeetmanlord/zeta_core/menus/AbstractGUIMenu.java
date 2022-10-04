@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.github.yeetmanlord.reflection_api.VersionMaterial;
+import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
