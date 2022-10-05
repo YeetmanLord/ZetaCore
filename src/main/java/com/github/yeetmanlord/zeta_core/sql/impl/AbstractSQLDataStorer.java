@@ -31,7 +31,7 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 	public AbstractSQLDataStorer(ZetaPlugin instanceIn, String name, String tableName) {
 
 		super(instanceIn, name);
-		this.tableName = tableName;
+		this.tableName = instanceIn.getPluginName().toLowerCase() + "." + tableName;
 
 	}
 

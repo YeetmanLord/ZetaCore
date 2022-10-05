@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.github.yeetmanlord.zeta_core.ZetaPlugin;
 import com.github.yeetmanlord.zeta_core.sql.ISQL;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
@@ -28,9 +29,9 @@ public abstract class AbstractSQLTableHandler<PrimaryKeyType> implements ISQLTab
 
 	protected String tableName;
 
-	public AbstractSQLTableHandler(String tableName) {
+	public AbstractSQLTableHandler(ZetaPlugin pl, String tableName) {
 
-		this.tableName = tableName;
+		this.tableName = pl.getPluginName().toLowerCase() + "." + tableName;
 
 	}
 

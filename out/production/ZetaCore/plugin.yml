@@ -3,7 +3,6 @@ version: 0.0.1
 author: YeetManLord
 main: com.github.yeetmanlord.zeta_core.ZetaCore
 description: All Zeta series plugins rely on this for functioning and code consistentcy
-depend: [ReflectionAPI]
 
 permissions:
     zetacore.admin:
@@ -52,9 +51,3 @@ commands:
     usage: /<command>
     permission: zetacore.admin
     aliases: [local_settings_gui]
-
-  test_raytrace:
-    description: Tests the raytrace
-    usage: /<command>
-    permission: zetacore.admin
-    aliases: [raytrace]

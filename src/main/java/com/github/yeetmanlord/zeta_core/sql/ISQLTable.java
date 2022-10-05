@@ -31,7 +31,7 @@ public interface ISQLTable {
      */
     String getPrimary();
 
-    public default void initializeTable(SQLHandler handler) {
+    default void initializeTable(SQLHandler handler) {
 
         if (handler != null) {
             String params = "";

@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.zeta_core.api.uitl.raytrace.RayTraceResult;
 import com.github.yeetmanlord.zeta_core.api.uitl.raytrace.RayTraceUtility;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
@@ -67,6 +68,7 @@ public class ZetaCore extends ZetaPlugin {
     @Override
     public void onEnable() {
 
+        ReflectionApi.init(this);
         INSTANCE = this;
         LOGGER = new Logger(this, ChatColor.GREEN);
         LOGGER.info("ZetaCore framework is preinitializing");
@@ -159,16 +161,6 @@ public class ZetaCore extends ZetaPlugin {
             }
             return true;
         });
-
-        getCommand("test_raytrace").setExecutor((commandSender, command, s, args) -> {
-            if (commandSender instanceof Player) {
-                Player player = (Player) commandSender;
-                RayTraceResult result = RayTraceUtility.raytrace(player, 10D);
-                player.sendMessage(result.toString());
-            }
-            return true;
-        });
-
     }
 
     @Override
