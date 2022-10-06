@@ -18,11 +18,24 @@ public abstract class AbstractPaginatedMenu<T> extends AbstractGUIMenu {
 
     private int itemsPerPage;
 
-    public AbstractPaginatedMenu(PlayerUtil helper, String title, int slots, int itemsPerPage) {
-        super(helper, title, slots <= 9 ? 18 : slots);
+    public AbstractPaginatedMenu(PlayerUtil helper, String title, int slots, int itemsPerPage, boolean shouldFill, AbstractGUIMenu parent) {
+        super(helper, title, slots <= 9 ? 18 : slots, shouldFill, parent);
         this.itemsPerPage = itemsPerPage;
         slotToIndex = new HashMap<>();
     }
+
+    public AbstractPaginatedMenu(PlayerUtil helper, String title, int slots, int itemsPerPage, boolean shouldFill) {
+        this(helper, title, slots, itemsPerPage, shouldFill, null);
+    }
+
+    public AbstractPaginatedMenu(PlayerUtil helper, String title, int slots, int itemsPerPage) {
+        this(helper, title, slots, itemsPerPage, false, null);
+    }
+
+    public AbstractPaginatedMenu(PlayerUtil helper, String title, int slots, int itemsPerPage, AbstractGUIMenu parent) {
+        this(helper, title, slots, itemsPerPage, false, parent);
+    }
+
 
     @Override
     public void setItems() {
@@ -37,16 +50,19 @@ public abstract class AbstractPaginatedMenu<T> extends AbstractGUIMenu {
         if (e.getCurrentItem() == null) return;
         if (e.getCurrentItem().getType() == Material.ARROW) {
             if (e.getSlot() == this.getSlots() - 1) {
-                if (page < getMaxPages()) {
+                if (page + 1 < getMaxPages()) {
                     page++;
                     renderPage();
                 }
             } else if (e.getSlot() == this.getSlots() - 9) {
-                if (page > 0) {
+                if (page - 1 > 0) {
                     page--;
                     renderPage();
                 }
             }
+        }
+        if (e.getSlot() == this.getSlots() - 5) {
+            this.close();
         }
     }
 
@@ -57,14 +73,14 @@ public abstract class AbstractPaginatedMenu<T> extends AbstractGUIMenu {
     public abstract void renderPage();
 
     public void nextPage() {
-        if (page < getMaxPages()) {
+        if (page + 1 < getMaxPages()) {
             page++;
             setItems();
         }
     }
 
     public void previousPage() {
-        if (page > 0) {
+        if (page - 1 > 0) {
             page--;
             setItems();
         }

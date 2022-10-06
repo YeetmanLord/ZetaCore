@@ -35,7 +35,7 @@ public class SQLHandler {
     public void createTable(String name, String parameters) {
 
         if (this.client.isConnected()) {
-            executeStatement("CREATE TABLE IF NOT EXISTS " + name + " (" + parameters + ");");
+            executeStatement("CREATE TABLE IF NOT EXISTS `" + name + "` (" + parameters + ");");
         }
 
     }
@@ -73,7 +73,7 @@ public class SQLHandler {
             }
 
             value = value.trim();
-            executeStatement("REPLACE INTO " + tableName + " (" + tableParams + ") VALUES (" + value + ");");
+            executeStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");");
 
         }
 
@@ -82,7 +82,7 @@ public class SQLHandler {
     public void dropTable(String tableName) {
 
         if (this.client.isConnected()) {
-            executeStatement("DROP TABLE " + tableName + ";");
+            executeStatement("DROP TABLE `" + tableName + "`;");
         }
 
     }
@@ -90,7 +90,7 @@ public class SQLHandler {
     public <PrimaryKeyValue> void removeRow(String tableName, String checkColumn, String value) {
 
         if (this.client.isConnected()) {
-            executeStatement("DELETE FROM " + tableName + " WHERE " + checkColumn + " = " + value + ";");
+            executeStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + " = " + value + ";");
         }
 
     }
@@ -129,12 +129,13 @@ public class SQLHandler {
 
             value = value.trim();
 
-            executeStatement("INSERT IGNORE INTO " + tableName + " (" + tableParams + ") VALUES (" + value + ");");
+            executeStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");");
         }
 
     }
 
     public void executeStatement(String sqlCode) {
+
         if (this.client.isConnected()) {
 
             try {
@@ -165,7 +166,7 @@ public class SQLHandler {
         if (this.client.isConnected()) {
 
             try {
-                PreparedStatement ps = this.client.getClient().prepareStatement("SELECT " + queryColumn + " FROM " + table + " WHERE " + mainColumnName + "=?");
+                PreparedStatement ps = this.client.getClient().prepareStatement("SELECT " + queryColumn + " FROM `" + table + "` WHERE " + mainColumnName + "=?");
                 ps.setObject(1, mainColumnValue);
                 ResultSet queryResult = ps.executeQuery();
 
@@ -190,7 +191,7 @@ public class SQLHandler {
         if (this.client.isConnected()) {
 
             try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT count(*) FROM " + table);
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT count(*) FROM `" + table + "`");
                 ResultSet queryResult = statement.executeQuery();
 
                 if (queryResult.next()) {
@@ -214,7 +215,7 @@ public class SQLHandler {
         if (this.client.isConnected()) {
 
             try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + columnName + " FROM " + table);
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + columnName + " FROM `" + table + "`");
                 ResultSet queryResult = statement.executeQuery();
                 if (queryResult.next()) {
                     Object obj = queryResult.getObject(columnName);
@@ -257,7 +258,7 @@ public class SQLHandler {
         if (this.client.isConnected()) {
 
             try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + primaryKey + " FROM " + table.getName() + " WHERE " + column + "=\"" + whereEquals.toString() + "\"");
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + primaryKey + " FROM `" + table.getName() + "` WHERE " + column + "=\"" + whereEquals.toString() + "\"");
                 ResultSet queryResult = statement.executeQuery();
 
                 if (queryResult.next()) {

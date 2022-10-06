@@ -30,285 +30,307 @@ import com.github.yeetmanlord.zeta_core.api.uitl.PlayerUtil;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+//TODO: Add ability to animate menu items and title
 public abstract class AbstractGUIMenu implements InventoryHolder {
 
-	protected Inventory inv;
+    protected Inventory inv;
 
-	protected ItemStack FILLER;
+    protected ItemStack FILLER;
 
-	protected int slots;
+    protected int slots;
 
-	protected Player owner;
+    protected Player owner;
 
-	protected PlayerUtil menuUtil;
+    protected PlayerUtil menuUtil;
 
-	protected String title;
+    protected String title;
 
-	protected boolean shouldFill;
+    protected boolean shouldFill;
 
-	private InputType type;
+    private InputType type;
 
-	public AbstractGUIMenu(PlayerUtil helper, String title, int slots, boolean shouldFill) {
+    private AbstractGUIMenu parent;
 
-		this.setInputType(InputType.NONE);
-		this.shouldFill = shouldFill;
-		this.title = title;
-		menuUtil = helper;
-		this.owner = helper.getOwner();
-		this.slots = slots;
-		FILLER = VersionMaterial.GRAY_STAINED_GLASS_PANE.getItem();
-		ItemMeta meta = FILLER.getItemMeta();
-		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6"));
-		FILLER.setItemMeta(meta);
+    public AbstractGUIMenu(PlayerUtil helper, String title, int slots, boolean shouldFill, AbstractGUIMenu parent) {
 
-	}
+        this.setInputType(InputType.NONE);
+        this.shouldFill = shouldFill;
+        this.title = title;
+        menuUtil = helper;
+        this.owner = helper.getOwner();
+        this.slots = slots;
+        FILLER = VersionMaterial.GRAY_STAINED_GLASS_PANE.getItem();
+        ItemMeta meta = FILLER.getItemMeta();
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6"));
+        FILLER.setItemMeta(meta);
+        this.parent = parent;
 
-	public AbstractGUIMenu(PlayerUtil helper, String title, int slots) {
-		this(helper, title, slots, false);
-	}
+    }
 
-	public ItemStack[] getItems() {
+    public AbstractGUIMenu(PlayerUtil helper, String title, int slots, boolean shouldFill) {
+        this(helper, title, slots, shouldFill, null);
+    }
 
-		return this.inv.getContents();
+    public AbstractGUIMenu(PlayerUtil helper, String title, int slots, AbstractGUIMenu parent) {
+        this(helper, title, slots, false, parent);
+    }
 
-	}
 
-	public abstract void setItems();
+    public AbstractGUIMenu(PlayerUtil helper, String title, int slots) {
+        this(helper, title, slots, false, null);
+    }
 
-	public void open() {
+    public ItemStack[] getItems() {
 
-		owner.closeInventory();
-		this.inv = Bukkit.createInventory(this, slots, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
-		this.setItems();
+        return this.inv.getContents();
 
-		if (this.shouldFill) {
-			this.makeFiller();
-		}
+    }
 
-		MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
+    public abstract void setItems();
 
-		this.owner.openInventory(inv);
-		this.menuUtil.setGUIMenu(true);
-		this.menuUtil.setMenuToInputTo(this);
+    public void open() {
 
-	}
+        owner.closeInventory();
+        this.inv = Bukkit.createInventory(this, slots, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
+        this.setItems();
 
-	public abstract void handleClick(InventoryClickEvent e);
+        if (this.shouldFill) {
+            this.makeFiller();
+        }
 
-	public String getMenuName() {
+        MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
 
-		return this.title;
+        this.owner.openInventory(inv);
+        this.menuUtil.setGUIMenu(true);
+        this.menuUtil.setMenuToInputTo(this);
 
-	}
+    }
 
-	public ItemStack makeItem(Material material, String name, @Nullable String... loreArray) {
+    public abstract void handleClick(InventoryClickEvent e);
 
-		ItemStack stack = new ItemStack(material);
-		ItemMeta meta = stack.getItemMeta();
-		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+    public String getMenuName() {
 
-		if (loreArray != null) {
-			ArrayList<String> lore = new ArrayList<>();
+        return this.title;
 
-			for (String s : loreArray) {
-				lore.add(ChatColor.translateAlternateColorCodes('&', s));
-			}
+    }
 
-			meta.setLore(lore);
+    public ItemStack makeItem(Material material, String name, @Nullable String... loreArray) {
 
-		}
+        ItemStack stack = new ItemStack(material);
+        ItemMeta meta = stack.getItemMeta();
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
 
-		stack.setItemMeta(meta);
-		return stack;
+        if (loreArray != null) {
+            ArrayList<String> lore = new ArrayList<>();
 
-	}
+            for (String s : loreArray) {
+                lore.add(ChatColor.translateAlternateColorCodes('&', s));
+            }
 
-	public ItemStack makeSkullWithCustomTexture(String name, @Nullable String[] loreArray, String textureURL) {
+            meta.setLore(lore);
 
-		ItemStack stack = VersionMaterial.PLAYER_HEAD.getItem();
-		SkullMeta meta = (SkullMeta) stack.getItemMeta();
-		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        }
 
-		GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-		profile.getProperties().put("textures", new Property("textures", textureURL));
+        stack.setItemMeta(meta);
+        return stack;
 
-		try {
-			Field headProfile = meta.getClass().getDeclaredField("profile");
-			headProfile.setAccessible(true);
-			headProfile.set(meta, profile);
-		}
-		catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
+    }
 
-		if (loreArray != null) {
-			ArrayList<String> lore = new ArrayList<>();
+    public ItemStack makeSkullWithCustomTexture(String name, @Nullable String[] loreArray, String textureURL) {
 
-			for (String s : loreArray) {
-				lore.add(ChatColor.translateAlternateColorCodes('&', s));
-			}
+        ItemStack stack = VersionMaterial.PLAYER_HEAD.getItem();
+        SkullMeta meta = (SkullMeta) stack.getItemMeta();
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
 
-			meta.setLore(lore);
-		}
+        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+        profile.getProperties().put("textures", new Property("textures", textureURL));
 
-		stack.setItemMeta(meta);
+        try {
+            Field headProfile = meta.getClass().getDeclaredField("profile");
+            headProfile.setAccessible(true);
+            headProfile.set(meta, profile);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
-		return stack;
+        if (loreArray != null) {
+            ArrayList<String> lore = new ArrayList<>();
 
-	}
+            for (String s : loreArray) {
+                lore.add(ChatColor.translateAlternateColorCodes('&', s));
+            }
 
-	public ItemStack makeItem(Material material, String name) {
+            meta.setLore(lore);
+        }
 
-		return this.makeItem(material, name, new String[] {});
+        stack.setItemMeta(meta);
 
-	}
+        return stack;
 
-	public ItemStack makeItemFromExisting(ItemStack base, String name, @Nullable String... loreArray) {
+    }
 
-		ItemStack stack = base.clone();
-		ItemMeta meta = stack.getItemMeta();
-		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+    public ItemStack makeItem(Material material, String name) {
 
-		if (loreArray != null) {
-			ArrayList<String> lore = new ArrayList<>();
+        return this.makeItem(material, name, new String[]{});
 
-			for (String s : loreArray) {
-				lore.add(ChatColor.translateAlternateColorCodes('&', s));
-			}
+    }
 
-			meta.setLore(lore);
-		}
+    public ItemStack makeItemFromExisting(ItemStack base, String name, @Nullable String... loreArray) {
 
-		stack.setItemMeta(meta);
+        ItemStack stack = base.clone();
+        ItemMeta meta = stack.getItemMeta();
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
 
-		return stack;
+        if (loreArray != null) {
+            ArrayList<String> lore = new ArrayList<>();
 
-	}
+            for (String s : loreArray) {
+                lore.add(ChatColor.translateAlternateColorCodes('&', s));
+            }
 
-	public void makeFiller() {
+            meta.setLore(lore);
+        }
 
-		for (int i = 0; i < this.getSlots(); i++) {
-			ItemStack stack = this.inv.getItem(i);
+        stack.setItemMeta(meta);
 
-			if (stack == null) {
-				this.inv.setItem(i, this.FILLER);
-			}
+        return stack;
 
-		}
+    }
 
-	}
+    public void makeFiller() {
 
-	public void makeBoarder() {
+        for (int i = 0; i < this.getSlots(); i++) {
+            ItemStack stack = this.inv.getItem(i);
 
-		for (int x = 0; x < this.inv.getSize() / 9; x++) {
+            if (stack == null) {
+                this.inv.setItem(i, this.FILLER);
+            }
 
-			if (this.inv.getItem(x * 9) == null) {
-				this.inv.setItem(x * 9, FILLER);
-			}
+        }
 
-			if (this.inv.getItem(x * 9 + 8) == null) {
-				this.inv.setItem(x * 9 + 8, FILLER);
-			}
+    }
 
-		}
+    public void makeBoarder() {
 
-		for (int x = 0; x < 9; x++) {
+        for (int x = 0; x < this.inv.getSize() / 9; x++) {
 
-			if (this.inv.getItem(x) == null) {
-				this.inv.setItem(x, FILLER);
-			}
+            if (this.inv.getItem(x * 9) == null) {
+                this.inv.setItem(x * 9, FILLER);
+            }
 
-		}
+            if (this.inv.getItem(x * 9 + 8) == null) {
+                this.inv.setItem(x * 9 + 8, FILLER);
+            }
 
-	}
+        }
 
-	public int getSlots() {
+        for (int x = 0; x < 9; x++) {
 
-		return slots;
+            if (this.inv.getItem(x) == null) {
+                this.inv.setItem(x, FILLER);
+            }
 
-	}
+        }
 
-	public boolean shouldFill() {
+    }
 
-		return this.shouldFill;
+    public int getSlots() {
 
-	}
+        return slots;
 
-	public PlayerUtil getPlayerUtil() {
+    }
 
-		return this.menuUtil;
+    public boolean shouldFill() {
 
-	}
+        return this.shouldFill;
 
-	@Override
-	public Inventory getInventory() {
+    }
 
-		return this.inv;
+    public PlayerUtil getPlayerUtil() {
 
-	}
+        return this.menuUtil;
 
-	public InputType getInputType() {
+    }
 
-		return type;
+    @Override
+    public Inventory getInventory() {
 
-	}
+        return this.inv;
 
-	public void setInputType(InputType type) {
+    }
 
-		this.type = type;
+    public InputType getInputType() {
 
-	}
+        return type;
 
-	public void sendTitlePackets(String title, String subtitle, @Nullable String actionBar) {
+    }
 
-		NMSPlayerReflection player = new NMSPlayerReflection(owner);
-		NMSPlayerConnectionReflection connection = player.getPlayerConnection();
-		NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection("TITLE", NMSChatSerializerReflection.createChatComponentFromRawText(title));
-		NMSTitlePacketReflection subtitlePacket = new NMSTitlePacketReflection("SUBTITLE", NMSChatSerializerReflection.createChatComponentFromRawText(subtitle));
-		NMSChatPacketReflection actionBarPacket = null;
+    public void setInputType(InputType type) {
 
-		if (actionBar != null) {
-			actionBarPacket = new NMSChatPacketReflection(NMSChatSerializerReflection.createChatComponentFromRawText(actionBar), (byte) 2);
-		}
+        this.type = type;
 
-		NMSTitlePacketReflection timesPacket = new NMSTitlePacketReflection(5, 400, 40);
+    }
 
-		if (actionBarPacket != null) {
-			connection.sendPacket(actionBarPacket);
-		}
+    public void sendTitlePackets(String title, String subtitle, @Nullable String actionBar) {
 
-		connection.sendPacket(timesPacket);
-		connection.sendPacket(titlePacket);
-		connection.sendPacket(subtitlePacket);
+        NMSPlayerReflection player = new NMSPlayerReflection(owner);
+        NMSPlayerConnectionReflection connection = player.getPlayerConnection();
+        NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection("TITLE", NMSChatSerializerReflection.createChatComponentFromRawText(title));
+        NMSTitlePacketReflection subtitlePacket = new NMSTitlePacketReflection("SUBTITLE", NMSChatSerializerReflection.createChatComponentFromRawText(subtitle));
+        NMSChatPacketReflection actionBarPacket = null;
 
-	}
+        if (actionBar != null) {
+            actionBarPacket = new NMSChatPacketReflection(NMSChatSerializerReflection.createChatComponentFromRawText(actionBar), (byte) 2);
+        }
 
-	public void sendTitlePackets(String title) {
+        NMSTitlePacketReflection timesPacket = new NMSTitlePacketReflection(5, 400, 40);
 
-		sendTitlePackets(title, "&cLeft click to cancel", null);
+        if (actionBarPacket != null) {
+            connection.sendPacket(actionBarPacket);
+        }
 
-	}
+        connection.sendPacket(timesPacket);
+        connection.sendPacket(titlePacket);
+        connection.sendPacket(subtitlePacket);
 
-	public void refresh() {
+    }
 
-		this.inv.clear();
-		this.setItems();
+    public void sendTitlePackets(String title) {
 
-		MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
+        sendTitlePackets(title, "&cLeft click to cancel", null);
 
-	}
+    }
 
-	@Override
-	public String toString() {
+    public void refresh() {
 
-		return this.getClass().getName() + ": {\"Menu Title\": " + this.getMenuName() + "\"Slot Number\": " + this.getSlots() + this.getPlayerUtil().toString() + "}";
+        this.inv.clear();
+        this.setItems();
 
-	}
+        MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
 
-	protected void createCloser() {
+    }
 
-		this.inv.setItem(slots - 5, this.makeItem(Material.BARRIER, "&cClose"));
+    @Override
+    public String toString() {
 
-	}
+        return this.getClass().getName() + ": {\"Menu Title\": " + this.getMenuName() + "\"Slot Number\": " + this.getSlots() + this.getPlayerUtil().toString() + "}";
+
+    }
+
+    protected void createCloser() {
+        if (parent == null) {
+            this.inv.setItem(slots - 5, this.makeItem(Material.BARRIER, "&cClose"));
+        } else {
+            this.inv.setItem(slots - 5, this.makeItem(Material.BARRIER, "&cBack"));
+        }
+    }
+
+    protected void close() {
+        if (parent == null) {
+            this.owner.closeInventory();
+        } else {
+            this.owner.openInventory(parent.getInventory());
+        }
+    }
 
 }

@@ -32,7 +32,7 @@ public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataS
 	public AbstractUntypedSQLDataStorer(ZetaPlugin instanceIn, String name, String tableName) {
 
 		super(instanceIn, name);
-		this.tableName = instanceIn.getPluginName().toLowerCase() + "." + tableName;
+		this.tableName = instanceIn.getPluginName().toLowerCase() + "/" + tableName;
 
 	}
 

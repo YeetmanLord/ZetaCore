@@ -31,7 +31,7 @@ public abstract class AbstractSQLTableHandler<PrimaryKeyType> implements ISQLTab
 
 	public AbstractSQLTableHandler(ZetaPlugin pl, String tableName) {
 
-		this.tableName = pl.getPluginName().toLowerCase() + "." + tableName;
+		this.tableName = pl.getPluginName().toLowerCase() + "/" + tableName;
 
 	}
 
