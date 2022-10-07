@@ -13,82 +13,83 @@ import com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu.MenuSetItemsEve
 
 public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventoryInputable {
 
-	public AbstractGUIMenu parent;
+    public AbstractGUIMenu parent;
 
-	public PlayerInputMenu(AbstractGUIMenu parent) {
+    public PlayerInputMenu(AbstractGUIMenu parent) {
 
-		super(parent.menuUtil, "&7Select an item", 9, parent);
-		this.parent = parent;
+        super(parent.menuUtil, "&7Select an item", 9, parent);
+        this.parent = parent;
 
-	}
+    }
 
-	@Override
-	public boolean isInputing() {
+    @Override
+    public boolean isInputing() {
 
-		return true;
+        return true;
 
-	}
+    }
 
-	@Override
-	public void playerInventoryInput(InventoryClickEvent e) {
+    @Override
+    public void playerInventoryInput(InventoryClickEvent e) {
 
-		if (this.parent instanceof IPlayerInputMenuInputable) {
-			((IPlayerInputMenuInputable) parent).setInputValuesFromInputMenu(e);
-			this.inv.setItem(4, new ItemStack(e.getCurrentItem().getType()));
-		}
+        if (this.parent instanceof IPlayerInputMenuInputable) {
+            ((IPlayerInputMenuInputable) parent).setInputValuesFromInputMenu(e);
+            this.inv.setItem(4, new ItemStack(e.getCurrentItem().getType()));
+        }
 
-	}
+    }
 
-	@Override
-	public void setItems() {
+    @Override
+    public void setItems() {
 
-		makeBoarder();
-		this.inv.setItem(4, this.makeItemFromExisting(VersionMaterial.RED_WOOL.getItem(), "&cSelect An Item!"));
-		this.inv.setItem(7, makeItem(Material.BARRIER, "&cBack"));
+        makeBoarder();
+        this.inv.setItem(4, this.makeItemFromExisting(VersionMaterial.RED_WOOL.getItem(), "&cSelect An Item!"));
+        this.inv.setItem(7, makeItem(Material.BARRIER, "&cBack"));
 
-	}
+    }
 
-	@Override
-	public void handleClick(InventoryClickEvent e) {
+    @Override
+    public void handleClick(InventoryClickEvent e) {
 
-		if (e.getCurrentItem().getType() == Material.BARRIER) {
-			close();
-		}
+        if (e.getCurrentItem().getType() == Material.BARRIER) {
+            close();
+        }
 
-	}
+    }
 
-	@Override
-	public void open() {
+    @Override
+    public void open() {
 
-		owner.closeInventory();
-		this.inv = Bukkit.createInventory(this, InventoryType.DISPENSER, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
-		this.setItems();
+        menuUtil.setMenuToInputTo(null);
+        owner.closeInventory();
+        this.inv = Bukkit.createInventory(this, InventoryType.DISPENSER, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
+        this.setItems();
 
-		if (this.shouldFill) {
-			this.makeFiller();
-		}
+        if (this.shouldFill) {
+            this.makeFiller();
+        }
 
-		MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
-		this.owner.openInventory(inv);
-		this.menuUtil.setGUIMenu(true);
-		this.menuUtil.setMenuToInputTo(this);
+        MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
+        this.owner.openInventory(inv);
+        this.menuUtil.setGUIMenu(true);
+        this.menuUtil.setMenuToInputTo(this);
 
-	}
+    }
 
-	@Override
-	public void makeBoarder() {
+    @Override
+    public void makeBoarder() {
 
-		for (int addon = 0; addon < 7; addon += 6) {
+        for (int addon = 0; addon < 7; addon += 6) {
 
-			for (int x = 0; x < 3; x++) {
-				this.inv.setItem(x + addon, FILLER);
-			}
+            for (int x = 0; x < 3; x++) {
+                this.inv.setItem(x + addon, FILLER);
+            }
 
-		}
+        }
 
-		this.inv.setItem(3, FILLER);
-		this.inv.setItem(5, FILLER);
+        this.inv.setItem(3, FILLER);
+        this.inv.setItem(5, FILLER);
 
-	}
+    }
 
 }

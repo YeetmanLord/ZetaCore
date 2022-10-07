@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
+import com.github.yeetmanlord.zeta_core.ZetaCore;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -90,19 +91,24 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
     public void open() {
 
+        menuUtil.setMenuToInputTo(null);
+        menuUtil.setGUIMenu(false);
         owner.closeInventory();
-        this.inv = Bukkit.createInventory(this, slots, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
-        this.setItems();
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.INSTANCE, () -> {
+            this.inv = Bukkit.createInventory(this, slots, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
+            this.setItems();
 
-        if (this.shouldFill) {
-            this.makeFiller();
-        }
+            if (this.shouldFill) {
+                this.makeFiller();
+            }
 
-        MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
+            MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
 
-        this.owner.openInventory(inv);
-        this.menuUtil.setGUIMenu(true);
-        this.menuUtil.setMenuToInputTo(this);
+            this.owner.openInventory(inv);
+            this.menuUtil.setGUIMenu(true);
+            this.menuUtil.setMenuToInputTo(this);
+        }, 1);
+
 
     }
 
@@ -333,8 +339,8 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
         }
     }
 
-    public void onClose() {
-
+    public boolean onClose() {
+        return false;
     }
 
     public AbstractGUIMenu getParent() {

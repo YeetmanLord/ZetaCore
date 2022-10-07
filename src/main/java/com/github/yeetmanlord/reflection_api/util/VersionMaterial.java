@@ -196,6 +196,24 @@ public class VersionMaterial {
 
     public static final WhiteMonsterEggVersionMaterial WHITE_MONSTER_EGG = new WhiteMonsterEggVersionMaterial();
 
+    public static final VersionMaterial WHITE_BANNER = new VersionMaterial("banner", "white_banner", (byte) 0);
+    public static final VersionMaterial ORANGE_BANNER = new VersionMaterial("banner", "orange_banner", (byte) 1);
+    public static final VersionMaterial MAGENTA_BANNER = new VersionMaterial("banner", "magenta_banner", (byte) 2);
+    public static final VersionMaterial LIGHT_BLUE_BANNER = new VersionMaterial("banner", "light_blue_banner", (byte) 3);
+    public static final VersionMaterial YELLOW_BANNER = new VersionMaterial("banner", "yellow_banner", (byte) 4);
+    public static final VersionMaterial LIME_BANNER = new VersionMaterial("banner", "lime_banner", (byte) 5);
+    public static final VersionMaterial PINK_BANNER = new VersionMaterial("banner", "pink_banner", (byte) 6);
+    public static final VersionMaterial GRAY_BANNER = new VersionMaterial("banner", "gray_banner", (byte) 7);
+    public static final VersionMaterial LIGHT_GRAY_BANNER = new VersionMaterial("banner", "light_gray_banner", (byte) 8);
+    public static final VersionMaterial CYAN_BANNER = new VersionMaterial("banner", "cyan_banner", (byte) 9);
+    public static final VersionMaterial PURPLE_BANNER = new VersionMaterial("banner", "purple_banner", (byte) 10);
+    public static final VersionMaterial BLUE_BANNER = new VersionMaterial("banner", "blue_banner", (byte) 11);
+    public static final VersionMaterial BROWN_BANNER = new VersionMaterial("banner", "brown_banner", (byte) 12);
+    public static final VersionMaterial GREEN_BANNER = new VersionMaterial("banner", "green_banner", (byte) 13);
+    public static final VersionMaterial RED_BANNER = new VersionMaterial("banner", "red_banner", (byte) 14);
+    public static final VersionMaterial BLACK_BANNER = new VersionMaterial("banner", "black_banner", (byte) 15);
+
+
     public static VersionMaterial getWool(DyeColor color) {
         switch (color) {
             case WHITE:

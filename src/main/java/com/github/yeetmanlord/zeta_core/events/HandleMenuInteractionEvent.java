@@ -23,7 +23,6 @@ public class HandleMenuInteractionEvent implements Listener {
 		if (event.getWhoClicked() instanceof Player && event.getClickedInventory() != null) {
 			Player player = (Player) event.getWhoClicked();
 			InventoryHolder holder = event.getClickedInventory().getHolder();
-
 			if (holder instanceof AbstractGUIMenu) {
 				AbstractGUIMenu menu = (AbstractGUIMenu) holder;
 				HandleMenuClickEvent handleEvent = CommonEventFactory.onMenuClicked(menu, event);
@@ -63,15 +62,16 @@ public class HandleMenuInteractionEvent implements Listener {
 
 		Player player = (Player) event.getPlayer();
 		PlayerUtil util = ZetaCore.getPlayerMenuUtitlity(player);
-		AbstractGUIMenu temp = util.getMenuToInputTo();
+		if (util.getMenuToInputTo() != null) {
+			boolean result = util.getMenuToInputTo().onClose();
+			if (result) {
+				return;
+			}
+		}
 		util.setGUIMenu(false);
 
 		if (!util.isTakingChatInput()) {
 			util.setMenuToInputTo(null);
-		}
-
-		if (temp != null) {
-			temp.onClose();
 		}
 
 	}
