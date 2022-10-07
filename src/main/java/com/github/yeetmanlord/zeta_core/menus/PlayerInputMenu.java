@@ -17,7 +17,7 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
 
 	public PlayerInputMenu(AbstractGUIMenu parent) {
 
-		super(parent.menuUtil, "&7Select an item", 9);
+		super(parent.menuUtil, "&7Select an item", 9, parent);
 		this.parent = parent;
 
 	}
@@ -44,7 +44,7 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
 
 		makeBoarder();
 		this.inv.setItem(4, this.makeItemFromExisting(VersionMaterial.RED_WOOL.getItem(), "&cSelect An Item!"));
-		this.inv.setItem(7, makeItem(Material.BARRIER, "&cClose"));
+		this.inv.setItem(7, makeItem(Material.BARRIER, "&cBack"));
 
 	}
 
@@ -52,7 +52,7 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
 	public void handleClick(InventoryClickEvent e) {
 
 		if (e.getCurrentItem().getType() == Material.BARRIER) {
-			this.parent.open();
+			close();
 		}
 
 	}

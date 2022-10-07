@@ -333,4 +333,11 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
         }
     }
 
+    public void onClose() {
+
+    }
+
+    public AbstractGUIMenu getParent() {
+        return parent;
+    }
 }

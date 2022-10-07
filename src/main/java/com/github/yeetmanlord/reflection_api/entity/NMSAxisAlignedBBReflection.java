@@ -8,13 +8,13 @@ import javax.annotation.Nullable;
 
 public class NMSAxisAlignedBBReflection extends NMSObjectReflection {
 
-    double x1;
-    double y1;
-    double z1;
+    private double x1;
+    private double y1;
+    private double z1;
 
-    double x2;
-    double y2;
-    double z2;
+    private double x2;
+    private double y2;
+    private double z2;
 
 
     public NMSAxisAlignedBBReflection(double x1, double y1, double z1, double x2, double y2, double z2) {
@@ -25,6 +25,10 @@ public class NMSAxisAlignedBBReflection extends NMSObjectReflection {
         this.x2 = Math.max(x1, x2);
         this.y2 = Math.max(y1, y2);
         this.z2 = Math.max(z1, z2);
+    }
+
+    public NMSAxisAlignedBBReflection(Location loc1, Location loc2) {
+        this(loc1.getX(), loc1.getY(), loc1.getZ(), loc2.getX(), loc2.getY(), loc2.getZ());
     }
 
     public NMSAxisAlignedBBReflection(Object nmsObject) {
@@ -65,6 +69,14 @@ public class NMSAxisAlignedBBReflection extends NMSObjectReflection {
 
     public boolean isWithinBoundingBox(Location location) {
         return this.isWithinBoundingBox(location.getX(), location.getY(), location.getZ());
+    }
+
+    public Location getStarting() {
+        return new Location(null, this.x1, this.y1, this.z1);
+    }
+
+    public Location getEnding() {
+        return new Location(null, this.x2, this.y2, this.z2);
     }
 
 }

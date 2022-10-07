@@ -63,11 +63,15 @@ public class HandleMenuInteractionEvent implements Listener {
 
 		Player player = (Player) event.getPlayer();
 		PlayerUtil util = ZetaCore.getPlayerMenuUtitlity(player);
-
+		AbstractGUIMenu temp = util.getMenuToInputTo();
 		util.setGUIMenu(false);
 
 		if (!util.isTakingChatInput()) {
 			util.setMenuToInputTo(null);
+		}
+
+		if (temp != null) {
+			temp.onClose();
 		}
 
 	}
