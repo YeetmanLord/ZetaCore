@@ -94,8 +94,12 @@ public interface ISQLTable {
 
     <PrimaryKeyType> void removeRow(String primaryKeyValue);
 
-    <PrimaryKeyType> void removeRow(String column, String value);
+    <PrimaryKeyType> void removeRowWhere(String column, String value);
 
     void drop();
+
+    <PrimaryKeyType> void update(String column, SQLValue<?> value, SQLValue<PrimaryKeyType> primaryKeyValue);
+
+    void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue);
 
 }

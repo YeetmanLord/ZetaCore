@@ -107,7 +107,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
             this.owner.openInventory(inv);
             this.menuUtil.setGUIMenu(true);
             this.menuUtil.setMenuToInputTo(this);
-        }, 1);
+        });
 
 
     }
@@ -148,15 +148,17 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
         SkullMeta meta = (SkullMeta) stack.getItemMeta();
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
 
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-        profile.getProperties().put("textures", new Property("textures", textureURL));
+        if (textureURL != null) {
+            GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+            profile.getProperties().put("textures", new Property("textures", textureURL));
 
-        try {
-            Field headProfile = meta.getClass().getDeclaredField("profile");
-            headProfile.setAccessible(true);
-            headProfile.set(meta, profile);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            e.printStackTrace();
+            try {
+                Field headProfile = meta.getClass().getDeclaredField("profile");
+                headProfile.setAccessible(true);
+                headProfile.set(meta, profile);
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
 
         if (loreArray != null) {
@@ -279,25 +281,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
     public void sendTitlePackets(String title, String subtitle, @Nullable String actionBar) {
 
-        NMSPlayerReflection player = new NMSPlayerReflection(owner);
-        NMSPlayerConnectionReflection connection = player.getPlayerConnection();
-        NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection("TITLE", NMSChatSerializerReflection.createChatComponentFromRawText(title));
-        NMSTitlePacketReflection subtitlePacket = new NMSTitlePacketReflection("SUBTITLE", NMSChatSerializerReflection.createChatComponentFromRawText(subtitle));
-        NMSChatPacketReflection actionBarPacket = null;
-
-        if (actionBar != null) {
-            actionBarPacket = new NMSChatPacketReflection(NMSChatSerializerReflection.createChatComponentFromRawText(actionBar), (byte) 2);
-        }
-
-        NMSTitlePacketReflection timesPacket = new NMSTitlePacketReflection(5, 400, 40);
-
-        if (actionBarPacket != null) {
-            connection.sendPacket(actionBarPacket);
-        }
-
-        connection.sendPacket(timesPacket);
-        connection.sendPacket(titlePacket);
-        connection.sendPacket(subtitlePacket);
+        ZetaCore.sendTitlePackets(owner, title, subtitle, actionBar);
 
     }
 
@@ -339,6 +323,24 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
         }
     }
 
+    /**
+     * Called whenever the menu is closed by the player either by clicking the close button or by closing the inventory
+     * with escape.
+     *
+     * @return Returns true if the menu should skip closing logic and return to the parent menu. Returns false if the menu should proceed
+     * with closing logic. <br>
+     * @apiNote This method is called when a menu is closed by a plugin using player.closeInventory().
+     * This could lead to Stack Overflows if not handled properly.
+     * @Example public boolean onClose() { <ul>
+     * if (this.getParent() != null) { <ul>
+     * this.getParent().open(); <br>
+     * return true;
+     * </ul>
+     * } <br>
+     * return false;
+     * </ul>
+     * }
+     */
     public boolean onClose() {
         return false;
     }

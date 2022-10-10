@@ -279,4 +279,10 @@ public class SQLHandler {
 
     }
 
+    public void update(String table, String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue) {
+        if (this.client.isConnected()) {
+            executeStatement("UPDATE `" + table + "` SET " + column + "=\"" + value.getValue() + "\" WHERE " + whereColumn + "=\"" + whereValue.getValue() + "\"");
+        }
+    }
+
 }

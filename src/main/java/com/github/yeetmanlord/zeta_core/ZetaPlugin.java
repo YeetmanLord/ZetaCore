@@ -81,7 +81,7 @@ public abstract class ZetaPlugin extends JavaPlugin {
         DataBase db = ZetaCore.INSTANCE.dataBase;
         this.logger.info("Reading data for " + this.getPluginName());
 
-        if (db.initialized && ZetaCore.INSTANCE.dataBase.client.isConnected()) {
+        if (ZetaCore.INSTANCE.isConnectedToDatabase()) {
             db.client.readData(this);
         } else {
             ZetaCore.getDataHandlers(this).forEach(d -> {
@@ -95,6 +95,9 @@ public abstract class ZetaPlugin extends JavaPlugin {
         DataBase db = ZetaCore.INSTANCE.dataBase;
 
         if (db.initialized && ZetaCore.INSTANCE.dataBase.client.isConnected()) {
+            ZetaCore.getDataHandlers(this).forEach(d -> {
+                d.write();
+            });
             db.client.writeData(this);
         } else {
             ZetaCore.getDataHandlers(this).forEach(d -> {

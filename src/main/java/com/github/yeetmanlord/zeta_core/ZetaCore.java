@@ -8,8 +8,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
-import com.github.yeetmanlord.zeta_core.api.uitl.raytrace.RayTraceResult;
-import com.github.yeetmanlord.zeta_core.api.uitl.raytrace.RayTraceUtility;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
 import org.bukkit.ChatColor;
@@ -191,34 +189,7 @@ public class ZetaCore extends ZetaPlugin {
     }
 
     public static void sendTitlePackets(Player bPlayer, String title, @Nullable String subtitle, @Nullable String actionBar) {
-
-        NMSPlayerReflection player = new NMSPlayerReflection(bPlayer);
-        NMSPlayerConnectionReflection connection = player.getPlayerConnection();
-        NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection("TITLE", NMSChatSerializerReflection.createChatComponentFromRawText(title));
-        NMSTitlePacketReflection subtitlePacket = null;
-        NMSChatPacketReflection actionBarPacket = null;
-
-        if (actionBar != null) {
-            actionBarPacket = new NMSChatPacketReflection(NMSChatSerializerReflection.createChatComponentFromRawText(actionBar), (byte) 2);
-        }
-
-        if (subtitle != null) {
-            subtitlePacket = new NMSTitlePacketReflection("SUBTITLE", NMSChatSerializerReflection.createChatComponentFromRawText(subtitle));
-        }
-
-        NMSTitlePacketReflection timesPacket = new NMSTitlePacketReflection(5, 400, 40);
-
-        if (actionBarPacket != null) {
-            connection.sendPacket(actionBarPacket);
-        }
-
-        connection.sendPacket(timesPacket);
-        connection.sendPacket(titlePacket);
-
-        if (subtitlePacket != null) {
-            connection.sendPacket(subtitlePacket);
-        }
-
+        sendTitlePackets(bPlayer, title, subtitle, actionBar, 5, 400, 40);
     }
 
     public static void sendTitlePackets(Player bPlayer, String title, String subtitle, @Nullable String actionBar, int fadeIn, int stay, int fadeOut) {
@@ -435,7 +406,7 @@ public class ZetaCore extends ZetaPlugin {
 
     public void readAll() {
 
-        if (dataBase.initialized && dataBase.client != null && dataBase.client.isConnected()) {
+        if (this.isConnectedToDatabase()) {
 
             databaseDataHandlers.values().forEach(list -> {
 
@@ -469,7 +440,7 @@ public class ZetaCore extends ZetaPlugin {
 
     public void saveAll() {
 
-        if (dataBase.initialized && dataBase.client != null && dataBase.client.isConnected()) {
+        if (this.isConnectedToDatabase()) {
 
             databaseDataHandlers.values().forEach(list -> {
 
@@ -503,6 +474,10 @@ public class ZetaCore extends ZetaPlugin {
 
     public static String getBooleanColor(boolean bool) {
         return "Current: " + (bool ? ChatColor.GREEN.toString() + true : ChatColor.RED.toString() + false);
+    }
+
+    public boolean isConnectedToDatabase() {
+        return dataBase.initialized && dataBase.client != null && dataBase.client.isConnected();
     }
 
 }

@@ -40,7 +40,10 @@ public class SQLValue<Type> {
 
     public static <T> SQLValue<T> create(String key, T value) {
 
-        return new SQLValue<>(key, value);
+        if (value instanceof Boolean) {
+            throw new IllegalArgumentException("Boolean values are not supported. Use Integer instead.");
+        }
+        else return new SQLValue<>(key, value);
 
     }
 
@@ -87,11 +90,17 @@ public class SQLValue<Type> {
 
     public boolean getBoolean() {
 
-        try {
-            return Boolean.parseBoolean(value.toString());
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Value is not a boolean!");
+
+        if (value instanceof Boolean) {
+            return (boolean) (Object) value;
+        } else if (value instanceof String) {
+            return Boolean.parseBoolean((String) value);
+        } else if (value instanceof Integer) {
+            return (int) (Object) value == 1;
         }
+
+        throw new IllegalArgumentException("Value is not a boolean!");
+
 
     }
 

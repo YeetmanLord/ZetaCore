@@ -185,15 +185,23 @@ public class SQLTable implements ISQLTable {
     }
 
     public <PrimaryKeyType> void removeRow(String primaryKeyValue) {
-    	this.handler.removeRow(this.tableName, this.primaryKey, primaryKeyValue);
+        this.handler.removeRow(this.tableName, this.primaryKey, primaryKeyValue);
     }
 
-    public <PrimaryKeyType> void removeRow(String column, String value) {
-    	this.handler.removeRow(this.tableName, column, value);
+    public <PrimaryKeyType> void removeRowWhere(String column, String value) {
+        this.handler.removeRow(this.tableName, column, value);
     }
 
     public void drop() {
-    	this.handler.dropTable(this.tableName);
+        this.handler.dropTable(this.tableName);
+    }
+
+    public <PrimaryKeyType> void update(String column, SQLValue<?> value, SQLValue<PrimaryKeyType> primaryKeyValue) {
+        this.handler.update(this.tableName, column, value, this.primaryKey, primaryKeyValue);
+    }
+
+    public void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue) {
+        this.handler.update(this.tableName, column, value, whereColumn, whereValue);
     }
 
 }
