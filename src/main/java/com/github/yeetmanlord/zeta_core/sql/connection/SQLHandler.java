@@ -15,6 +15,7 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 /**
  * @author YeetManLord
@@ -56,6 +57,8 @@ public class SQLHandler {
 
                     if (obj instanceof String) {
                         value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\", ";
+                    } else if (obj instanceof Boolean) {
+                        value += ((Boolean) obj ? 1 : 0) + ", ";
                     } else {
                         value += obj.toString().replaceAll("\"", "\\\\\\\"") + ", ";
                     }
@@ -64,7 +67,9 @@ public class SQLHandler {
 
                     if (obj instanceof String) {
                         value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
-                    } else {
+                    } else if (obj instanceof Boolean) {
+                        value += (Boolean) obj ? 1 : 0;
+                    }else {
                         value += obj.toString().replaceAll("\"", "\\\\\\\"");
                     }
 
@@ -87,10 +92,10 @@ public class SQLHandler {
 
     }
 
-    public <PrimaryKeyValue> void removeRow(String tableName, String checkColumn, String value) {
+    public <PrimaryKeyValue> void removeRow(String tableName, String checkColumn, Object value) {
 
         if (this.client.isConnected()) {
-            executeStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + " = " + value + ";");
+            executeStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + " = " + getStringRepresentation(value) + ";");
         }
 
     }
@@ -111,7 +116,10 @@ public class SQLHandler {
 
                     if (obj instanceof String) {
                         value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\", ";
-                    } else {
+                    } else if (obj instanceof Boolean) {
+                        value += (Boolean) obj ? 1 : 0 + ", ";
+                    }
+                    else {
                         value += obj.toString().replaceAll("\"", "\\\\\\\"") + ", ";
                     }
 
@@ -119,7 +127,10 @@ public class SQLHandler {
 
                     if (obj instanceof String) {
                         value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
-                    } else {
+                    } else if (obj instanceof Boolean) {
+                        value += (Boolean) obj ? 1 : 0;
+                    }
+                    else {
                         value += obj.toString().replaceAll("\"", "\\\\\\\"");
                     }
 
@@ -239,14 +250,13 @@ public class SQLHandler {
     public <PrimaryColumnValue> Row getRow(ISQLTable table, PrimaryColumnValue prim) {
 
         HashMap<String, SQLValue<?>> row = new HashMap<>();
-
         if (this.client.isConnected()) {
-
             for (SQLColumn<?> val : table.getColumns().values()) {
                 row.put(val.getKey(), val.get(prim));
             }
 
         }
+
         return Row.createRow(row);
 
     }
@@ -258,7 +268,7 @@ public class SQLHandler {
         if (this.client.isConnected()) {
 
             try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + primaryKey + " FROM `" + table.getName() + "` WHERE " + column + "=\"" + whereEquals.toString() + "\"");
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + primaryKey + " FROM `" + table.getName() + "` WHERE " + column + "=\"" + getStringRepresentation(whereEquals) + "\"");
                 ResultSet queryResult = statement.executeQuery();
 
                 if (queryResult.next()) {
@@ -281,7 +291,18 @@ public class SQLHandler {
 
     public void update(String table, String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue) {
         if (this.client.isConnected()) {
-            executeStatement("UPDATE `" + table + "` SET " + column + "=\"" + value.getValue() + "\" WHERE " + whereColumn + "=\"" + whereValue.getValue() + "\"");
+            executeStatement("UPDATE `" + table + "` SET " + column + "=" + getStringRepresentation(value.getValue()) + " WHERE " + whereColumn + "=" + getStringRepresentation(whereValue.getValue()) + "");
+        }
+    }
+
+    private String getStringRepresentation(Object value) {
+        if (value instanceof String) {
+            return "\"" + value.toString().replaceAll("\"", "\\\\\\\"") + "\"";
+        } else if (value instanceof Boolean) {
+            return (Boolean) value ? "1" : "0";
+        }
+        else {
+            return value.toString().replaceAll("\"", "\\\\\\\"");
         }
     }
 

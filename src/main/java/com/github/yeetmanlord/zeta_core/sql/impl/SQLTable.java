@@ -70,15 +70,7 @@ public class SQLTable implements ISQLTable {
     @Override
     public <PrimaryKeyType> Row getRow(PrimaryKeyType primaryKeyValue) {
 
-        Row row = handler.getRow(this, primaryKeyValue);
-
-        Row map = new Row();
-
-        row.forEach((key, val) -> {
-            map.put(val.getKey(), val);
-        });
-
-        return map;
+        return handler.getRow(this, primaryKeyValue);
 
     }
 
@@ -204,4 +196,8 @@ public class SQLTable implements ISQLTable {
         this.handler.update(this.tableName, column, value, whereColumn, whereValue);
     }
 
+    @Override
+    public String toString() {
+        return "SQLTable{primaryKey: " + primaryKey + ", tableName: " + tableName + ", columns: " + columns + "}";
+    }
 }

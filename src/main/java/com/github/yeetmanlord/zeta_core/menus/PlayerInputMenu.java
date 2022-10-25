@@ -1,6 +1,7 @@
 package com.github.yeetmanlord.zeta_core.menus;
 
 import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
+import com.github.yeetmanlord.zeta_core.ZetaCore;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -61,19 +62,20 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
     public void open() {
 
         menuUtil.setMenuToInputTo(null);
-        owner.closeInventory();
-        this.inv = Bukkit.createInventory(this, InventoryType.DISPENSER, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
-        this.setItems();
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.INSTANCE, () -> {
+            owner.closeInventory();
+            this.inv = Bukkit.createInventory(this, InventoryType.DISPENSER, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
+            this.setItems();
 
-        if (this.shouldFill) {
-            this.makeFiller();
-        }
+            if (this.shouldFill) {
+                this.makeFiller();
+            }
 
-        MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
-        this.owner.openInventory(inv);
-        this.menuUtil.setGUIMenu(true);
-        this.menuUtil.setMenuToInputTo(this);
-
+            MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
+            this.owner.openInventory(inv);
+            this.menuUtil.setGUIMenu(true);
+            this.menuUtil.setMenuToInputTo(this);
+        });
     }
 
     @Override

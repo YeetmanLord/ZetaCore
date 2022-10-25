@@ -2,6 +2,7 @@ package com.github.yeetmanlord.zeta_core.menus;
 
 import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import com.github.yeetmanlord.zeta_core.CommonEventFactory;
+import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu.MenuSetItemsEvent;
 import com.github.yeetmanlord.zeta_core.api.uitl.InputType;
 import com.github.yeetmanlord.zeta_core.api.uitl.PlayerUtil;
@@ -45,18 +46,20 @@ public abstract class HopperMenu extends AbstractGUIMenu {
     public void open() {
 
         menuUtil.setMenuToInputTo(null);
-        owner.closeInventory();
-        this.inv = Bukkit.createInventory(this, InventoryType.HOPPER, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
-        this.setItems();
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.INSTANCE, () -> {
+            owner.closeInventory();
+            this.inv = Bukkit.createInventory(this, InventoryType.HOPPER, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
+            this.setItems();
 
-        if (this.shouldFill) {
-            this.makeFiller();
-        }
+            if (this.shouldFill) {
+                this.makeFiller();
+            }
 
-        MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
+            MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
 
-        this.owner.openInventory(inv);
-        this.menuUtil.setGUIMenu(true);
-        this.menuUtil.setMenuToInputTo(this);
+            this.owner.openInventory(inv);
+            this.menuUtil.setGUIMenu(true);
+            this.menuUtil.setMenuToInputTo(this);
+        });
     }
 }

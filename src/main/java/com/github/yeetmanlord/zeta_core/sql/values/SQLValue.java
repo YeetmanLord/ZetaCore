@@ -40,10 +40,7 @@ public class SQLValue<Type> {
 
     public static <T> SQLValue<T> create(String key, T value) {
 
-        if (value instanceof Boolean) {
-            throw new IllegalArgumentException("Boolean values are not supported. Use Integer instead.");
-        }
-        else return new SQLValue<>(key, value);
+        return new SQLValue<>(key, value);
 
     }
 
@@ -112,6 +109,9 @@ public class SQLValue<Type> {
 
         }
 
+        if (value == null) {
+            return "null";
+        }
         return value.toString();
     }
 

@@ -2,6 +2,7 @@ package com.github.yeetmanlord.zeta_core.sql.types;
 
 import java.util.ArrayList;
 
+import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;

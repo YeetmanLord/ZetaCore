@@ -153,6 +153,13 @@ public class ColumnSettings {
 
         }
 
+
     }
 
+    @Override
+    public String toString() {
+
+            return "ColumnSettings{nonNull=" + nonNull + ", unique=" + unique + ", unsigned=" + unsigned + ", index=" + index + "}";
+
+    }
 }

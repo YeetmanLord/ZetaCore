@@ -6,8 +6,10 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.github.yeetmanlord.reflection_api.packets.NMSPacketReflection;
 import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
+import net.minecraft.server.v1_8_R3.PacketPlayOutCloseWindow;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,11 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import com.github.yeetmanlord.reflection_api.chat_components.NMSChatSerializerReflection;
-import com.github.yeetmanlord.reflection_api.entity.players.NMSPlayerReflection;
-import com.github.yeetmanlord.reflection_api.entity.players.player_connection.NMSPlayerConnectionReflection;
-import com.github.yeetmanlord.reflection_api.packets.chat.NMSChatPacketReflection;
-import com.github.yeetmanlord.reflection_api.packets.player.NMSTitlePacketReflection;
 import com.github.yeetmanlord.zeta_core.CommonEventFactory;
 import com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu.MenuSetItemsEvent;
 import com.github.yeetmanlord.zeta_core.api.uitl.InputType;
@@ -65,7 +62,6 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6"));
         FILLER.setItemMeta(meta);
         this.parent = parent;
-
     }
 
     public AbstractGUIMenu(PlayerUtil helper, String title, int slots, boolean shouldFill) {
@@ -93,8 +89,8 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
         menuUtil.setMenuToInputTo(null);
         menuUtil.setGUIMenu(false);
-        owner.closeInventory();
         Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.INSTANCE, () -> {
+            owner.closeInventory();
             this.inv = Bukkit.createInventory(this, slots, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
             this.setItems();
 
@@ -317,9 +313,9 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
     protected void close() {
         if (parent == null) {
-            this.owner.closeInventory();
+            this.syncClose();
         } else {
-            this.owner.openInventory(parent.getInventory());
+            parent.open();
         }
     }
 
@@ -347,5 +343,22 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
     public AbstractGUIMenu getParent() {
         return parent;
+    }
+
+    /**
+     * This is a <b>VERY</b> important method. I discovered (through a lot of pain, trial, and error.) that when closing an inventory using
+     * {@link Player#closeInventory() owner.closeInventory()} inside the {@link #handleClick(InventoryClickEvent) handleClick method}, the inventory is closed
+     * <em>asynchronously</em> causing an error to be thrown. If you ever should close an inventory inside the {@link #handleClick(InventoryClickEvent) handleClick method},
+     * you <b>must use this method</b> to avoid all possible errors.
+     *
+     * @apiNote Note 1: I'd just like to make a note that these asynchronous closing errors only happen when right-clicking in a slot greater than 45. WHY? I have no clue, NMS is weird sometimes.
+     * My best guess would be that it tries to do stuff in the player inventory, since closing an inventory opens the player inventory. This is some deep NMS stuff but the player inventory has 45 slots.
+     * I'm just assuming that's what is happening although I could be wrong. This is more of an explanation of the above error, but you should still use this method to close inventories despite being in a slot below 45. <br>
+     * Note 2: The {@link #open() open method} already accounts for this error, so you shouldn't have to call this method before using the open method. Basically, you should try to replace the owner.closeInventory() method with this method.
+     */
+    public void syncClose() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.INSTANCE, () -> {
+            this.owner.closeInventory();
+        });
     }
 }

@@ -1,5 +1,6 @@
 package com.github.yeetmanlord.zeta_core.api.uitl.raytrace;
 
+import com.github.yeetmanlord.reflection_api.entity.NMSAxisAlignedBBReflection;
 import com.github.yeetmanlord.reflection_api.entity.NMSEntityReflection;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.api.uitl.DistanceUtils;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public class RayTraceUtility {
 
-    public static BlockRayTraceResult rayTraceBlocks(LivingEntity entity, double maxDistance) {
+    public static BlockRayTraceResult rayTraceBlocks(LivingEntity entity, double maxDistance, Precision precision) {
 
         Location starting = entity.getEyeLocation();
         Vector direction = starting.getDirection();
@@ -34,7 +35,7 @@ public class RayTraceUtility {
         double distanceTraveled = 0;
         while (distanceTraveled < maxDistance) {
             last = check.clone();
-            check = getRayTraceLocation(check, direction, 0.25D);
+            check = getRayTraceLocation(check, direction, precision.getAdvance());
             if (check.getBlock().getType() != Material.AIR) {
                 break;
             }
@@ -51,15 +52,17 @@ public class RayTraceUtility {
         return new BlockRayTraceResult(ResultType.BLOCK, block, face);
     }
 
-    public static EntityRayTraceResult rayTraceEntities(LivingEntity entity, double maxDistance) {
+    public static EntityRayTraceResult rayTraceEntities(LivingEntity entity, double maxDistance, Precision precision) {
         Location starting = entity.getEyeLocation();
         Vector direction = starting.getDirection();
         Location check = starting.clone();
-        List<Entity> entityList = new ArrayList<>(entity.getNearbyEntities(maxDistance + 0.5, maxDistance + 0.5, maxDistance + 0.5)).stream().filter(e -> e != entity).collect(Collectors.toList());
+        Location last = getRayTraceLocation(starting, direction, maxDistance + 0.5D);
+        NMSAxisAlignedBBReflection bb = new NMSAxisAlignedBBReflection(check, last);
+        List<Entity> entityList = new ArrayList<>(entity.getNearbyEntities(maxDistance + 0.5, maxDistance + 0.5, maxDistance + 0.5)).stream().filter(e -> e != entity).filter(e -> bb.isWithinBoundingBox(e.getLocation())).collect(Collectors.toList());
         Entity hitResult = null;
         double distanceTraveled = 0;
         while (distanceTraveled < maxDistance) {
-            check = getRayTraceLocation(check, direction, 0.01D);
+            check = getRayTraceLocation(check, direction, precision.getAdvance());
             if (check.getBlock().getType() != Material.AIR) {
                 break;
             }
@@ -92,9 +95,9 @@ public class RayTraceUtility {
 
     }
 
-    public static RayTraceResult raytrace(LivingEntity entity, double maxDistance) {
-        EntityRayTraceResult entityResult = rayTraceEntities(entity, maxDistance);
-        BlockRayTraceResult blockResult = rayTraceBlocks(entity, maxDistance);
+    public static RayTraceResult raytrace(LivingEntity entity, double maxDistance, Precision precision) {
+        EntityRayTraceResult entityResult = rayTraceEntities(entity, maxDistance, precision);
+        BlockRayTraceResult blockResult = rayTraceBlocks(entity, maxDistance, precision);
         if (entityResult.getType() != ResultType.EMPTY) {
             return entityResult;
         }
@@ -107,6 +110,53 @@ public class RayTraceUtility {
     public static Location getRayTraceLocation(Location starting, Vector direction, double distance) {
         Location ending = starting.clone().add(direction.clone().multiply(distance));
         return ending;
+    }
+
+    public enum Precision {
+
+        /**
+         * Ray-cast pointer will move 1 block at a time. Very imprecise but fast.
+         * I'd recommend this for drawing a line from the player's eyes but
+         * not necessarily for getting accurate results for what the ray-cast hits.
+         */
+        IMPRECISE_BLOCK(1D),
+        /**
+         * Ray-cast pointer will move 0.25 blocks at a time. Very imprecise for entity detection but fast. I'd use this
+         * for general entity detection but not necessarily for getting accurate results for what the ray-cast hits.
+         */
+        IMPRECISE_ENTITY(0.25D),
+        /**
+         * Ray-cast pointer will move 0.5 blocks at a time. This is rather quick but still a little imprecise. Don't use this for
+         * anti cheats.
+         */
+        SEMI_ACCURATE_BLOCK(0.5D),
+        /**
+         * Ray-cast pointer will move 0.125 blocks at a time. This is slow but still a little imprecise. Don't use this for
+         * anti cheats.
+         */
+        SEMI_ACCURATE_ENTITY(0.125D),
+        /**
+         * Ray-cast pointer will move 0.1 blocks at a time. This is very slow but very accurate. Use this for anti cheats.
+         * Note when I say slow this takes up around 3% of the tick according to BStats, so it could be a little resource heavy for big servers.
+         * (My testing server uses 1GB of RAM)
+         */
+        PRECISE_BLOCK(0.1D),
+        /**
+         * Ray-cast pointer will move 0.01 blocks at a time. This is <b>very</b> slow but very accurate. Use this for anti cheats.
+         * Note when I say slow this takes up around 3% of the tick according to BStats, so it could be a little resource heavy for big servers.
+         * (My testing server uses 1GB of RAM)
+         */
+        PRECISE_ENTITY(0.01D);
+
+        private double advance;
+
+        Precision(double advance) {
+            this.advance = advance;
+        }
+
+        public double getAdvance() {
+            return advance;
+        }
     }
 
 }

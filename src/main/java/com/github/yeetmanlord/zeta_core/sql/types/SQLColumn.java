@@ -101,4 +101,8 @@ public abstract class SQLColumn<Type> {
 
 	}
 
+	@Override
+	public String toString() {
+		return "SQLColumn{settings: " + settings + ", table: " + table.getName() + ", key: " + key + ", type: " + this.getClass().getSimpleName() + "}";
+	}
 }
