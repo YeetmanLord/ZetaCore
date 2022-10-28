@@ -1,15 +1,15 @@
-package com.github.yeetmanlord.zeta_core.api.uitl.raytrace;
+package com.github.yeetmanlord.zeta_core.api.uitl.raycast;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-public class BlockRayTraceResult extends RayTraceResult {
+public class BlockRayCastResult extends RayCastResult {
 
     private Block block;
 
     private BlockFace face;
 
-    public BlockRayTraceResult(ResultType type, Block block, BlockFace face) {
+    public BlockRayCastResult(ResultType type, Block block, BlockFace face) {
         super(type, block);
         this.block = block;
         this.face = face;

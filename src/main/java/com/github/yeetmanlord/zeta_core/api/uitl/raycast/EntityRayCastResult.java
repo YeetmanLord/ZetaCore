@@ -1,12 +1,12 @@
-package com.github.yeetmanlord.zeta_core.api.uitl.raytrace;
+package com.github.yeetmanlord.zeta_core.api.uitl.raycast;
 
 import org.bukkit.entity.Entity;
 
-public class EntityRayTraceResult extends RayTraceResult {
+public class EntityRayCastResult extends RayCastResult {
 
     private Entity entity;
 
-    public EntityRayTraceResult(ResultType type, Entity entity) {
+    public EntityRayCastResult(ResultType type, Entity entity) {
         super(type, entity);
         this.entity = entity;
     }

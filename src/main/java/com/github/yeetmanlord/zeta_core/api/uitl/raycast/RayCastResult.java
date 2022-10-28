@@ -1,14 +1,12 @@
-package com.github.yeetmanlord.zeta_core.api.uitl.raytrace;
+package com.github.yeetmanlord.zeta_core.api.uitl.raycast;
 
-import org.bukkit.block.Block;
-
-public class RayTraceResult {
+public class RayCastResult {
 
     private ResultType type;
 
     private Object object;
 
-    public RayTraceResult(ResultType type, Object object) {
+    public RayCastResult(ResultType type, Object object) {
         this.type = type;
         this.object = object;
     }
