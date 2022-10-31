@@ -9,7 +9,7 @@ public class CommandUtil {
 
     public static Parsed<Integer> parseInteger(CommandSender sender, String string, String errorMessage) {
         try {
-            return new Parsed<>(Integer.parseInt(string), true);
+            return new Parsed<>(Integer.parseInt(string.trim()), true);
         } catch (NumberFormatException e) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', errorMessage));
         }
@@ -18,7 +18,7 @@ public class CommandUtil {
 
     public static Parsed<Double> parseDouble(CommandSender sender, String string, String errorMessage) {
         try {
-            return new Parsed<>(Double.parseDouble(string), true);
+            return new Parsed<>(Double.parseDouble(string.trim()), true);
         } catch (NumberFormatException e) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', errorMessage));
         }
@@ -27,7 +27,7 @@ public class CommandUtil {
 
     public static Parsed<Float> parseFloat(CommandSender sender, String string, String errorMessage) {
         try {
-            return new Parsed<>(Float.parseFloat(string), true);
+            return new Parsed<>(Float.parseFloat(string.trim()), true);
         } catch (NumberFormatException e) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', errorMessage));
         }
@@ -35,6 +35,7 @@ public class CommandUtil {
     }
 
     public static Parsed<Boolean> parseBoolean(CommandSender sender, String string, String errorMessage) {
+        string = string.trim();
         if (string.equalsIgnoreCase("true") || string.equalsIgnoreCase("1") || string.equalsIgnoreCase("yes")) {
             return new Parsed<>(true, true);
         } else if (string.equalsIgnoreCase("false") || string.equalsIgnoreCase("0") || string.equalsIgnoreCase("no")) {
@@ -47,7 +48,7 @@ public class CommandUtil {
 
     public static Parsed<ChatColor> parseChatColor(CommandSender sender, String string, String errorMessage) {
         try {
-            return new Parsed<>(ChatColor.valueOf(string.toUpperCase()), true);
+            return new Parsed<>(ChatColor.valueOf(string.toUpperCase().trim()), true);
         } catch (IllegalArgumentException e) {
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', errorMessage));
         }
@@ -55,10 +56,10 @@ public class CommandUtil {
     }
 
     public static Parsed<Material> parseMaterial(CommandSender sender, String string, String errorMessage) {
-        Material material = Material.matchMaterial(string);
+        Material material = Material.matchMaterial(string.toUpperCase().trim());
 
         if (material == null) {
-            material = Bukkit.getUnsafe().getMaterialFromInternalName(string);
+            material = Bukkit.getUnsafe().getMaterialFromInternalName(string.trim());
         }
 
         if (material != null) {

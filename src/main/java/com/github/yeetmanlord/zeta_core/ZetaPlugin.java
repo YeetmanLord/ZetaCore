@@ -38,7 +38,7 @@ public abstract class ZetaPlugin extends JavaPlugin {
 
     private void initDB() {
 
-        if (ZetaCore.INSTANCE.dataBase.client != null) {
+        if (ZetaCore.INSTANCE.isConnectedToDatabase()) {
 
             ZetaCore.getDatabaseDataHandlers(this).forEach(d -> {
                 d.initializeDB(ZetaCore.INSTANCE.dataBase.client.handler);

@@ -95,7 +95,17 @@ public class SQLHandler {
     public <PrimaryKeyValue> void removeRow(String tableName, String checkColumn, Object value) {
 
         if (this.client.isConnected()) {
-            executeStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + " = " + getStringRepresentation(value) + ";");
+            try {
+
+                if (client != null) {
+                    PreparedStatement statement = client.getClient().prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;");
+                    statement.setObject(1, value);
+                    statement.executeUpdate();
+                }
+
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+            }
         }
 
     }
@@ -268,7 +278,8 @@ public class SQLHandler {
         if (this.client.isConnected()) {
 
             try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + primaryKey + " FROM `" + table.getName() + "` WHERE " + column + "=\"" + getStringRepresentation(whereEquals) + "\"");
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + primaryKey + " FROM `" + table.getName() + "` WHERE " + column + "=?;");
+                statement.setObject(1, whereEquals);
                 ResultSet queryResult = statement.executeQuery();
 
                 if (queryResult.next()) {
@@ -291,19 +302,18 @@ public class SQLHandler {
 
     public void update(String table, String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue) {
         if (this.client.isConnected()) {
-            executeStatement("UPDATE `" + table + "` SET " + column + "=" + getStringRepresentation(value.getValue()) + " WHERE " + whereColumn + "=" + getStringRepresentation(whereValue.getValue()) + "");
+            try {
+
+                if (client != null) {
+                    PreparedStatement statement = client.getClient().prepareStatement("UPDATE `" + table + "` SET " + column + "=?" + " WHERE " + whereColumn + "=?;");
+                    statement.setObject(1, value.getValue());
+                    statement.setObject(2, whereValue.getValue());
+                    statement.executeUpdate();
+                }
+
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+            }
         }
     }
-
-    private String getStringRepresentation(Object value) {
-        if (value instanceof String) {
-            return "\"" + value.toString().replaceAll("\"", "\\\\\\\"") + "\"";
-        } else if (value instanceof Boolean) {
-            return (Boolean) value ? "1" : "0";
-        }
-        else {
-            return value.toString().replaceAll("\"", "\\\\\\\"");
-        }
-    }
-
 }

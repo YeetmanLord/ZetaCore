@@ -84,6 +84,7 @@ public class RoundingUtil {
 
 	public static Location center(Location loc) {
 
+		System.out.println(loc);
 		double x = loc.getX();
 		double z = loc.getZ();
 
@@ -101,10 +102,6 @@ public class RoundingUtil {
 			xDeci = 0D;
 		}
 
-		if (x < 0) {
-			xDeci *= -1;
-		}
-
 		x = Math.floor(x) + xDeci;
 
 		if (zDeci >= 0.75D) {
@@ -117,16 +114,13 @@ public class RoundingUtil {
 			zDeci = 0D;
 		}
 
-		if (z < 0) {
-			zDeci *= -1;
-		}
-
 		z = Math.floor(z) + zDeci;
 
 		loc.setX(x);
 		loc.setZ(z);
 		loc.setY(roundNearestPlace(loc.getY(), 1));
 
+		System.out.println(loc);
 		return loc;
 
 	}
