@@ -45,6 +45,13 @@ public class DistanceUtils {
 
 	}
 
+	public static double pythagoream3D(double x, double y, double z) {
+		double a = pythagoream(x, y);
+		double c = Math.sqrt(a*a + z*z);
+
+		return Math.sqrt(c);
+	}
+
 	public static double[] getDelta(Location vec1, Location vec2) {
 
 		double aX = vec1.getX();

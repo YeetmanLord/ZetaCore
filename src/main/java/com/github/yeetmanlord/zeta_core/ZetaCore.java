@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
+import com.github.yeetmanlord.zeta_core.events.ChatEvent;
+import com.github.yeetmanlord.zeta_core.events.HandleMenuInteractionEvent;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -74,6 +76,10 @@ public class ZetaCore extends ZetaPlugin {
         LOGGER.info("ZetaCore framework is initializing");
         dataBase.read();
         localSettings.read();
+
+        getServer().getPluginManager().registerEvents(new HandleMenuInteractionEvent(), this);
+        getServer().getPluginManager().registerEvents(new ChatEvent(), this);
+
         getCommand("enable_debug").setExecutor((sender, command, label, args) -> {
             if (sender.hasPermission("zeta.admin")) {
                 LOGGER.setDebugging(true);

@@ -1,11 +1,14 @@
 package com.github.yeetmanlord.reflection_api.inventory;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.reflection_api.nbt.NMSNBTTagCompoundReflection;
+import net.minecraft.server.v1_8_R3.Blocks;
+import net.minecraft.server.v1_8_R3.Items;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -41,6 +44,14 @@ public class NMSItemStackReflection extends NMSObjectReflection {
 
     }
 
+    /**
+     * @param mat    Material of the itemstack
+     * @param amount Amount in the stack
+     * @param damage Damage or metadata value
+     * @param data   Data value
+     * @deprecated Uses deprecated ItemStack constructor
+     */
+    @Deprecated
     public NMSItemStackReflection(Material mat, int amount, short damage, Byte data) {
 
         this(new ItemStack(mat, amount, damage, data));
@@ -50,10 +61,17 @@ public class NMSItemStackReflection extends NMSObjectReflection {
     private static Object init(ItemStack stack) {
 
         try {
-            Method asNMSCopy = ReflectionApi.getCraftBukkitClass("CraftItemStack", "inventory").getMethod("asNMSCopy", ItemStack.class);
-            return asNMSCopy.invoke(null, stack);
+            if (stack.getType() != Material.AIR) {
+                Method asNMSCopy = ReflectionApi.getCraftBukkitClass("CraftItemStack", "inventory").getMethod("asNMSCopy", ItemStack.class);
+                return asNMSCopy.invoke(null, stack);
+            }
+            else {
+                Constructor<?> constr = staticClass.getConstructor(ReflectionApi.getNMSClass("Block"));
+                Object airBlock = ReflectionApi.getNMSClass("Blocks").getField("AIR").get(null);
+                return constr.newInstance(airBlock);
+            }
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException |
-                 InvocationTargetException e) {
+                 InvocationTargetException | NoSuchFieldException | InstantiationException e) {
             e.printStackTrace();
         }
 
@@ -104,6 +122,10 @@ public class NMSItemStackReflection extends NMSObjectReflection {
         } catch (NoSuchMethodException exc) {
             exc.printStackTrace();
         }
+    }
+
+    public static Object asNMS(ItemStack stack) {
+        return new NMSItemStackReflection(stack).nmsObject;
     }
 
 }

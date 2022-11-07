@@ -52,12 +52,12 @@ public abstract class AbstractPaginatedMenu<T> extends AbstractGUIMenu {
             if (e.getSlot() == this.getSlots() - 1) {
                 if (page + 1 < getMaxPages()) {
                     page++;
-                    renderPage();
+                    setItems();
                 }
             } else if (e.getSlot() == this.getSlots() - 9) {
-                if (page - 1 > 0) {
+                if (page - 1 >= 0) {
                     page--;
-                    renderPage();
+                    setItems();
                 }
             }
         }

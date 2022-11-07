@@ -68,10 +68,10 @@ public class HandleMenuInteractionEvent implements Listener {
 				return;
 			}
 		}
-		util.setGUIMenu(false);
 
 		if (!util.isTakingChatInput()) {
 			util.setMenuToInputTo(null);
+			util.setGUIMenu(false);
 		}
 
 	}

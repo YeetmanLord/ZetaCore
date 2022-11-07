@@ -143,6 +143,17 @@ public class NMSScoreboardTeamReflection extends NMSObjectReflection {
 
 	}
 
+	public void setCanSeeFriendlyInvisibles(boolean allow) {
+
+		try {
+			invokeMethodForNmsObject("setCanSeeFriendlyInvisibles", new Class<?>[] { boolean.class }, new Object[] { allow });
+		}
+		catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public String getSuffix() {
 
 		try {
@@ -219,6 +230,16 @@ public class NMSScoreboardTeamReflection extends NMSObjectReflection {
 
 		return null;
 
+	}
+
+	public boolean canSeeFriendlyInvisibles() {
+		try {
+			return (boolean) invokeMethodForNmsObject("canSeeFriendlyInvisibles");
+		}
+		catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override

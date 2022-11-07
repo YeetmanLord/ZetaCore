@@ -23,7 +23,8 @@ public class ChatEvent implements Listener {
 		PlayerUtil util = ZetaCore.getPlayerMenuUtitlity(player);
 		AbstractGUIMenu menu = util.getMenuToInputTo();
 
-		if (util.isTakingChatInput() && menu != null && menu instanceof IChatInputable) {
+
+		if (util.isTakingChatInput() && menu instanceof IChatInputable) {
 			((IChatInputable) menu).processChatInput(menu.getInputType(), event);
 
 			NMSPlayerReflection entityPlayer = new NMSPlayerReflection(player);
@@ -32,7 +33,7 @@ public class ChatEvent implements Listener {
 
 			connection.sendPacket(titlePacket);
 
-			util.getMenuToInputTo().open();
+			menu.open();
 			util.setTakingChatInput(false);
 
 			event.setCancelled(true);
