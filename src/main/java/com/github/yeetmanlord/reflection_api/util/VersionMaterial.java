@@ -11,6 +11,8 @@ import java.util.List;
 
 public class VersionMaterial {
     public static final HashMap<String, VersionMaterial> stringMaterialMap = new HashMap<>();
+
+    public static final HashMap<String, VersionMaterial> legacyStringMaterialMap = new HashMap<>();
     public static final boolean IS_FLAT = ReflectionApi.version.isNewer("1.13");
     private String legacyMaterial, flatMaterial;
     private byte data;
@@ -20,6 +22,7 @@ public class VersionMaterial {
         this.flatMaterial = flatMaterial.toUpperCase();
         this.data = data;
         stringMaterialMap.put(flatMaterial.toUpperCase(), this);
+        legacyStringMaterialMap.put(legacyMaterial.toUpperCase(), this);
     }
 
     public String getLegacyMaterial() {
@@ -51,7 +54,7 @@ public class VersionMaterial {
     }
 
     public static VersionMaterial valueOf(String material) {
-        return stringMaterialMap.get(material.toUpperCase());
+            return IS_FLAT ? stringMaterialMap.get(material) : legacyStringMaterialMap.get(material);
     }
 
     public static final VersionMaterial WHITE_WOOL = new VersionMaterial("wool", "white_wool", (byte) 0);
@@ -296,4 +299,6 @@ public class VersionMaterial {
             return WHITE_BED;
         }
     }
+
+
 }
