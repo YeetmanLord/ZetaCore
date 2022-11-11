@@ -6,129 +6,107 @@ import java.sql.SQLException;
 
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
+import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
+import org.bukkit.Bukkit;
 
 /**
- * 
  * Actual client that connects to the sql database
- * 
- * @author YeetManLord
  *
+ * @author YeetManLord
  */
 public class SQLClient {
 
-	private int port;
+    private int port;
 
-	private String hostname;
+    private String hostname;
 
-	private String username;
+    private String username;
 
-	private String password;
+    private String password;
 
-	private String database;
+    private String database;
 
-	private Connection client;
+    private Connection client;
 
-	public SQLHandler handler;
+    public SQLHandler handler;
 
-	public SQLClient(String hostname, String username, String password, int port, String database) {
+    public SQLClient(String hostname, String username, String password, int port, String database) {
 
-		this.hostname = hostname;
-		this.username = username;
-		this.password = password;
-		this.port = port;
-		this.database = database;
+        this.hostname = hostname;
+        this.username = username;
+        this.password = password;
+        this.port = port;
+        this.database = database;
 
-		try {
-			this.connect();
-		}
-		catch (SQLException e) {
-			ZetaCore.LOGGER.info("&cDatabase not connected");
-		}
+        this.connect();
 
-	}
+    }
 
-	public boolean isConnected() {
+    public boolean isConnected() {
 
-		return (client == null ? false : true);
+        return (client != null);
 
-	}
+    }
 
-	public void connect() throws SQLException {
+    public void connect() {
 
-		if (!isConnected()) {
-			client = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?useSSL=false&characterEncoding=UTF-8", username, password);
-			handler = new SQLHandler(this);
-			ZetaCore.LOGGER.info("&aDatabase is connected!");
-		}
+        if (!isConnected()) {
+            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                try {
+                    client = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?useSSL=false&characterEncoding=UTF-8", username, password);
+                    handler = new SQLHandler(this);
+                    ZetaCore.LOGGER.info("&aDatabase is connected!");
+                } catch (SQLException e) {
+                    ZetaCore.LOGGER.info("&cDatabase not connected");
+                }
+            });
+        }
 
-	}
+    }
 
-	public void disconnect() {
+    public void disconnect() {
 
-		if (isConnected()) {
+        if (isConnected()) {
 
-			try {
-				client.close();
-				this.client = null;
-			}
-			catch (SQLException exc) {
-				exc.printStackTrace();
-			}
+            try {
+                client.close();
+                this.client = null;
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+            }
 
-		}
+        }
 
-	}
+    }
 
-	public Connection getClient() {
+    public Connection getClient() {
 
-		return client;
+        return client;
 
-	}
+    }
 
-	public void readData(ZetaPlugin plugin) {
+    public void readData(ZetaPlugin plugin) {
 
-		ZetaCore.getDatabaseDataHandlers(plugin).forEach(d -> {
-			d.readDB();
-		});
+        ZetaCore.getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::readDB);
 
-	}
+    }
 
-	public void readData() {
+    public void readData() {
 
-		ZetaCore.getDatabaseDataHandlers().values().forEach(dList -> {
+        ZetaCore.getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::readDB));
 
-			dList.forEach(d -> {
+    }
 
-				d.readDB();
+    public void writeData() {
 
-			});
+        ZetaCore.getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::writeDB));
 
-		});
+    }
 
-	}
+    public void writeData(ZetaPlugin plugin) {
 
-	public void writeData() {
+        ZetaCore.getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeDB);
 
-		ZetaCore.getDatabaseDataHandlers().values().forEach(dList -> {
-
-			dList.forEach(d -> {
-
-				d.writeDB();
-
-			});
-
-		});
-
-	}
-
-	public void writeData(ZetaPlugin plugin) {
-
-		ZetaCore.getDatabaseDataHandlers(plugin).forEach(d -> {
-
-			d.writeDB();
-
-		});
-
-	}
+    }
 
 }

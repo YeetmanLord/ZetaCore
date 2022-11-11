@@ -20,7 +20,7 @@ public class ChatEvent implements Listener {
 	public void onChatInput(final AsyncPlayerChatEvent event) {
 
 		Player player = event.getPlayer();
-		PlayerUtil util = ZetaCore.getPlayerMenuUtitlity(player);
+		PlayerUtil util = ZetaCore.getPlayerMenuUtility(player);
 		AbstractGUIMenu menu = util.getMenuToInputTo();
 
 

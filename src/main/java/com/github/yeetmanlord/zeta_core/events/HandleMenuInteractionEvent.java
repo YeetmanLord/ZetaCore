@@ -34,7 +34,7 @@ public class HandleMenuInteractionEvent implements Listener {
 				event.setCancelled(true);
 			}
 			else if (event.getClickedInventory() instanceof PlayerInventory) {
-				PlayerUtil util = ZetaCore.getPlayerMenuUtitlity(player);
+				PlayerUtil util = ZetaCore.getPlayerMenuUtility(player);
 
 				if (util.isGUIMenu()) {
 					event.setCancelled(true);
@@ -61,7 +61,7 @@ public class HandleMenuInteractionEvent implements Listener {
 	public void onMenuClosed(InventoryCloseEvent event) {
 
 		Player player = (Player) event.getPlayer();
-		PlayerUtil util = ZetaCore.getPlayerMenuUtitlity(player);
+		PlayerUtil util = ZetaCore.getPlayerMenuUtility(player);
 		if (util.getMenuToInputTo() != null && !util.isTakingChatInput()) {
 			boolean result = util.getMenuToInputTo().onClose();
 			if (result) {

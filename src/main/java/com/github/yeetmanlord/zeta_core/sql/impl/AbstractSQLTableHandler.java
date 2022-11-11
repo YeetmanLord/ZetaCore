@@ -82,7 +82,7 @@ public abstract class AbstractSQLTableHandler<PrimaryKeyType> implements ISQLTab
 
 		List<ISQL<?>> iSQLs = new ArrayList<>();
 
-		List<Row> list = this.table.getHandler().getRowsWhere(this.getPrimaryKey(), this.table, valueToCheck.getKey(), valueToCheck.getValue());
+		List<Row> list = this.table.getHandler().getRowsWhere(this.table, valueToCheck.getKey(), valueToCheck.getValue());
 
 		for (Row map : list) {
 			iSQLs.add(this.getHandler().load(map));

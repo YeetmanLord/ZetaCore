@@ -8,55 +8,54 @@ import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 
 /**
  * Represents a BOOL in SQL
- * 
- * @author YeetManLord
  *
+ * @author YeetManLord
  */
 public class SQLBool extends SQLColumn<Boolean> {
 
-	public SQLBool(String key, ISQLTable table) {
+    public SQLBool(String key, ISQLTable table) {
 
-		super(key, table);
+        super(key, table);
 
-	}
+    }
 
-	public SQLBool(String key, ISQLTable table, ColumnSettings settings) {
+    public SQLBool(String key, ISQLTable table, ColumnSettings settings) {
 
-		super(key, table, settings);
+        super(key, table, settings);
 
-	}
+    }
 
-	@Override
-	public String initialize() {
+    @Override
+    public String initialize() {
 
-		return this.getKey() + " BOOL";
+        return this.getKey() + " BOOL";
 
-	}
+    }
 
-	@Override
-	public <PrimaryKeyValue> SQLValue<Boolean> get(PrimaryKeyValue value) {
+    @Override
+    public <PrimaryKeyValue> SQLValue<Boolean> get(PrimaryKeyValue value) {
 
-		return SQLValue.create(this.getKey(), getTable().get(value, getKey()).getValue() == Integer.valueOf(1) || getTable().get(value, getKey()).getValue() == Boolean.valueOf(true));
+        return SQLValue.create(this.getKey(), getTable().get(value, getKey()).getValue() == Integer.valueOf(1) || getTable().get(value, getKey()).getValue() == Boolean.valueOf(true));
 
-	}
+    }
 
-	@Override
-	public ArrayList<SQLValue<Boolean>> load(SQLHandler handler) {
+    @Override
+    public ArrayList<SQLValue<Boolean>> load(SQLHandler handler) {
 
-		if (handler != null) {
-			ArrayList<SQLValue<Boolean>> returnable = new ArrayList<>();
-			ArrayList<SQLValue<?>> list = handler.getColumnEntries(this.getTable().getName(), getKey());
+        if (handler != null) {
+            ArrayList<SQLValue<Boolean>> returnable = new ArrayList<>();
 
-			for (SQLValue<?> sqlValue : list) {
-				returnable.add(new SQLValue<Boolean>(sqlValue.getKey(), (Boolean) sqlValue.getValue()));
-			}
+            ArrayList<SQLValue<?>> sqlValues = handler.getColumnEntries(this.getTable().getName(), getKey());
 
-			return returnable;
+            for (SQLValue<?> sqlValue : sqlValues) {
+                returnable.add(new SQLValue<Boolean>(sqlValue.getKey(), (Boolean) sqlValue.getValue()));
+            }
 
-		}
+            return returnable;
 
-		return null;
+        }
 
-	}
+        return null;
+    }
 
 }

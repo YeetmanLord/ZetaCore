@@ -56,25 +56,27 @@ public abstract class Command implements TabExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
 
-		if (args.length > 0) {
+		if (this.main.initializedFinished()) {
+			if (args.length > 0) {
 
-			for (ISubCommand cmd : commands) {
+				for (ISubCommand cmd : commands) {
 
-				if (args[0].equalsIgnoreCase(cmd.getName()) && sender.hasPermission(cmd.getPermission())) {
-					cmd.run(sender, args);
-					return true;
-				}
-				else if (args[0].equalsIgnoreCase(cmd.getName()) && !sender.hasPermission(cmd.getPermission())) {
-					sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou do not have the permission to run the command " + this.getName() + " " + cmd.getName() + " (required permission: " + cmd.getPermission() + ")"));
-					return true;
+					if (args[0].equalsIgnoreCase(cmd.getName()) && sender.hasPermission(cmd.getPermission())) {
+						cmd.run(sender, args);
+						return true;
+					} else if (args[0].equalsIgnoreCase(cmd.getName()) && !sender.hasPermission(cmd.getPermission())) {
+						sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou do not have the permission to run the command " + this.getName() + " " + cmd.getName() + " (required permission: " + cmd.getPermission() + ")"));
+						return true;
+					}
+
 				}
 
 			}
 
+			this.getHelp(sender);
+		} else {
+			sender.sendMessage(ChatColor.RED +  main.getPluginName() + " is still initializing");
 		}
-
-		this.getHelp(sender);
-
 		return true;
 
 	}

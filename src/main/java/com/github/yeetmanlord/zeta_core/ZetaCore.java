@@ -11,6 +11,7 @@ import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
 import com.github.yeetmanlord.zeta_core.events.ChatEvent;
 import com.github.yeetmanlord.zeta_core.events.HandleMenuInteractionEvent;
+import com.github.yeetmanlord.zeta_core.events.LeftClickEvent;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -46,6 +47,7 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
  * methods, classes, and fields will come with javadocs to help explain
  * what they are used for and in some cases providing examples
  * @zeta.usage Zeta Core Class. Usable by other plugins
+ * @implNote I would suggest using async tasks for whenever reading and writing to a database. By default, when you are loading a plugin everything will be read asynchronously. When disabling everything will be saved synchronously.
  */
 public class ZetaCore extends ZetaPlugin {
 
@@ -71,7 +73,7 @@ public class ZetaCore extends ZetaPlugin {
         ReflectionApi.init(this);
         INSTANCE = this;
         LOGGER = new Logger(this, ChatColor.GREEN);
-        LOGGER.info("ZetaCore framework is preinitializing");
+        LOGGER.info("ZetaCore framework is pre-initializing");
         this.registerDataStorers();
         LOGGER.info("ZetaCore framework is initializing");
         dataBase.read();
@@ -79,6 +81,7 @@ public class ZetaCore extends ZetaPlugin {
 
         getServer().getPluginManager().registerEvents(new HandleMenuInteractionEvent(), this);
         getServer().getPluginManager().registerEvents(new ChatEvent(), this);
+        getServer().getPluginManager().registerEvents(new LeftClickEvent(), this);
 
         getCommand("enable_debug").setExecutor((sender, command, label, args) -> {
             if (sender.hasPermission("zeta.admin")) {
@@ -98,7 +101,7 @@ public class ZetaCore extends ZetaPlugin {
 
         getCommand("local_settings").setExecutor((sender, command, label, args) -> {
             if (sender.hasPermission("zeta.admin") && sender instanceof Player) {
-                LocalSettingsMenu menu = new LocalSettingsMenu(getPlayerMenuUtitlity((Player) sender));
+                LocalSettingsMenu menu = new LocalSettingsMenu(getPlayerMenuUtility((Player) sender));
                 menu.open();
             }
             return true;
@@ -181,7 +184,7 @@ public class ZetaCore extends ZetaPlugin {
         dataBase.write();
         localSettings.write();
 
-        if (dataBase.initialized && dataBase.client.isConnected()) {
+        if (this.isConnectedToDatabase()) {
             dataBase.client.disconnect();
         }
 
@@ -256,7 +259,7 @@ public class ZetaCore extends ZetaPlugin {
      * used if you are interacting with this plugins method. I still do
      * not suggest messing with those menus though.
      */
-    public static PlayerUtil getPlayerMenuUtitlity(Player p) {
+    public static PlayerUtil getPlayerMenuUtility(Player p) {
 
         PlayerUtil util;
 
@@ -410,23 +413,29 @@ public class ZetaCore extends ZetaPlugin {
 
     }
 
+    @Override
+    public void onDataReadFinish() {
+
+    }
+
+    @Override
+    public boolean initializedFinished() {
+        return true;
+    }
+
     public void readAll() {
 
         if (this.isConnectedToDatabase()) {
 
             databaseDataHandlers.values().forEach(list -> {
 
-                list.forEach(handler -> {
-                    handler.readDB();
-                });
+                list.forEach(ISQLTableHandler::readDB);
 
             });
 
             dataHandlers.values().forEach(list -> {
 
-                list.forEach(handler -> {
-                    handler.read();
-                });
+                list.forEach(DataStorer::read);
 
             });
 
@@ -434,9 +443,7 @@ public class ZetaCore extends ZetaPlugin {
 
             dataHandlers.values().forEach(list -> {
 
-                list.forEach(handler -> {
-                    handler.read();
-                });
+                list.forEach(DataStorer::read);
 
             });
 
@@ -450,17 +457,13 @@ public class ZetaCore extends ZetaPlugin {
 
             databaseDataHandlers.values().forEach(list -> {
 
-                list.forEach(handler -> {
-                    handler.writeDB();
-                });
+                list.forEach(ISQLTableHandler::writeDB);
 
             });
 
             dataHandlers.values().forEach(list -> {
 
-                list.forEach(handler -> {
-                    handler.write();
-                });
+                list.forEach(DataStorer::write);
 
             });
 
@@ -468,9 +471,7 @@ public class ZetaCore extends ZetaPlugin {
 
             dataHandlers.values().forEach(list -> {
 
-                list.forEach(handler -> {
-                    handler.write();
-                });
+                list.forEach(DataStorer::write);
 
             });
 

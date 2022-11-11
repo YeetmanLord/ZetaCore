@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
 import com.github.yeetmanlord.zeta_core.sql.types.ColumnSettings;
@@ -98,9 +97,8 @@ public class SQLTable implements ISQLTable {
     @Override
     public void setColumns(List<SQLColumn<?>> columns) {
 
-
         for (SQLColumn<?> sqlColumn : columns) {
-            if (sqlColumn.getKey() == this.primaryKey && !sqlColumn.getSettings().isNonNull()) {
+            if (sqlColumn.getKey().equalsIgnoreCase(this.primaryKey) && !sqlColumn.getSettings().isNonNull()) {
                 ColumnSettings settings = sqlColumn.getSettings();
                 if (!settings.isUnique()) {
                     settings.setNonNull(true);
@@ -110,10 +108,13 @@ public class SQLTable implements ISQLTable {
             this.columns.put(sqlColumn.getKey(), sqlColumn);
         }
 
-
     }
 
     public void writeValue(Object... args) {
+        writeValue(false, args);
+    }
+
+    public void writeValue(boolean async, Object... args) {
 
         String params = "";
 
@@ -132,12 +133,11 @@ public class SQLTable implements ISQLTable {
         }
 
         params.trim();
-        this.handler.replaceInto(tableName, params, args);
+        this.handler.replaceInto(tableName, params, async, args);
 
     }
 
-    public void writeValue(Row row) {
-
+    public void writeValue(Row row, boolean async) {
         String params = "";
         Object[] values = new Object[row.size()];
 
@@ -159,7 +159,17 @@ public class SQLTable implements ISQLTable {
         }
 
         params.trim();
-        this.handler.replaceInto(tableName, params, values);
+        this.handler.replaceInto(tableName, params, async, values);
+    }
+
+    /**
+     * By default, synchronous
+     *
+     * @param row {@link Row} of data to write
+     */
+    public void writeValue(Row row) {
+
+        this.writeValue(row, false);
 
     }
 
@@ -176,24 +186,54 @@ public class SQLTable implements ISQLTable {
 
     }
 
-    public <PrimaryKeyType> void removeRow(String primaryKeyValue) {
-        this.handler.removeRow(this.tableName, this.primaryKey, primaryKeyValue);
+    /**
+     * By default, asynchronous
+     *
+     * @param primaryKeyValue Value of the primary key
+     */
+    public void removeRow(Object primaryKeyValue) {
+        this.removeRow(primaryKeyValue, true);
     }
 
-    public <PrimaryKeyType> void removeRowWhere(String column, String value) {
-        this.handler.removeRow(this.tableName, column, value);
+    public void removeRow(Object primaryKeyValue, boolean async) {
+        this.handler.removeRow(this.tableName, this.primaryKey, primaryKeyValue, async);
+    }
+
+    public void removeRowWhere(String column, Object value) {
+        this.removeRowWhere(column, value, true);
+    }
+
+    public void removeRowWhere(String column, Object value, boolean async) {
+        this.handler.removeRow(this.tableName, column, value, async);
     }
 
     public void drop() {
-        this.handler.dropTable(this.tableName);
+        this.drop(true);
     }
 
-    public <PrimaryKeyType> void update(String column, SQLValue<?> value, SQLValue<PrimaryKeyType> primaryKeyValue) {
-        this.handler.update(this.tableName, column, value, this.primaryKey, primaryKeyValue);
+    public void drop(boolean async) {
+        this.handler.dropTable(this.tableName, async);
+    }
+
+    public void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue) {
+        update(column, value, primaryKeyValue, true);
+    }
+
+    public void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue, boolean async) {
+        this.handler.updateWhere(this.tableName, column, value, this.primaryKey, primaryKeyValue, async);
     }
 
     public void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue) {
-        this.handler.update(this.tableName, column, value, whereColumn, whereValue);
+        update(column, value, whereColumn, whereValue, true);
+    }
+
+    public void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue, boolean async) {
+        this.handler.updateWhere(this.tableName, column, value, whereColumn, whereValue, async);
+    }
+
+    @Override
+    public ArrayList<Row> getAllData() {
+        return this.handler.getAllData(this);
     }
 
     @Override

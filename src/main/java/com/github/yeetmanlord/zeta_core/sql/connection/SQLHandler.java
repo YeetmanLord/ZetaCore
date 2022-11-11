@@ -15,7 +15,7 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.bukkit.Bukkit;
 
 /**
  * @author YeetManLord
@@ -33,15 +33,15 @@ public class SQLHandler {
 
     }
 
-    public void createTable(String name, String parameters) {
+    public void createTable(String name, String parameters, boolean async) {
 
         if (this.client.isConnected()) {
-            executeStatement("CREATE TABLE IF NOT EXISTS `" + name + "` (" + parameters + ");");
+            executeStatement("CREATE TABLE IF NOT EXISTS `" + name + "` (" + parameters + ");", async);
         }
 
     }
 
-    public void replaceInto(String tableName, String tableParams, @Nonnull Object... values) {
+    public void replaceInto(String tableName, String tableParams, boolean async, @Nonnull Object... values) {
 
         if (this.client.isConnected()) {
             String value = "";
@@ -69,7 +69,7 @@ public class SQLHandler {
                         value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
                     } else if (obj instanceof Boolean) {
                         value += (Boolean) obj ? 1 : 0;
-                    }else {
+                    } else {
                         value += obj.toString().replaceAll("\"", "\\\\\\\"");
                     }
 
@@ -78,39 +78,47 @@ public class SQLHandler {
             }
 
             value = value.trim();
-            executeStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");");
+            executeStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");", async);
 
         }
 
     }
 
-    public void dropTable(String tableName) {
+    public void dropTable(String tableName, boolean async) {
 
         if (this.client.isConnected()) {
-            executeStatement("DROP TABLE `" + tableName + "`;");
+            executeStatement("DROP TABLE `" + tableName + "`;", async);
         }
 
     }
 
-    public <PrimaryKeyValue> void removeRow(String tableName, String checkColumn, Object value) {
-
+    public void removeRow(String tableName, String checkColumn, Object value, boolean async) {
         if (this.client.isConnected()) {
-            try {
-
-                if (client != null) {
-                    PreparedStatement statement = client.getClient().prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;");
-                    statement.setObject(1, value);
-                    statement.executeUpdate();
+            if (client != null) {
+                if (async) {
+                    Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                        try {
+                            PreparedStatement statement = client.getClient().prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;");
+                            statement.setObject(1, value);
+                            statement.executeUpdate();
+                        } catch (SQLException exc) {
+                            exc.printStackTrace();
+                        }
+                    });
+                } else {
+                    try {
+                        PreparedStatement statement = client.getClient().prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;");
+                        statement.setObject(1, value);
+                        statement.executeUpdate();
+                    } catch (SQLException exc) {
+                        exc.printStackTrace();
+                    }
                 }
-
-            } catch (SQLException exc) {
-                exc.printStackTrace();
             }
         }
-
     }
 
-    public void insertIntoIgnore(String tableName, String tableParams, @Nonnull Object... values) {
+    public void insertIntoIgnore(String tableName, String tableParams, boolean async, @Nonnull Object... values) {
 
         if (this.client.isConnected()) {
             String value = "";
@@ -128,8 +136,7 @@ public class SQLHandler {
                         value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\", ";
                     } else if (obj instanceof Boolean) {
                         value += (Boolean) obj ? 1 : 0 + ", ";
-                    }
-                    else {
+                    } else {
                         value += obj.toString().replaceAll("\"", "\\\\\\\"") + ", ";
                     }
 
@@ -139,8 +146,7 @@ public class SQLHandler {
                         value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
                     } else if (obj instanceof Boolean) {
                         value += (Boolean) obj ? 1 : 0;
-                    }
-                    else {
+                    } else {
                         value += obj.toString().replaceAll("\"", "\\\\\\\"");
                     }
 
@@ -150,28 +156,39 @@ public class SQLHandler {
 
             value = value.trim();
 
-            executeStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");");
+            executeStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");", async);
         }
 
     }
 
-    public void executeStatement(String sqlCode) {
+    public void executeStatement(final String sqlCode, boolean async) {
+        if (async) {
+            asyncExecuteStatement(sqlCode);
+            return;
+        }
+        executeStatement(sqlCode);
+    }
+
+    public void executeStatement(final String sqlCode) {
 
         if (this.client.isConnected()) {
 
-            try {
-
-                if (client != null) {
+            if (client != null) {
+                try {
                     PreparedStatement statement = client.getClient().prepareStatement(sqlCode);
                     statement.executeUpdate();
+                } catch (SQLException exc) {
+                    exc.printStackTrace();
                 }
-
-            } catch (SQLException exc) {
-                exc.printStackTrace();
             }
 
         }
+    }
 
+    public void asyncExecuteStatement(final String sqlCode) {
+        if (this.client.isConnected()) {
+            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> executeStatement(sqlCode));
+        }
     }
 
     public Connection getClient() {
@@ -238,14 +255,11 @@ public class SQLHandler {
             try {
                 PreparedStatement statement = client.getClient().prepareStatement("SELECT " + columnName + " FROM `" + table + "`");
                 ResultSet queryResult = statement.executeQuery();
-                if (queryResult.next()) {
-                    Object obj = queryResult.getObject(columnName);
-                    list.add(SQLValue.create(columnName, obj));
-                }
-
                 while (queryResult.next()) {
                     list.add(SQLValue.create(columnName, queryResult.getObject(columnName)));
                 }
+
+                statement.close();
 
             } catch (SQLException exc) {
                 exc.printStackTrace();
@@ -257,37 +271,49 @@ public class SQLHandler {
 
     }
 
-    public <PrimaryColumnValue> Row getRow(ISQLTable table, PrimaryColumnValue prim) {
+    public Row getRow(ISQLTable table, Object prim) {
 
-        HashMap<String, SQLValue<?>> row = new HashMap<>();
+        Row row = new Row();
         if (this.client.isConnected()) {
-            for (SQLColumn<?> val : table.getColumns().values()) {
-                row.put(val.getKey(), val.get(prim));
-            }
+            try {
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT * FROM `" + table.getName() + "` WHERE " + table.getPrimary() + "=?;");
+                statement.setObject(1, prim);
+                ResultSet result = statement.executeQuery();
 
+                while (result.next()) {
+                    for (String col : table.getColumns().keySet()) {
+                        row.put(col, result.getObject(col));
+                    }
+                }
+
+
+                statement.close();
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            }
         }
 
-        return Row.createRow(row);
+        return row;
 
     }
 
-    public <RowValue> List<Row> getRowsWhere(String primaryKey, ISQLTable table, String column, RowValue whereEquals) {
+    public List<Row> getRowsWhere(ISQLTable table, String column, Object whereEquals) {
 
         List<Row> list = new ArrayList<>();
 
         if (this.client.isConnected()) {
 
             try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + primaryKey + " FROM `" + table.getName() + "` WHERE " + column + "=?;");
+                PreparedStatement statement = client.getClient().prepareStatement("SELECT * FROM `" + table.getName() + "` WHERE " + column + "=?;");
                 statement.setObject(1, whereEquals);
                 ResultSet queryResult = statement.executeQuery();
 
-                if (queryResult.next()) {
-                    list.add(getRow(table, queryResult.getObject(primaryKey)));
-                }
-
                 while (queryResult.next()) {
-                    list.add(getRow(table, queryResult.getObject(primaryKey)));
+                    Row row = new Row();
+                    for (String key : table.getColumns().keySet()) {
+                        row.put(key, queryResult.getObject(key));
+                    }
+                    list.add(row);
                 }
 
             } catch (SQLException exc) {
@@ -300,20 +326,56 @@ public class SQLHandler {
 
     }
 
-    public void update(String table, String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue) {
+    public void updateWhere(String table, String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue, boolean async) {
         if (this.client.isConnected()) {
-            try {
-
-                if (client != null) {
+            if (client != null) {
+                if (async) {
+                    Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                        try {
+                            PreparedStatement statement = client.getClient().prepareStatement("UPDATE `" + table + "` SET " + column + "=?" + " WHERE " + whereColumn + "=?;");
+                            statement.setObject(1, value.getValue());
+                            statement.setObject(2, whereValue.getValue());
+                            statement.executeUpdate();
+                        } catch (SQLException exc) {
+                            exc.printStackTrace();
+                        }
+                    });
+                }
+            } else {
+                try {
                     PreparedStatement statement = client.getClient().prepareStatement("UPDATE `" + table + "` SET " + column + "=?" + " WHERE " + whereColumn + "=?;");
                     statement.setObject(1, value.getValue());
                     statement.setObject(2, whereValue.getValue());
                     statement.executeUpdate();
+                } catch (SQLException exc) {
+                    exc.printStackTrace();
                 }
-
-            } catch (SQLException exc) {
-                exc.printStackTrace();
             }
         }
+    }
+
+
+    public ArrayList<Row> getAllData(ISQLTable table) {
+        ArrayList<Row> rows = new ArrayList<>();
+        if (this.client.isConnected()) {
+            if (client != null) {
+                try {
+                    PreparedStatement statement = client.getClient().prepareStatement("SELECT * FROM `" + table + "`;");
+                    ResultSet set = statement.executeQuery();
+
+                    while (set.next()) {
+                        Row row = new Row();
+                        for (String key : table.getColumns().keySet()) {
+                            row.put(key, set.getObject(key));
+                        }
+                        rows.add(row);
+                    }
+                } catch (SQLException exc) {
+                    exc.printStackTrace();
+                }
+            }
+        }
+
+        return rows;
     }
 }

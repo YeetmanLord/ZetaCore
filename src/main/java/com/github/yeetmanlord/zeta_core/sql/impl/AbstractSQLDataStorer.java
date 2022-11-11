@@ -14,6 +14,7 @@ import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
+import org.bukkit.Bukkit;
 
 public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer implements ISQLTableHandler<PrimaryKeyType> {
 
@@ -64,6 +65,8 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 			this.writeDB();
 		}
 
+		this.readDB();
+
 	}
 
 	public abstract List<SQLColumn<?>> getColumns(SQLHandler handler);
@@ -79,7 +82,7 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 
 		List<ISQL<?>> iSQLs = new ArrayList<>();
 
-		List<Row> list = this.table.getHandler().getRowsWhere(this.getPrimaryKey(), this.table, valueToCheck.getKey(), valueToCheck.getValue());
+		List<Row> list = this.table.getHandler().getRowsWhere(this.table, valueToCheck.getKey(), valueToCheck.getValue());
 
 		for (Row map : list) {
 			iSQLs.add(this.getHandler().load(map));

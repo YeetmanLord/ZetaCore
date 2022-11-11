@@ -1,12 +1,17 @@
 package com.github.yeetmanlord.zeta_core;
 
+import com.github.yeetmanlord.zeta_core.data.DataStorer;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.yeetmanlord.zeta_core.data.DataBase;
 import com.github.yeetmanlord.zeta_core.logging.Logger;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 /**
- * Extention of {@link JavaPlugin} and is used to add some ease of use
+ * Extension of {@link JavaPlugin} and is used to add some ease of use
  * functionality to all Zeta series plugins. As well as ensure standard and
  * default behaviors.
  *
@@ -37,16 +42,20 @@ public abstract class ZetaPlugin extends JavaPlugin {
     }
 
     private void initDB() {
+        final LocalDateTime end = LocalDateTime.now().plus(3200, ChronoUnit.MILLIS);
 
-        if (ZetaCore.INSTANCE.isConnectedToDatabase()) {
+        if (ZetaCore.INSTANCE.dataBase.initialized) {
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
 
-            ZetaCore.getDatabaseDataHandlers(this).forEach(d -> {
-                d.initializeDB(ZetaCore.INSTANCE.dataBase.client.handler);
+                while (!ZetaCore.INSTANCE.isConnectedToDatabase()) {
+                    if (LocalDateTime.now().isAfter(end)) break;
+                }
+                ZetaCore.getDatabaseDataHandlers(this).forEach(d -> d.initializeDB(ZetaCore.INSTANCE.dataBase.client.handler));
+
             });
-
         }
-
     }
+
 
     @Override
     public void onDisable() {
@@ -57,12 +66,7 @@ public abstract class ZetaPlugin extends JavaPlugin {
             ZetaCore.INSTANCE.dataBase.client.writeData(this);
         }
 
-        ZetaCore.getDataHandlers(this).forEach((handler) -> {
-
-            handler.write();
-
-        });
-
+        ZetaCore.getDataHandlers(this).forEach(DataStorer::write);
 
     }
 
@@ -78,16 +82,27 @@ public abstract class ZetaPlugin extends JavaPlugin {
 
     protected void readData() {
 
-        DataBase db = ZetaCore.INSTANCE.dataBase;
+        final DataBase db = ZetaCore.INSTANCE.dataBase;
         this.logger.info("Reading data for " + this.getPluginName());
 
-        if (ZetaCore.INSTANCE.isConnectedToDatabase()) {
-            db.client.readData(this);
-        } else {
-            ZetaCore.getDataHandlers(this).forEach(d -> {
-                d.read();
-            });
-        }
+        final LocalDateTime end = LocalDateTime.now().plus(3200, ChronoUnit.MILLIS);
+
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            if (db.initialized) {
+                while (!ZetaCore.INSTANCE.isConnectedToDatabase()) {
+                    if (LocalDateTime.now().isAfter(end)) break;
+                }
+                if (ZetaCore.INSTANCE.isConnectedToDatabase()) {
+                    db.client.readData(this);
+                } else {
+                    ZetaCore.getDataHandlers(this).forEach(DataStorer::read);
+                }
+                Bukkit.getScheduler().runTask(this, this::onDataReadFinish);
+            } else {
+                ZetaCore.getDataHandlers(this).forEach(DataStorer::read);
+                onDataReadFinish();
+            }
+        });
 
     }
 
@@ -95,15 +110,19 @@ public abstract class ZetaPlugin extends JavaPlugin {
         DataBase db = ZetaCore.INSTANCE.dataBase;
 
         if (db.initialized && ZetaCore.INSTANCE.dataBase.client.isConnected()) {
-            ZetaCore.getDataHandlers(this).forEach(d -> {
-                d.write();
-            });
+            ZetaCore.getDataHandlers(this).forEach(DataStorer::write);
             db.client.writeData(this);
         } else {
-            ZetaCore.getDataHandlers(this).forEach(d -> {
-                d.write();
-            });
+            ZetaCore.getDataHandlers(this).forEach(DataStorer::write);
         }
     }
+
+    /**
+     * Very important callback method that is called once asynchronous reading is completed. Use this to start any tasks relating to reading data from databases.
+     * IF database connection fails files will be read from local files.
+     */
+    public abstract void onDataReadFinish();
+
+    public abstract boolean initializedFinished();
 
 }
