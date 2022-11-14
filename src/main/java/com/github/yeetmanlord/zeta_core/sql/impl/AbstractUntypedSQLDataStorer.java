@@ -67,7 +67,7 @@ public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataS
 
 		if (this.table.getRows().isEmpty()) {
 			this.read();
-			this.writeDB();
+			this.writeToDB();
 		}
 
 	}

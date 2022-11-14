@@ -62,7 +62,7 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 
 		if (this.table.getRows().isEmpty()) {
 			this.read();
-			this.writeDB();
+			this.writeToDB();
 		}
 
 		this.readDB();

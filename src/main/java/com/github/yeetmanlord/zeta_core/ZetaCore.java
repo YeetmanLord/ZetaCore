@@ -457,7 +457,7 @@ public class ZetaCore extends ZetaPlugin {
 
             databaseDataHandlers.values().forEach(list -> {
 
-                list.forEach(ISQLTableHandler::writeDB);
+                list.forEach(ISQLTableHandler::writeToDB);
 
             });
 

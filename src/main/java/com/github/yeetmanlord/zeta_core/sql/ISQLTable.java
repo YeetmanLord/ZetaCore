@@ -72,6 +72,7 @@ public interface ISQLTable {
 
     /**
      * By default, this runs asynchronously
+     *
      * @param handler SQLHandler object to process sql requests
      */
     default void initializeTable(SQLHandler handler) {
@@ -102,6 +103,30 @@ public interface ISQLTable {
     List<Row> getRows();
 
     void setColumns(List<SQLColumn<?>> column);
+
+    /**
+     * Writes a row to an SQL table
+     *
+     * @param row   {@link Row} of data to write
+     * @param async Determines whether the SQL operation should be run on an async thread
+     * @implNote This is very important for server performance. When writing to a database
+     * <i>outside of</i> the {@link ZetaPlugin#onDisable() onDisable} method will slow down the server
+     * if your database is not already hosted locally. This also applies to the onDisable method but data <i>must</i>
+     * be written immediately before the plugin is shut off so that someone stopping the server doesn't lose data.
+     */
+    void writeValue(Row row, boolean async);
+
+    /**
+     * Writes a row to an SQL table
+     *
+     * @param row   {@link Row} of data to write
+     * @param async Determines whether the SQL operation should be run on an async thread
+     * @implNote This is very important for server performance. When writing to a database
+     * <i>outside of</i> the {@link ZetaPlugin#onDisable() onDisable} method will slow down the server
+     * if your database is not already hosted locally. This also applies to the onDisable method but data <i>must</i>
+     * be written immediately before the plugin is shut off so that someone stopping the server doesn't lose data.
+     */
+    void writeValue(boolean async, Object... args);
 
     /**
      * Writes a row to an SQL table
@@ -215,11 +240,17 @@ public interface ISQLTable {
      * @param value       Value to update (new value)
      * @param whereColumn Column to check and update by
      * @param whereValue  Value of that column
-     *
-     * @param async Whether to run on async thread or main thread. True indicates running on an async thread
+     * @param async       Whether to run on async thread or main thread. True indicates running on an async thread
      */
     void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue, boolean async);
 
-    ArrayList<Row> getAllData();
+    /**
+     * Since {@link #writeValue(Row)} and {@link #writeValue(Object...)} use an SQL batch statement to execute writing (in order to save performance)
+     * you must use this to commit the changes to the database. Not committing will lead to data being lost.
+     *
+     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row, boolean) for implementation of batching.
+     * @implNote When using {@link ISQLTableHandler SQL table handlers} you can also use {@link ISQLTableHandler#writeToDB()} to commit automatically.
+     */
+    void commit();
 
 }

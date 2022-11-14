@@ -99,13 +99,13 @@ public class SQLClient {
 
     public void writeData() {
 
-        ZetaCore.getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::writeDB));
+        ZetaCore.getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::writeToDB));
 
     }
 
     public void writeData(ZetaPlugin plugin) {
 
-        ZetaCore.getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeDB);
+        ZetaCore.getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeToDB);
 
     }
 

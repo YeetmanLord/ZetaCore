@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,6 +13,8 @@ import javax.annotation.Nonnull;
 
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
+import com.github.yeetmanlord.zeta_core.sql.connection.batch.AsyncSQLBatchStatement;
+import com.github.yeetmanlord.zeta_core.sql.connection.batch.SQLBatchStatement;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
@@ -41,46 +44,82 @@ public class SQLHandler {
 
     }
 
-    public void replaceInto(String tableName, String tableParams, boolean async, @Nonnull Object... values) {
+    public void replaceInto(String tableName, String tableParams, boolean async, @Nonnull final Object... values) {
 
         if (this.client.isConnected()) {
             String value = "";
 
             for (int x = 0; x < values.length; x++) {
-                Object obj = values[x];
-
-                if (obj == null) {
-                    obj = "null";
-                }
-
-                if (x < values.length - 1) {
-
-                    if (obj instanceof String) {
-                        value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\", ";
-                    } else if (obj instanceof Boolean) {
-                        value += ((Boolean) obj ? 1 : 0) + ", ";
-                    } else {
-                        value += obj.toString().replaceAll("\"", "\\\\\\\"") + ", ";
-                    }
-
+                if (x == values.length - 1) {
+                    value += "?";
                 } else {
-
-                    if (obj instanceof String) {
-                        value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
-                    } else if (obj instanceof Boolean) {
-                        value += (Boolean) obj ? 1 : 0;
-                    } else {
-                        value += obj.toString().replaceAll("\"", "\\\\\\\"");
-                    }
-
+                    value += "?, ";
                 }
-
             }
 
-            value = value.trim();
-            executeStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");", async);
+            final String valueFinal = value.trim();
+            if (async) {
+                Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                    try {
+                        PreparedStatement statement = client.getClient().prepareStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");");
+
+                        for (int x = 0; x < values.length; x++) {
+                            statement.setObject(x + 1, values[x]);
+                        }
+                        statement.executeUpdate();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                });
+                return;
+            }
+            try {
+                PreparedStatement statement = client.getClient().prepareStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");");
+
+                for (int x = 0; x < values.length; x++) {
+                    statement.setObject(x + 1, values[x]);
+                }
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
         }
+
+    }
+
+    public SQLBatchStatement addReplaceInto(SQLBatchStatement existing, String tableName, String params, boolean async, Object... values) {
+
+        String value = "";
+
+        for (int x = 0; x < values.length; x++) {
+            if (x == values.length - 1) {
+                value += "?";
+            } else {
+                value += "?, ";
+            }
+        }
+
+        String statement = "REPLACE INTO `" + tableName + "` (" + params + ") VALUES (" + value + ");";
+
+        SQLBatchStatement batch;
+        if (async) {
+            if (existing != null) {
+                batch = existing instanceof AsyncSQLBatchStatement ? existing : new AsyncSQLBatchStatement(existing);
+            } else {
+                batch = new AsyncSQLBatchStatement(statement);
+            }
+        }
+        else {
+            if (existing != null) {
+                batch = existing instanceof AsyncSQLBatchStatement ? new SQLBatchStatement((AsyncSQLBatchStatement) existing) : existing;
+            } else {
+                batch = new SQLBatchStatement(statement);
+            }
+        }
+
+        batch.addBatch(Arrays.asList(values));
+        return batch;
 
     }
 
@@ -124,39 +163,41 @@ public class SQLHandler {
             String value = "";
 
             for (int x = 0; x < values.length; x++) {
-                Object obj = values[x];
-
-                if (obj == null) {
-                    obj = "null";
-                }
-
-                if (x < values.length - 1) {
-
-                    if (obj instanceof String) {
-                        value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\", ";
-                    } else if (obj instanceof Boolean) {
-                        value += (Boolean) obj ? 1 : 0 + ", ";
-                    } else {
-                        value += obj.toString().replaceAll("\"", "\\\\\\\"") + ", ";
-                    }
-
+                if (x == values.length - 1) {
+                    value += "?";
                 } else {
-
-                    if (obj instanceof String) {
-                        value += "\"" + obj.toString().replaceAll("\"", "\\\\\\\"") + "\"";
-                    } else if (obj instanceof Boolean) {
-                        value += (Boolean) obj ? 1 : 0;
-                    } else {
-                        value += obj.toString().replaceAll("\"", "\\\\\\\"");
-                    }
-
+                    value += "?, ";
                 }
-
             }
 
-            value = value.trim();
+            final String valueFinal = value.trim();
 
-            executeStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");", async);
+
+            if (async) {
+                Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                    try {
+                        PreparedStatement statement = client.getClient().prepareStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");");
+
+                        for (int x = 0; x < values.length; x++) {
+                            statement.setObject(x + 1, values[x]);
+                        }
+                        statement.executeUpdate();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                });
+                return;
+            }
+            try {
+                PreparedStatement statement = client.getClient().prepareStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");");
+
+                for (int x = 0; x < values.length; x++) {
+                    statement.setObject(x + 1, values[x]);
+                }
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
     }

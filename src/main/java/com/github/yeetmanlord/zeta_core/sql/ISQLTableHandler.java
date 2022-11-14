@@ -32,6 +32,11 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 
 	void writeDB();
 
+	default void writeToDB() {
+		this.writeDB();
+		this.getTable().commit();
+	}
+
 	/**
 	 * @param primaryKey Primary key value
 	 * @return The translated form of the SQL data in a certain row gotten from the
@@ -41,7 +46,7 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 
 	/**
 	 * 
-	 * @param primaryKeyValue The value of the of the primary key in the row to grab
+	 * @param primaryKeyValue The value of the primary key in the row to grab
 	 *                        the column value from
 	 * @param columnName      The column to grab the value from
 	 * @see SQLColumn#get(Object)

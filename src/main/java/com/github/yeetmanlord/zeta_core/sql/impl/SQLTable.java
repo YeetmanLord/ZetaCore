@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
+import com.github.yeetmanlord.zeta_core.sql.connection.batch.AsyncSQLBatchStatement;
+import com.github.yeetmanlord.zeta_core.sql.connection.batch.SQLBatchStatement;
 import com.github.yeetmanlord.zeta_core.sql.types.ColumnSettings;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
@@ -21,6 +23,8 @@ public class SQLTable implements ISQLTable {
     private LinkedHashMap<String, SQLColumn<?>> columns;
 
     private SQLHandler handler;
+
+    private SQLBatchStatement batch;
 
     public SQLTable(String primaryKey, String tableName, SQLHandler handler) {
 
@@ -82,15 +86,7 @@ public class SQLTable implements ISQLTable {
     @Override
     public List<Row> getRows() {
 
-        List<Row> rows = new ArrayList<>();
-
-        List<SQLValue<?>> primaryKeys = this.handler.getColumnEntries(tableName, primaryKey);
-
-        for (SQLValue<?> value : primaryKeys) {
-            rows.add(this.getRow(value.getValue()));
-        }
-
-        return rows;
+        return this.handler.getAllData(this);
 
     }
 
@@ -132,8 +128,8 @@ public class SQLTable implements ISQLTable {
             x++;
         }
 
-        params.trim();
-        this.handler.replaceInto(tableName, params, async, args);
+        params = params.trim();
+        this.batch = this.handler.addReplaceInto(this.batch, tableName, params, async, args);
 
     }
 
@@ -158,8 +154,12 @@ public class SQLTable implements ISQLTable {
 
         }
 
-        params.trim();
-        this.handler.replaceInto(tableName, params, async, values);
+        params = params.trim();
+        this.batch = this.handler.addReplaceInto(this.batch, tableName, params, async, values);
+    }
+
+    public void commit() {
+        this.batch.execute(this.handler);
     }
 
     /**
@@ -229,11 +229,6 @@ public class SQLTable implements ISQLTable {
 
     public void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue, boolean async) {
         this.handler.updateWhere(this.tableName, column, value, whereColumn, whereValue, async);
-    }
-
-    @Override
-    public ArrayList<Row> getAllData() {
-        return this.handler.getAllData(this);
     }
 
     @Override
