@@ -6,16 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
-import com.github.yeetmanlord.zeta_core.sql.connection.batch.AsyncSQLBatchStatement;
-import com.github.yeetmanlord.zeta_core.sql.connection.batch.SQLBatchStatement;
-import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 import org.bukkit.Bukkit;
@@ -102,21 +98,7 @@ public class SQLHandler {
 
         String statement = "REPLACE INTO `" + tableName + "` (" + params + ") VALUES (" + value + ");";
 
-        SQLBatchStatement batch;
-        if (async) {
-            if (existing != null) {
-                batch = existing instanceof AsyncSQLBatchStatement ? existing : new AsyncSQLBatchStatement(existing);
-            } else {
-                batch = new AsyncSQLBatchStatement(statement);
-            }
-        }
-        else {
-            if (existing != null) {
-                batch = existing instanceof AsyncSQLBatchStatement ? new SQLBatchStatement((AsyncSQLBatchStatement) existing) : existing;
-            } else {
-                batch = new SQLBatchStatement(statement);
-            }
-        }
+        SQLBatchStatement batch = existing == null ? new SQLBatchStatement(statement) : existing;
 
         batch.addBatch(Arrays.asList(values));
         return batch;

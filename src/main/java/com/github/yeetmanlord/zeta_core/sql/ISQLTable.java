@@ -248,8 +248,18 @@ public interface ISQLTable {
      * Since {@link #writeValue(Row)} and {@link #writeValue(Object...)} use an SQL batch statement to execute writing (in order to save performance)
      * you must use this to commit the changes to the database. Not committing will lead to data being lost.
      *
-     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row, boolean) for implementation of batching.
+     * @param async Whether to run on async thread or main thread. True indicates running on an async thread
      * @implNote When using {@link ISQLTableHandler SQL table handlers} you can also use {@link ISQLTableHandler#writeToDB()} to commit automatically.
+     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row, boolean) for implementation of batching.
+     */
+    void commit(boolean async);
+
+    /**
+     * Since {@link #writeValue(Row)} and {@link #writeValue(Object...)} use an SQL batch statement to execute writing (in order to save performance)
+     * you must use this to commit the changes to the database. Not committing will lead to data being lost.
+     *
+     * @implNote When using {@link ISQLTableHandler SQL table handlers} you can also use {@link ISQLTableHandler#writeToDB()} to commit automatically.
+     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row, boolean) for implementation of batching.
      */
     void commit();
 

@@ -1,14 +1,12 @@
 package com.github.yeetmanlord.zeta_core.sql.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
-import com.github.yeetmanlord.zeta_core.sql.connection.batch.AsyncSQLBatchStatement;
-import com.github.yeetmanlord.zeta_core.sql.connection.batch.SQLBatchStatement;
+import com.github.yeetmanlord.zeta_core.sql.connection.SQLBatchStatement;
 import com.github.yeetmanlord.zeta_core.sql.types.ColumnSettings;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
@@ -158,8 +156,12 @@ public class SQLTable implements ISQLTable {
         this.batch = this.handler.addReplaceInto(this.batch, tableName, params, async, values);
     }
 
+    public void commit(boolean async) {
+        this.batch.execute(this.handler, true);
+    }
+
     public void commit() {
-        this.batch.execute(this.handler);
+        this.commit(false);
     }
 
     /**

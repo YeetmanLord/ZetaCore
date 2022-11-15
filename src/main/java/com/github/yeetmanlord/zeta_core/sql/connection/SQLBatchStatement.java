@@ -1,6 +1,7 @@
-package com.github.yeetmanlord.zeta_core.sql.connection.batch;
+package com.github.yeetmanlord.zeta_core.sql.connection;
 
-import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
+import com.github.yeetmanlord.zeta_core.ZetaCore;
+import org.bukkit.Bukkit;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -19,16 +20,20 @@ public class SQLBatchStatement {
         this.batches = new ArrayList<>();
     }
 
-    public SQLBatchStatement(AsyncSQLBatchStatement statement) {
-        this.statement = statement.statement;
-        this.batches = statement.batches;
-    }
-
     public void addBatch(Object... args) {
         this.batches.add(Arrays.asList(args));
     }
 
-    public void execute(final SQLHandler handler) {
+    public void execute(final SQLHandler handler, boolean async) {
+        if (async) {
+            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> this.execute(handler));
+        } else {
+            this.execute(handler);
+        }
+    }
+
+
+    private void execute(final SQLHandler handler) {
         try {
             PreparedStatement statement = handler.getClient().prepareStatement(this.statement);
             for (List<Object> args : batches) {
@@ -41,6 +46,5 @@ public class SQLBatchStatement {
             exception.printStackTrace();
         }
     }
-
 
 }
