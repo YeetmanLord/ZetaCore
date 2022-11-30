@@ -17,8 +17,14 @@ import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
  */
 public interface ISQLTableHandler<PrimaryKeyType> {
 
+	/**
+	 * @return Table associated with this handler
+	 */
 	ISQLTable getTable();
 
+	/**
+	 * @return Table's primary key
+	 */
 	String getPrimaryKey();
 
 	/**
@@ -28,8 +34,15 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 	 */
 	Map<PrimaryKeyType, ISQL<?>> getData();
 
+	/**
+	 * Reads data from the table. By default, it is read asynchronously.
+	 */
 	void readDB();
 
+	/**
+	 * Used to write values to a batch statement buffer. All writes won't be executed until you commit using {@link ISQLTable#commit(boolean)}.
+	 * Otherwise, use {@link #writeToDB()} to automatically commit (synchronously)
+	 */
 	void writeDB();
 
 	default void writeToDB() {

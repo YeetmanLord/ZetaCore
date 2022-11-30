@@ -40,7 +40,7 @@ public class SQLHandler {
 
     }
 
-    public void replaceInto(String tableName, String tableParams, boolean async, @Nonnull final Object... values) {
+    public void replaceInto(final String tableName, final String tableParams, boolean async, @Nonnull final Object... values) {
 
         if (this.client.isConnected()) {
             String value = "";
@@ -56,9 +56,7 @@ public class SQLHandler {
             final String valueFinal = value.trim();
             if (async) {
                 Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
-                    try {
-                        PreparedStatement statement = client.getClient().prepareStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");");
-
+                    try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");")){
                         for (int x = 0; x < values.length; x++) {
                             statement.setObject(x + 1, values[x]);
                         }
@@ -69,9 +67,7 @@ public class SQLHandler {
                 });
                 return;
             }
-            try {
-                PreparedStatement statement = client.getClient().prepareStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");");
-
+            try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");")) {
                 for (int x = 0; x < values.length; x++) {
                     statement.setObject(x + 1, values[x]);
                 }
@@ -84,7 +80,7 @@ public class SQLHandler {
 
     }
 
-    public SQLBatchStatement addReplaceInto(SQLBatchStatement existing, String tableName, String params, boolean async, Object... values) {
+    public SQLBatchStatement addReplaceInto(SQLBatchStatement existing, String tableName, String params, Object... values) {
 
         String value = "";
 
@@ -118,8 +114,7 @@ public class SQLHandler {
             if (client != null) {
                 if (async) {
                     Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
-                        try {
-                            PreparedStatement statement = client.getClient().prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;");
+                        try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;")) {
                             statement.setObject(1, value);
                             statement.executeUpdate();
                         } catch (SQLException exc) {
@@ -127,8 +122,7 @@ public class SQLHandler {
                         }
                     });
                 } else {
-                    try {
-                        PreparedStatement statement = client.getClient().prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;");
+                    try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;")) {
                         statement.setObject(1, value);
                         statement.executeUpdate();
                     } catch (SQLException exc) {
@@ -157,9 +151,7 @@ public class SQLHandler {
 
             if (async) {
                 Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
-                    try {
-                        PreparedStatement statement = client.getClient().prepareStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");");
-
+                    try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");")) {
                         for (int x = 0; x < values.length; x++) {
                             statement.setObject(x + 1, values[x]);
                         }
@@ -170,9 +162,7 @@ public class SQLHandler {
                 });
                 return;
             }
-            try {
-                PreparedStatement statement = client.getClient().prepareStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + value + ");");
-
+            try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");")) {
                 for (int x = 0; x < values.length; x++) {
                     statement.setObject(x + 1, values[x]);
                 }
@@ -197,8 +187,7 @@ public class SQLHandler {
         if (this.client.isConnected()) {
 
             if (client != null) {
-                try {
-                    PreparedStatement statement = client.getClient().prepareStatement(sqlCode);
+                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement(sqlCode)) {
                     statement.executeUpdate();
                 } catch (SQLException exc) {
                     exc.printStackTrace();
@@ -214,25 +203,24 @@ public class SQLHandler {
         }
     }
 
-    public Connection getClient() {
+    public SQLClient getClient() {
 
-        return client.getClient();
+        return client;
 
     }
 
-    public SQLValue<?> query(String mainColumnName, Object mainColumnValue, String table, String queryColumn) {
+    public SQLValue<?> queryFirst(String mainColumnName, Object mainColumnValue, String table, String queryColumn) {
 
-        Object defaultValue = null;
+        Object value = null;
 
         if (this.client.isConnected()) {
 
-            try {
-                PreparedStatement ps = this.client.getClient().prepareStatement("SELECT " + queryColumn + " FROM `" + table + "` WHERE " + mainColumnName + "=?");
+            try (Connection conn = client.getSource().getConnection(); PreparedStatement ps = conn.prepareStatement("SELECT " + queryColumn + " FROM `" + table + "` WHERE " + mainColumnName + "=?")) {
                 ps.setObject(1, mainColumnValue);
                 ResultSet queryResult = ps.executeQuery();
 
                 if (queryResult.next()) {
-                    defaultValue = queryResult.getObject(queryColumn);
+                    value = queryResult.getObject(queryColumn);
                 }
 
             } catch (SQLException exc) {
@@ -241,8 +229,30 @@ public class SQLHandler {
 
         }
 
-        return SQLValue.create(queryColumn, defaultValue);
+        return SQLValue.create(queryColumn, value);
 
+    }
+
+    public List<SQLValue<?>> query(String mainColumnName, Object mainColumnValue, String table, String queryColumn) {
+        List<SQLValue<?>> results = new ArrayList<>();
+
+        if (this.client.isConnected()) {
+
+            try (Connection conn = client.getSource().getConnection(); PreparedStatement ps = conn.prepareStatement("SELECT " + queryColumn + " FROM `" + table + "` WHERE " + mainColumnName + "=?")) {
+                ps.setObject(1, mainColumnValue);
+                ResultSet queryResult = ps.executeQuery();
+
+                while (queryResult.next()) {
+                    results.add(SQLValue.create(queryColumn, queryResult.getObject(queryColumn)));
+                }
+
+            } catch (SQLException exc) {
+                exc.printStackTrace();
+            }
+
+        }
+
+        return results;
     }
 
     public int getEntrySize(String table) {
@@ -251,8 +261,7 @@ public class SQLHandler {
 
         if (this.client.isConnected()) {
 
-            try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT count(*) FROM `" + table + "`");
+            try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT count(*) FROM `" + table + "`")) {
                 ResultSet queryResult = statement.executeQuery();
 
                 if (queryResult.next()) {
@@ -275,15 +284,11 @@ public class SQLHandler {
 
         if (this.client.isConnected()) {
 
-            try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT " + columnName + " FROM `" + table + "`");
+            try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT " + columnName + " FROM `" + table + "`")) {
                 ResultSet queryResult = statement.executeQuery();
                 while (queryResult.next()) {
                     list.add(SQLValue.create(columnName, queryResult.getObject(columnName)));
                 }
-
-                statement.close();
-
             } catch (SQLException exc) {
                 exc.printStackTrace();
             }
@@ -298,8 +303,7 @@ public class SQLHandler {
 
         Row row = new Row();
         if (this.client.isConnected()) {
-            try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT * FROM `" + table.getName() + "` WHERE " + table.getPrimary() + "=?;");
+            try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM `" + table.getName() + "` WHERE " + table.getPrimary() + "=?;")) {
                 statement.setObject(1, prim);
                 ResultSet result = statement.executeQuery();
 
@@ -326,8 +330,7 @@ public class SQLHandler {
 
         if (this.client.isConnected()) {
 
-            try {
-                PreparedStatement statement = client.getClient().prepareStatement("SELECT * FROM `" + table.getName() + "` WHERE " + column + "=?;");
+            try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM `" + table.getName() + "` WHERE " + column + "=?;")) {
                 statement.setObject(1, whereEquals);
                 ResultSet queryResult = statement.executeQuery();
 
@@ -354,8 +357,7 @@ public class SQLHandler {
             if (client != null) {
                 if (async) {
                     Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
-                        try {
-                            PreparedStatement statement = client.getClient().prepareStatement("UPDATE `" + table + "` SET " + column + "=?" + " WHERE " + whereColumn + "=?;");
+                        try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + column + "=?" + " WHERE " + whereColumn + "=?;")) {
                             statement.setObject(1, value.getValue());
                             statement.setObject(2, whereValue.getValue());
                             statement.executeUpdate();
@@ -365,8 +367,7 @@ public class SQLHandler {
                     });
                 }
             } else {
-                try {
-                    PreparedStatement statement = client.getClient().prepareStatement("UPDATE `" + table + "` SET " + column + "=?" + " WHERE " + whereColumn + "=?;");
+                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + column + "=?" + " WHERE " + whereColumn + "=?;")) {
                     statement.setObject(1, value.getValue());
                     statement.setObject(2, whereValue.getValue());
                     statement.executeUpdate();
@@ -382,8 +383,7 @@ public class SQLHandler {
         ArrayList<Row> rows = new ArrayList<>();
         if (this.client.isConnected()) {
             if (client != null) {
-                try {
-                    PreparedStatement statement = client.getClient().prepareStatement("SELECT * FROM `" + table + "`;");
+                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM `" + table + "`;")) {
                     ResultSet set = statement.executeQuery();
 
                     while (set.next()) {

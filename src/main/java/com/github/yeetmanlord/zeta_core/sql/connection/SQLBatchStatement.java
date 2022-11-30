@@ -3,6 +3,7 @@ package com.github.yeetmanlord.zeta_core.sql.connection;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import org.bukkit.Bukkit;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,14 +35,14 @@ public class SQLBatchStatement {
 
 
     private void execute(final SQLHandler handler) {
-        try {
-            PreparedStatement statement = handler.getClient().prepareStatement(this.statement);
+        try (Connection conn = handler.getClient().getSource().getConnection(); PreparedStatement statement = conn.prepareStatement(this.statement)) {
             for (List<Object> args : batches) {
                 for (int x = 0; x < args.size(); x++) {
                     statement.setObject(x + 1, args.get(x));
                 }
                 statement.addBatch();
             }
+            statement.executeBatch();
         } catch (SQLException exception) {
             exception.printStackTrace();
         }

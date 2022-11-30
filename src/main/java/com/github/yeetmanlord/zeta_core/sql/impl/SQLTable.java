@@ -64,7 +64,7 @@ public class SQLTable implements ISQLTable {
 
     public <PrimaryKeyType> SQLValue<?> get(PrimaryKeyType primaryKeyValue, String columnToGet) {
 
-        return handler.query(getPrimary(), primaryKeyValue, getName(), columnToGet);
+        return handler.queryFirst(getPrimary(), primaryKeyValue, getName(), columnToGet);
 
     }
 
@@ -127,7 +127,7 @@ public class SQLTable implements ISQLTable {
         }
 
         params = params.trim();
-        this.batch = this.handler.addReplaceInto(this.batch, tableName, params, async, args);
+        this.batch = this.handler.addReplaceInto(this.batch, tableName, params, args);
 
     }
 
@@ -153,7 +153,7 @@ public class SQLTable implements ISQLTable {
         }
 
         params = params.trim();
-        this.batch = this.handler.addReplaceInto(this.batch, tableName, params, async, values);
+        this.batch = this.handler.addReplaceInto(this.batch, tableName, params, values);
     }
 
     public void commit(boolean async) {
@@ -164,11 +164,6 @@ public class SQLTable implements ISQLTable {
         this.commit(false);
     }
 
-    /**
-     * By default, synchronous
-     *
-     * @param row {@link Row} of data to write
-     */
     public void writeValue(Row row) {
 
         this.writeValue(row, false);
@@ -188,11 +183,6 @@ public class SQLTable implements ISQLTable {
 
     }
 
-    /**
-     * By default, asynchronous
-     *
-     * @param primaryKeyValue Value of the primary key
-     */
     public void removeRow(Object primaryKeyValue) {
         this.removeRow(primaryKeyValue, true);
     }

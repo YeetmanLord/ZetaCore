@@ -1,13 +1,16 @@
 package com.github.yeetmanlord.zeta_core.sql.connection;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.Bukkit;
+
+import javax.sql.DataSource;
 
 /**
  * Actual client that connects to the sql database
@@ -26,9 +29,11 @@ public class SQLClient {
 
     private String database;
 
-    private Connection client;
+    private DataSource dataSource;
 
     public SQLHandler handler;
+
+    private boolean validated = false;
 
     public SQLClient(String hostname, String username, String password, int port, String database) {
 
@@ -44,7 +49,7 @@ public class SQLClient {
 
     public boolean isConnected() {
 
-        return (client != null);
+        return (this.dataSource != null && validated);
 
     }
 
@@ -52,12 +57,27 @@ public class SQLClient {
 
         if (!isConnected()) {
             Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                Properties props = new Properties();
+                props.setProperty("dataSourceClassName", "org.mariadb.jdbc.MariaDbDataSource");
+                props.setProperty("dataSource.serverName", hostname);
+                props.setProperty("dataSource.portNumber", String.valueOf(port));
+                props.setProperty("dataSource.user", username);
+                props.setProperty("dataSource.password", password);
+                props.setProperty("dataSource.databaseName", database);
+
+                HikariConfig hConfig = new HikariConfig(props);
+
+                hConfig.setMaximumPoolSize(10);
+
+                this.dataSource = new HikariDataSource(hConfig);
+                handler = new SQLHandler(this);
+
                 try {
-                    client = DriverManager.getConnection("jdbc:mysql://" + hostname + ":" + port + "/" + database + "?useSSL=false&characterEncoding=UTF-8", username, password);
-                    handler = new SQLHandler(this);
+                    validated = this.dataSource.getConnection().isValid(3);
                     ZetaCore.LOGGER.info("&aDatabase is connected!");
                 } catch (SQLException e) {
-                    ZetaCore.LOGGER.info("&cDatabase not connected");
+                    ZetaCore.LOGGER.error(e, "&aCould not connect to database. Caused by the following exception:");
+                    validated = false;
                 }
             });
         }
@@ -68,20 +88,16 @@ public class SQLClient {
 
         if (isConnected()) {
 
-            try {
-                client.close();
-                this.client = null;
-            } catch (SQLException exc) {
-                exc.printStackTrace();
-            }
+            ((HikariDataSource)this.dataSource).close();
+            this.dataSource = null;
 
         }
 
     }
 
-    public Connection getClient() {
+    public DataSource getSource() {
 
-        return client;
+        return dataSource;
 
     }
 
