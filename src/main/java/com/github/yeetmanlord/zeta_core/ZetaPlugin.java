@@ -37,7 +37,6 @@ public abstract class ZetaPlugin extends JavaPlugin {
         }
         this.registerDataStorers();
         this.initDB();
-        this.readData();
 
     }
 
@@ -50,9 +49,15 @@ public abstract class ZetaPlugin extends JavaPlugin {
                 while (!ZetaCore.INSTANCE.isConnectedToDatabase()) {
                     if (LocalDateTime.now().isAfter(end)) break;
                 }
-                ZetaCore.getDatabaseDataHandlers(this).forEach(d -> d.initializeDB(ZetaCore.INSTANCE.dataBase.client.handler));
+                if (ZetaCore.INSTANCE.isConnectedToDatabase()) {
+                    ZetaCore.getDatabaseDataHandlers(this).forEach(d -> d.initializeDB(ZetaCore.INSTANCE.dataBase.client.handler));
+                }
+
+                this.readData();
 
             });
+        } else {
+            this.readData();
         }
     }
 
@@ -95,12 +100,12 @@ public abstract class ZetaPlugin extends JavaPlugin {
                 if (ZetaCore.INSTANCE.isConnectedToDatabase()) {
                     db.client.readData(this);
                 } else {
-                    ZetaCore.getDataHandlers(this).forEach(DataStorer::read);
+                    Bukkit.getScheduler().runTask(this, () -> ZetaCore.getDataHandlers(this).forEach(DataStorer::read));
                 }
                 Bukkit.getScheduler().runTask(this, this::onDataReadFinish);
             } else {
-                ZetaCore.getDataHandlers(this).forEach(DataStorer::read);
-                onDataReadFinish();
+                Bukkit.getScheduler().runTask(this, () -> ZetaCore.getDataHandlers(this).forEach(DataStorer::read));
+                Bukkit.getScheduler().runTask(this, this::onDataReadFinish);
             }
         });
 

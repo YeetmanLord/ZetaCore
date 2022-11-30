@@ -357,7 +357,7 @@ public class ZetaCore extends ZetaPlugin {
         ZetaPlugin plugin = storer.getPlugin();
         LOGGER.debug("Registering data handler for file, " + storer.getFileName() + ", for " + plugin.getName());
 
-        if (storer instanceof ISQLTableHandler && ZetaCore.INSTANCE.dataBase.initialized && ZetaCore.INSTANCE.dataBase.client != null && ZetaCore.INSTANCE.dataBase.client.isConnected()) {
+        if (storer instanceof ISQLTableHandler && ZetaCore.INSTANCE.dataBase.initialized) {
 
             if (!databaseDataHandlers.containsKey(plugin)) {
                 databaseDataHandlers.put(plugin, new ArrayList<>());

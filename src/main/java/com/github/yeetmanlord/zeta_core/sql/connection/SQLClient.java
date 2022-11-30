@@ -59,20 +59,18 @@ public class SQLClient {
             Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
                 Properties props = new Properties();
                 props.setProperty("dataSourceClassName", "org.mariadb.jdbc.MariaDbDataSource");
-                props.setProperty("dataSource.serverName", hostname);
-                props.setProperty("dataSource.portNumber", String.valueOf(port));
+                props.setProperty("dataSource.url", String.format("jdbc:%s://%s:%s/%s", "mariadb", hostname, port, database));
                 props.setProperty("dataSource.user", username);
                 props.setProperty("dataSource.password", password);
-                props.setProperty("dataSource.databaseName", database);
 
                 HikariConfig hConfig = new HikariConfig(props);
 
                 hConfig.setMaximumPoolSize(10);
 
-                this.dataSource = new HikariDataSource(hConfig);
-                handler = new SQLHandler(this);
-
                 try {
+                    this.dataSource = new HikariDataSource(hConfig);
+                    handler = new SQLHandler(this);
+
                     validated = this.dataSource.getConnection().isValid(3);
                     ZetaCore.LOGGER.info("&aDatabase is connected!");
                 } catch (SQLException e) {

@@ -107,30 +107,6 @@ public interface ISQLTable {
     /**
      * Writes a row to an SQL table
      *
-     * @param row   {@link Row} of data to write
-     * @param async Determines whether the SQL operation should be run on an async thread
-     * @implNote This is very important for server performance. When writing to a database
-     * <i>outside of</i> the {@link ZetaPlugin#onDisable() onDisable} method will slow down the server
-     * if your database is not already hosted locally. This also applies to the onDisable method but data <i>must</i>
-     * be written immediately before the plugin is shut off so that someone stopping the server doesn't lose data.
-     */
-    void writeValue(Row row, boolean async);
-
-    /**
-     * Writes a row to an SQL table
-     *
-     * @param row   {@link Row} of data to write
-     * @param async Determines whether the SQL operation should be run on an async thread
-     * @implNote This is very important for server performance. When writing to a database
-     * <i>outside of</i> the {@link ZetaPlugin#onDisable() onDisable} method will slow down the server
-     * if your database is not already hosted locally. This also applies to the onDisable method but data <i>must</i>
-     * be written immediately before the plugin is shut off so that someone stopping the server doesn't lose data.
-     */
-    void writeValue(boolean async, Object... args);
-
-    /**
-     * Writes a row to an SQL table
-     *
      * @param row {@link Row} of data to write
      * @implNote This is very important for server performance. When writing to a database
      * <i>outside of</i> the {@link ZetaPlugin#onDisable() onDisable} method will slow down the server
@@ -210,7 +186,14 @@ public interface ISQLTable {
      * @param primaryKeyValue Primary key to grab row by and then update
      * @implNote By default, this runs asynchronously
      */
-    void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue);
+    void update(String column, Object value, Object primaryKeyValue);
+
+    /**
+     * @see #update(String, Object, Object)
+     */
+    default void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue) {
+        update(column, value.getValue(), primaryKeyValue.getValue());
+    }
 
     /**
      * Updates a given column with new data using a primary key
@@ -220,7 +203,14 @@ public interface ISQLTable {
      * @param primaryKeyValue Primary key to grab row by and then update
      * @param async           Whether to run on async thread or main thread. True indicates running on an async thread
      */
-    void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue, boolean async);
+    void update(String column, Object value, Object primaryKeyValue, boolean async);
+
+    /**
+     * @see ISQLTable#update(String, Object, Object, boolean)
+     */
+    default void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue, boolean async) {
+        update(column, value.getValue(), primaryKeyValue.getValue(), async);
+    }
 
     /**
      * Updates a given column with new data where the specified whereColumn has the given.
@@ -231,7 +221,14 @@ public interface ISQLTable {
      * @param whereValue  Value of that column
      * @implNote By default, this runs asynchronously
      */
-    void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue);
+    void update(String column, Object value, String whereColumn, Object whereValue);
+
+    /**
+     * @see #update(String, Object, String, Object)
+     */
+    default void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue) {
+        update(column, value.getValue(), whereColumn, whereValue.getValue());
+    }
 
     /**
      * Updates a given column with new data where the specified whereColumn has the given.
@@ -242,7 +239,14 @@ public interface ISQLTable {
      * @param whereValue  Value of that column
      * @param async       Whether to run on async thread or main thread. True indicates running on an async thread
      */
-    void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue, boolean async);
+    void update(String column, Object value, String whereColumn, Object whereValue, boolean async);
+
+    /**
+     * @see #update(String, Object, String, Object, boolean)
+     */
+    default void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue, boolean async) {
+        update(column, value.getValue(), whereColumn, whereValue.getValue(), async);
+    }
 
     /**
      * Since {@link #writeValue(Row)} and {@link #writeValue(Object...)} use an SQL batch statement to execute writing (in order to save performance)

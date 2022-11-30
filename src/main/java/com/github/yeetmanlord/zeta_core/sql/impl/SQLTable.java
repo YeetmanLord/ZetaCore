@@ -105,10 +105,6 @@ public class SQLTable implements ISQLTable {
     }
 
     public void writeValue(Object... args) {
-        writeValue(false, args);
-    }
-
-    public void writeValue(boolean async, Object... args) {
 
         String params = "";
 
@@ -131,7 +127,7 @@ public class SQLTable implements ISQLTable {
 
     }
 
-    public void writeValue(Row row, boolean async) {
+    public void writeValue(Row row) {
         String params = "";
         Object[] values = new Object[row.size()];
 
@@ -162,12 +158,6 @@ public class SQLTable implements ISQLTable {
 
     public void commit() {
         this.commit(false);
-    }
-
-    public void writeValue(Row row) {
-
-        this.writeValue(row, false);
-
     }
 
     @Override
@@ -207,20 +197,20 @@ public class SQLTable implements ISQLTable {
         this.handler.dropTable(this.tableName, async);
     }
 
-    public void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue) {
+    public void update(String column, Object value, Object primaryKeyValue) {
         update(column, value, primaryKeyValue, true);
     }
 
-    public void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue, boolean async) {
-        this.handler.updateWhere(this.tableName, column, value, this.primaryKey, primaryKeyValue, async);
+    public void update(String column, Object value, Object primaryKeyValue, boolean async) {
+        this.handler.updateWhere(this.tableName, new SQLValue<>(column, value), SQLValue.create(this.primaryKey, primaryKeyValue), async);
     }
 
-    public void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue) {
+    public void update(String column, Object value, String whereColumn, Object whereValue) {
         update(column, value, whereColumn, whereValue, true);
     }
 
-    public void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue, boolean async) {
-        this.handler.updateWhere(this.tableName, column, value, whereColumn, whereValue, async);
+    public void update(String column, Object value, String whereColumn, Object whereValue, boolean async) {
+        this.handler.updateWhere(this.tableName, new SQLValue<>(column, value), SQLValue.create(whereColumn, whereValue), async);
     }
 
     @Override

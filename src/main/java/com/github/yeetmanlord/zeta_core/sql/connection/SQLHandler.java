@@ -352,12 +352,12 @@ public class SQLHandler {
 
     }
 
-    public void updateWhere(String table, String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue, boolean async) {
+    public void updateWhere(String table, SQLValue<?> value, SQLValue<?> whereValue, boolean async) {
         if (this.client.isConnected()) {
             if (client != null) {
                 if (async) {
                     Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
-                        try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + column + "=?" + " WHERE " + whereColumn + "=?;")) {
+                        try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + value.getKey() + "=?" + " WHERE " + whereValue.getKey() + "=?;")) {
                             statement.setObject(1, value.getValue());
                             statement.setObject(2, whereValue.getValue());
                             statement.executeUpdate();
@@ -367,7 +367,7 @@ public class SQLHandler {
                     });
                 }
             } else {
-                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + column + "=?" + " WHERE " + whereColumn + "=?;")) {
+                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + value.getKey() + "=?" + " WHERE " + whereValue.getKey() + "=?;")) {
                     statement.setObject(1, value.getValue());
                     statement.setObject(2, whereValue.getValue());
                     statement.executeUpdate();
