@@ -153,7 +153,8 @@ public class SQLTable implements ISQLTable {
     }
 
     public void commit(boolean async) {
-        this.batch.execute(this.handler, true);
+        if (this.batch == null) return;
+        this.batch.execute(this.handler, async);
     }
 
     public void commit() {
@@ -216,5 +217,9 @@ public class SQLTable implements ISQLTable {
     @Override
     public String toString() {
         return "SQLTable{primaryKey: " + primaryKey + ", tableName: " + tableName + ", columns: " + columns + "}";
+    }
+
+    public void setHandler(SQLHandler handler) {
+        this.handler = handler;
     }
 }

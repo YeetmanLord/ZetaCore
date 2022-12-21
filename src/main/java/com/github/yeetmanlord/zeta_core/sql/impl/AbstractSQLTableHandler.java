@@ -17,79 +17,92 @@ import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 /**
  * Same as {@link AbstractSQLDataStorer} except this does not hava a physical
  * file and only manages an SQL table
- * 
- * @author YeetManLord
  *
  * @param <PrimaryKeyType> The type of the primary key. Usually either String or
  *                         int
+ * @author YeetManLord
  */
 public abstract class AbstractSQLTableHandler<PrimaryKeyType> implements ISQLTableHandler<PrimaryKeyType> {
 
-	protected ISQLTable table;
+    protected ISQLTable table;
 
-	protected String tableName;
+    protected String tableName;
 
-	public AbstractSQLTableHandler(ZetaPlugin pl, String tableName) {
+    public AbstractSQLTableHandler(ZetaPlugin pl, String tableName) {
 
-		this.tableName = pl.getPluginName().toLowerCase() + "/" + tableName;
+        this.tableName = pl.getPluginName().toLowerCase() + "/" + tableName;
 
-	}
+    }
 
-	@Override
-	public ISQLTable getTable() {
+    @Override
+    public ISQLTable getTable() {
 
-		return table;
+        return table;
 
-	}
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Map<PrimaryKeyType, ISQL<?>> getData() {
+    @Override
+    public void setTable(ISQLTable table) {
+        this.table = table;
+    }
 
-		List<Row> list = this.table.getRows();
-		Map<PrimaryKeyType, ISQL<?>> iSQLValues = new HashMap<>();
+    @Override
+    public String getTableName() {
+        return tableName;
+    }
 
-		for (Row map : list) {
-			SQLValue<?> primaryKey = map.get(this.getPrimaryKey());
-			iSQLValues.put((PrimaryKeyType) primaryKey.getValue(), this.getHandler().load(map));
-		}
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<PrimaryKeyType, ISQL<?>> getData() {
 
-		return iSQLValues;
+        List<Row> list = this.table.getRows();
+        Map<PrimaryKeyType, ISQL<?>> iSQLValues = new HashMap<>();
 
-	}
+        for (Row map : list) {
+            SQLValue<?> primaryKey = map.get(this.getPrimaryKey());
+            iSQLValues.put((PrimaryKeyType) primaryKey.getValue(), this.getHandler().load(map));
+        }
 
-	@Override
-	public void initializeDB(SQLHandler handler) {
+        return iSQLValues;
 
-		this.table = new SQLTable(tableName, handler);
-		this.table.setPrimaryKey(this.getPrimaryKey());
-		this.table.setColumns(getColumns(handler));
-		this.table.initializeTable(handler);
+    }
 
+    @Override
+    public void initializeDB(SQLHandler handler) {
 
-	}
+        this.table = new SQLTable(tableName, handler);
+        this.table.setPrimaryKey(this.getPrimaryKey());
+        this.table.setColumns(getColumns(handler));
+        this.table.initializeTable(handler);
 
-	public abstract List<SQLColumn<?>> getColumns(SQLHandler handler);
+    }
 
-	@Override
-	public ISQL<?> get(PrimaryKeyType primaryKey) {
+    @Override
+    public ISQL<?> get(PrimaryKeyType primaryKey) {
 
-		return getData().get(primaryKey);
+        return getData().get(primaryKey);
 
-	}
+    }
 
-	public List<ISQL<?>> getISQLsWithValue(SQLValue<?> valueToCheck) {
+    public List<ISQL<?>> getISQLsWithValue(SQLValue<?> valueToCheck) {
 
-		List<ISQL<?>> iSQLs = new ArrayList<>();
+        List<ISQL<?>> iSQLs = new ArrayList<>();
 
-		List<Row> list = this.table.getHandler().getRowsWhere(this.table, valueToCheck.getKey(), valueToCheck.getValue());
+        List<Row> list = this.table.getHandler().getRowsWhere(this.table, valueToCheck.getKey(), valueToCheck.getValue());
 
-		for (Row map : list) {
-			iSQLs.add(this.getHandler().load(map));
-		}
+        for (Row map : list) {
+            iSQLs.add(this.getHandler().load(map));
+        }
 
-		return iSQLs;
+        return iSQLs;
 
-	}
+    }
 
+    @Override
+    public String toString() {
+        return "AbstractSQLTableHandler{" +
+                "table=" + table +
+                ", tableName='" + tableName + '\'' +
+                '}';
+    }
 }

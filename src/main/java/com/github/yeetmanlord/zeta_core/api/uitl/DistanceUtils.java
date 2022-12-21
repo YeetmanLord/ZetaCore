@@ -72,7 +72,6 @@ public class DistanceUtils {
 		int finalX = 0;
 		int finalY = 0;
 		int finalZ = 0;
-		float var9 = -99999.0F;
 
 		for (int i = 0; i < 10; ++i) {
 			int x = rand.nextInt(2 * planarBound + 1) - planarBound;
@@ -80,22 +79,22 @@ public class DistanceUtils {
 			int z = rand.nextInt(2 * planarBound + 1) - planarBound;
 
 			if (location == null || x * location.getX() + z * location.getZ() >= 0.0D) {
-				Location var19;
+				Location newLocation;
 				x += Math.floor(entity.getLocation().getX());
 				y += Math.floor(entity.getLocation().getY());
 				z += Math.floor(entity.getLocation().getZ());
-				var19 = new Location(entity.getWorld(), x, y, z);
+				newLocation = new Location(entity.getWorld(), x, y, z);
 
 				if (planarBound > 1) {
 
-					if (entity.getLocation().getX() > var19.getX()) {
+					if (entity.getLocation().getX() > newLocation.getX()) {
 						x -= rand.nextInt(planarBound / 2);
 					}
 					else {
 						x += rand.nextInt(planarBound / 2);
 					}
 
-					if (entity.getLocation().getZ() > var19.getZ()) {
+					if (entity.getLocation().getZ() > newLocation.getZ()) {
 						z -= rand.nextInt(planarBound / 2);
 					}
 					else {

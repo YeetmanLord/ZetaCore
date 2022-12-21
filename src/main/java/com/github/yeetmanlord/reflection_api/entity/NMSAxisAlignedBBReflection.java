@@ -1,7 +1,6 @@
 package com.github.yeetmanlord.reflection_api.entity;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
-import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;

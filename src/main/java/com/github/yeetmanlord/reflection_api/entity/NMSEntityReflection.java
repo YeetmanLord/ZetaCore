@@ -3,6 +3,7 @@ package com.github.yeetmanlord.reflection_api.entity;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
@@ -75,6 +76,12 @@ public class NMSEntityReflection extends NMSObjectReflection {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	public void setLocation(Location location) {
+
+		setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 
 	}
 

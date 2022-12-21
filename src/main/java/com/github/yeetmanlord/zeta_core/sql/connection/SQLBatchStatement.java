@@ -35,16 +35,18 @@ public class SQLBatchStatement {
 
 
     private void execute(final SQLHandler handler) {
-        try (Connection conn = handler.getClient().getSource().getConnection(); PreparedStatement statement = conn.prepareStatement(this.statement)) {
-            for (List<Object> args : batches) {
-                for (int x = 0; x < args.size(); x++) {
-                    statement.setObject(x + 1, args.get(x));
+        if (handler != null && handler.getClient().isConnected()) {
+            try (Connection conn = handler.getClient().getSource().getConnection(); PreparedStatement statement = conn.prepareStatement(this.statement)) {
+                for (List<Object> args : batches) {
+                    for (int x = 0; x < args.size(); x++) {
+                        statement.setObject(x + 1, args.get(x));
+                    }
+                    statement.addBatch();
                 }
-                statement.addBatch();
+                statement.executeBatch();
+            } catch (SQLException exception) {
+                exception.printStackTrace();
             }
-            statement.executeBatch();
-        } catch (SQLException exception) {
-            exception.printStackTrace();
         }
     }
 

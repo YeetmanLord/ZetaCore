@@ -3,9 +3,11 @@ package com.github.yeetmanlord.reflection_api.mappings.types;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.reflection_api.exceptions.MappingsException;
 import com.github.yeetmanlord.reflection_api.mappings.IMapping;
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import com.github.yeetmanlord.reflection_api.mappings.VersionRange;
 
 public class ClassNameMapping implements IMapping<String> {
@@ -18,6 +20,7 @@ public class ClassNameMapping implements IMapping<String> {
 
 		this.mappings = mappings;
 		this.name = name;
+		Mappings.mappings.add(this);
 
 	}
 
@@ -88,4 +91,13 @@ public class ClassNameMapping implements IMapping<String> {
 
 	}
 
+	@Override
+	public boolean testMapping() {
+		try {
+			getNMSClassMapping();
+			return true;
+		} catch (MappingsException e) {
+			return false;
+		}
+	}
 }

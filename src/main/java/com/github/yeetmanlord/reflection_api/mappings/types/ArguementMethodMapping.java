@@ -119,4 +119,30 @@ public class ArguementMethodMapping<ReturnType> implements IMapping<String> {
 
 	}
 
+	@Override
+	public boolean testMapping() {
+		try {
+			for (VersionRange range : mappings.keySet()) {
+				Class<?> nmsClass;
+				try {
+					nmsClass = (Class<?>) reflectionType.getField("staticClass").get(null);
+				} catch (NoSuchFieldException | ClassCastException | IllegalAccessException e) {
+					throw new NMSObjectReflection.ImplementationException("The reflection type " + reflectionType.getName() + " does not have a staticClass field");
+				}
+				if (range.isWithinRange(ReflectionApi.version)) {
+					try {
+						nmsClass.getMethod(mappings.get(range), argTypes);
+					} catch (NoSuchMethodException e) {
+						nmsClass.getDeclaredMethod(mappings.get(range), argTypes);
+					}
+					return true;
+
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return false;
+	}
 }

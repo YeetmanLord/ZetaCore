@@ -148,13 +148,13 @@ public class VersionMaterial {
     public static final VersionMaterial NETHERITE_BLOCK = new VersionMaterial("netherite_block", "netherite_block", (byte) 0);
 
     public static final VersionMaterial WOODEN_SWORD = new VersionMaterial("wood_sword", "wooden_sword", (byte) 0);
-    public static final VersionMaterial WOODEN_SHOVEL = new VersionMaterial("wood_shovel", "wooden_shovel", (byte) 0);
+    public static final VersionMaterial WOODEN_SHOVEL = new VersionMaterial("wood_spade", "wooden_shovel", (byte) 0);
     public static final VersionMaterial WOODEN_PICKAXE = new VersionMaterial("wood_pickaxe", "wooden_pickaxe", (byte) 0);
     public static final VersionMaterial WOODEN_AXE = new VersionMaterial("wood_axe", "wooden_axe", (byte) 0);
     public static final VersionMaterial WOODEN_HOE = new VersionMaterial("wood_hoe", "wooden_hoe", (byte) 0);
 
     public static final VersionMaterial GOLDEN_SWORD = new VersionMaterial("gold_sword", "golden_sword", (byte) 0);
-    public static final VersionMaterial GOLDEN_SHOVEL = new VersionMaterial("gold_shovel", "golden_shovel", (byte) 0);
+    public static final VersionMaterial GOLDEN_SHOVEL = new VersionMaterial("gold_spade", "golden_shovel", (byte) 0);
     public static final VersionMaterial GOLDEN_PICKAXE = new VersionMaterial("gold_pickaxe", "golden_pickaxe", (byte) 0);
     public static final VersionMaterial GOLDEN_AXE = new VersionMaterial("gold_axe", "golden_axe", (byte) 0);
     public static final VersionMaterial GOLDEN_HOE = new VersionMaterial("gold_hoe", "golden_hoe", (byte) 0);
@@ -162,6 +162,10 @@ public class VersionMaterial {
     public static final VersionMaterial GOLDEN_CHESTPLATE = new VersionMaterial("gold_chestplate", "golden_chestplate", (byte) 0);
     public static final VersionMaterial GOLDEN_LEGGINGS = new VersionMaterial("gold_leggings", "golden_leggings", (byte) 0);
     public static final VersionMaterial GOLDEN_BOOTS = new VersionMaterial("gold_boots", "golden_boots", (byte) 0);
+
+    public static final VersionMaterial IRON_SHOVEL = new VersionMaterial("iron_spade", "iron_shovel", (byte) 0);
+    public static final VersionMaterial DIAMOND_SHOVEL = new VersionMaterial("diamond_spade", "diamond_shovel", (byte) 0);
+    public static final VersionMaterial STONE_SHOVEL = new VersionMaterial("stone_spade", "stone_shovel", (byte) 0);
 
     public static final VersionMaterial GRASS_BLOCK = new VersionMaterial("grass", "grass_block", (byte) 0);
     public static final VersionMaterial OAK_SIGN = new VersionMaterial("sign", "oak_sign", (byte) 0);
@@ -216,6 +220,8 @@ public class VersionMaterial {
     public static final VersionMaterial RED_BANNER = new VersionMaterial("banner", "red_banner", (byte) 1);
     public static final VersionMaterial BLACK_BANNER = new VersionMaterial("banner", "black_banner", (byte) 0);
 
+    public static final VersionMaterial REDSTONE_TORCH = new VersionMaterial("redstone_torch_on", "redstone_torch", (byte) 0);
+
 
     public static VersionMaterial getWool(DyeColor color) {
         switch (color) {
@@ -235,8 +241,6 @@ public class VersionMaterial {
                 return PINK_WOOL;
             case GRAY:
                 return GRAY_WOOL;
-            case SILVER:
-                return LIGHT_GRAY_WOOL;
             case CYAN:
                 return CYAN_WOOL;
             case PURPLE:
@@ -252,6 +256,9 @@ public class VersionMaterial {
             case BLACK:
                 return BLACK_WOOL;
             default:
+                if (color.name().equalsIgnoreCase("LIGHT_GRAY") || color.name().equalsIgnoreCase("SILVER")) {
+                    return LIGHT_GRAY_WOOL;
+                }
                 throw new IllegalArgumentException("Unknown color " + color);
         }
     }
@@ -275,8 +282,6 @@ public class VersionMaterial {
                     return PINK_BED;
                 case GRAY:
                     return GRAY_BED;
-                case SILVER:
-                    return LIGHT_GRAY_BED;
                 case CYAN:
                     return CYAN_BED;
                 case PURPLE:
@@ -292,6 +297,9 @@ public class VersionMaterial {
                 case BLACK:
                     return BLACK_BED;
                 default:
+                    if (color.name().equalsIgnoreCase("LIGHT_GRAY") || color.name().equalsIgnoreCase("SILVER")) {
+                        return LIGHT_GRAY_BED;
+                    }
                     throw new IllegalArgumentException("Unknown color " + color);
             }
         }

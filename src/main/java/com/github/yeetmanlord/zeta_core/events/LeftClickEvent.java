@@ -30,7 +30,7 @@ public class LeftClickEvent implements Listener {
                     AbstractGUIMenu menu = util.getMenuToInputTo();
                     menu.open();
 
-                    NMSTitlePacketReflection title = new NMSTitlePacketReflection("CLEAR", NMSChatSerializerReflection.createChatComponentFromRawText("&6"));
+                    NMSTitlePacketReflection title = NMSTitlePacketReflection.clear();
 
                     new NMSPlayerConnectionReflection(player).sendPacket(title);
                 }
@@ -38,7 +38,7 @@ public class LeftClickEvent implements Listener {
                     util.setInputObject(null);
                     util.setInputObjectType(null);
 
-                    NMSTitlePacketReflection title = new NMSTitlePacketReflection("CLEAR", NMSChatSerializerReflection.createChatComponentFromRawText("&6"));
+                    NMSTitlePacketReflection title = NMSTitlePacketReflection.clear();
 
                     new NMSPlayerConnectionReflection(player).sendPacket(title);
                 }

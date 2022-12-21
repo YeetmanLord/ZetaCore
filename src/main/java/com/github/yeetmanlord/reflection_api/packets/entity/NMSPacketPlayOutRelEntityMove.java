@@ -12,13 +12,13 @@ import net.md_5.bungee.api.ChatColor;
 
 public class NMSPacketPlayOutRelEntityMove extends NMSPacketReflection {
 
-	public NMSPacketPlayOutRelEntityMove(int entityId, long x, long y, long z, byte pitch, byte yaw, boolean bool) {
+	public NMSPacketPlayOutRelEntityMove(int entityId, long x, long y, long z, byte pitch, byte yaw, boolean onGround) {
 
-		super(Mappings.PACKET_PLAY_OUT_REL_ENTITY_MOVE_LOOK_CLASS_MAPPING, getVersionDependentArgs(entityId, x, y, z, pitch, yaw, bool));
+		super(Mappings.PACKET_PLAY_OUT_REL_ENTITY_MOVE_LOOK_CLASS_MAPPING, getVersionDependentArgs(entityId, x, y, z, pitch, yaw, onGround));
 
 	}
 
-	private static Object[] getVersionDependentArgs(int entityId, long x, long y, long z, byte pitch, byte yaw, boolean bool) {
+	private static Object[] getVersionDependentArgs(int entityId, long x, long y, long z, byte pitch, byte yaw, boolean onGround) {
 
 		Object[] args = new Object[7];
 		args[0] = entityId;
@@ -40,7 +40,7 @@ public class NMSPacketPlayOutRelEntityMove extends NMSPacketReflection {
 
 		args[4] = pitch;
 		args[5] = yaw;
-		args[6] = bool;
+		args[6] = onGround;
 
 		return args;
 

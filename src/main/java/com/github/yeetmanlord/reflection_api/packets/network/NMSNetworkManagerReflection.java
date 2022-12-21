@@ -13,7 +13,7 @@ public class NMSNetworkManagerReflection extends NMSObjectReflection {
 	 * @param value Allowed values are SERVERBOUND and CLIENTBOUND although case
 	 *              doesn't matter
 	 */
-	public NMSNetworkManagerReflection(String value) {
+	public NMSNetworkManagerReflection(EnumNetworkDirection value) {
 
 		super(init(value));
 
@@ -25,11 +25,11 @@ public class NMSNetworkManagerReflection extends NMSObjectReflection {
 
 	}
 
-	private static Object init(String value) {
+	private static Object init(EnumNetworkDirection value) {
 
 		try {
 			Class<?> enumProtocolDirection = ReflectionApi.getNMSClass("EnumProtocolDirection");
-			Object direction = enumProtocolDirection.getField(value.toUpperCase()).get(null);
+			Object direction = enumProtocolDirection.getField(value.name()).get(null);
 			Constructor<?> managerConstructor = staticClass.getConstructor(enumProtocolDirection);
 			return managerConstructor.newInstance(direction);
 		}
@@ -62,7 +62,7 @@ public class NMSNetworkManagerReflection extends NMSObjectReflection {
 	}
 
 
-	private static Class<?> staticClass = ReflectionApi.getNMSClass("NetworkManager");
+	public static Class<?> staticClass = ReflectionApi.getNMSClass("NetworkManager");
 
 	public static NMSNetworkManagerReflection cast(NMSObjectReflection refl) {
 
@@ -72,6 +72,10 @@ public class NMSNetworkManagerReflection extends NMSObjectReflection {
 
 		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSNetworkManagerReflection");
 
+	}
+
+	public enum EnumNetworkDirection {
+		SERVERBOUND, CLIENTBOUND;
 	}
 
 }

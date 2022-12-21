@@ -1,11 +1,13 @@
 com.github.yeetmanlord.zeta_core
 com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu
 com.github.yeetmanlord.zeta_core.api.uitl
+com.github.yeetmanlord.zeta_core.api.uitl.raycast
 com.github.yeetmanlord.zeta_core.commands
 com.github.yeetmanlord.zeta_core.data
 com.github.yeetmanlord.zeta_core.events
 com.github.yeetmanlord.zeta_core.logging
 com.github.yeetmanlord.zeta_core.menus
+com.github.yeetmanlord.zeta_core.menus.config
 com.github.yeetmanlord.zeta_core.sql
 com.github.yeetmanlord.zeta_core.sql.connection
 com.github.yeetmanlord.zeta_core.sql.impl

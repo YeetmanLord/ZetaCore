@@ -6,169 +6,188 @@ import java.lang.reflect.Modifier;
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.exceptions.FieldReflectionExcpetion;
 
+import javax.annotation.Nullable;
+
 public class ReflectedField<Type> {
 
-	private final NMSObjectReflection holder;
+    private final NMSObjectReflection holder;
 
-	private final String fieldName;
+    private final String fieldName;
 
-	private final boolean isFinal;
+    private final boolean isFinal;
 
-	private final boolean isStatic;
+    private final boolean isStatic;
 
-	private final boolean isPrivate;
+    private final boolean isPrivate;
 
-	private final boolean nmsObject;
+    private final boolean nmsObject;
 
-	public ReflectedField(Field fieldReflection, boolean isPrivate, boolean nmsObject, NMSObjectReflection holder) {
+    private String getter, setter;
 
-		this.nmsObject = nmsObject;
-		this.holder = holder;
-		this.isPrivate = isPrivate;
-		isFinal = Modifier.isFinal(fieldReflection.getModifiers());
-		isStatic = Modifier.isStatic(fieldReflection.getModifiers());
-		fieldName = fieldReflection.getName();
+    public ReflectedField(Field fieldReflection, boolean isPrivate, boolean nmsObject, NMSObjectReflection holder) {
 
-	}
+        this.nmsObject = nmsObject;
+        this.holder = holder;
+        this.isPrivate = isPrivate;
+        isFinal = Modifier.isFinal(fieldReflection.getModifiers());
+        isStatic = Modifier.isStatic(fieldReflection.getModifiers());
+        fieldName = fieldReflection.getName();
 
-	public ReflectedField(String fieldName, boolean isPrivate, boolean nmsObject, NMSObjectReflection holder) throws FieldReflectionExcpetion {
+    }
 
-		this.nmsObject = nmsObject;
-		this.holder = holder;
-		this.isPrivate = isPrivate;
-		Field fieldReflection = null;
-		this.fieldName = fieldName;
+    public ReflectedField(Field fieldReflection, boolean isPrivate, boolean nmsObject, NMSObjectReflection holder, String getterName, String setterName) {
 
-		try {
-			fieldReflection = holder.getField(fieldName);
-		}
-		catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		}
+        this(fieldReflection, isPrivate, false, holder);
+        this.getter = getterName;
+        this.setter = setterName;
 
-		if (fieldReflection == null) {
-			throw new FieldReflectionExcpetion("The specified field name, " + fieldName + " is not a field in class " + holder.getNmsObject().getClass());
-		}
+    }
 
-		isFinal = Modifier.isFinal(fieldReflection.getModifiers());
-		isStatic = Modifier.isStatic(fieldReflection.getModifiers());
+    public ReflectedField(String fieldName, boolean isPrivate, boolean nmsObject, NMSObjectReflection holder) throws FieldReflectionExcpetion {
 
-	}
+        this.nmsObject = nmsObject;
+        this.holder = holder;
+        this.isPrivate = isPrivate;
+        Field fieldReflection = null;
+        this.fieldName = fieldName;
 
-	public void set(Type value) throws FieldReflectionExcpetion {
+        try {
+            fieldReflection = holder.getField(fieldName);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
 
-		if (isFinal) {
-			throw new FieldReflectionExcpetion(this, "You cannot modify the final field");
-		}
+        if (fieldReflection == null) {
+            throw new FieldReflectionExcpetion("The specified field name, " + fieldName + " is not a field in class " + holder.getNmsObject().getClass());
+        }
 
-		try {
-			Field field = holder.getField(fieldName);
+        isFinal = Modifier.isFinal(fieldReflection.getModifiers());
+        isStatic = Modifier.isStatic(fieldReflection.getModifiers());
 
-			if (isPrivate) {
-				field.setAccessible(true);
-			}
+    }
 
-			if (isStatic) {
+    public void set(Type value) throws FieldReflectionExcpetion {
 
-				if (nmsObject) {
-					if (value == null) {
-						field.set(null, null);
-					}
-					else {
-						field.set(null, ((NMSObjectReflection) value).getNmsObject());
-					}
-				}
-				else {
-					field.set(null, value);
-				}
+        if (isFinal) {
+            throw new FieldReflectionExcpetion(this, "You cannot modify the final field");
+        }
 
-			}
-			else {
+        if (setter != null && !setter.isEmpty()) {
+            try {
+                holder.invokeMethodForNmsObject(setter, new Class[]{value.getClass()}, new Object[]{value});
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            Field field = holder.getField(fieldName);
 
-				if (nmsObject) {
-					if (value == null) {
-						field.set(holder.getNmsObject(), null);
-					}
-					else {
-						field.set(holder.getNmsObject(), ((NMSObjectReflection) value).getNmsObject());
-					}
-				}
-				else {
-					field.set(holder.getNmsObject(), value);
-				}
+            if (isPrivate) {
+                field.setAccessible(true);
+            }
 
-			}
+            if (isStatic) {
 
-			if (isPrivate) {
-				field.setAccessible(isFinal);
-			}
+                if (nmsObject) {
+                    if (value == null) {
+                        field.set(null, null);
+                    } else {
+                        field.set(null, ((NMSObjectReflection) value).getNmsObject());
+                    }
+                } else {
+                    field.set(null, value);
+                }
 
-		}
-		catch (Exception exc) {
-			exc.printStackTrace();
-		}
+            } else {
 
-	}
+                if (nmsObject) {
+                    if (value == null) {
+                        field.set(holder.getNmsObject(), null);
+                    } else {
+                        field.set(holder.getNmsObject(), ((NMSObjectReflection) value).getNmsObject());
+                    }
+                } else {
+                    field.set(holder.getNmsObject(), value);
+                }
 
-	public Type get() throws FieldReflectionExcpetion {
+            }
 
-		try {
-			Field field = holder.getField(fieldName);
+            if (isPrivate) {
+                field.setAccessible(isFinal);
+            }
 
-			if (isPrivate) {
-				field.setAccessible(true);
-			}
-			Type value;
-			if (isStatic) {
-				value = (Type) field.get(null);
-			}
-			else {
-				value = (Type) field.get(holder.getNmsObject());
-			}
+        } catch (Exception exc) {
+            exc.printStackTrace();
+        }
 
-			if (isPrivate) {
-				field.setAccessible(isFinal);
-			}
+    }
 
-			return value;
+    public Type get() throws FieldReflectionExcpetion {
 
-		}
-		catch (Exception exc) {
-			exc.printStackTrace();
-		}
+        if (getter != null && !getter.isEmpty()) {
+            try {
+                return (Type) holder.invokeMethodForNmsObject(getter);
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                Field field = holder.getField(fieldName);
 
-		throw new FieldReflectionExcpetion(this, "Could not get field");
+                if (isPrivate) {
+                    field.setAccessible(true);
+                }
+                Type value;
+                if (isStatic) {
+                    value = (Type) field.get(null);
+                } else {
+                    value = (Type) field.get(holder.getNmsObject());
+                }
 
-	}
+                if (isPrivate) {
+                    field.setAccessible(isFinal);
+                }
 
-	public String getFieldName() {
+                return value;
 
-		return fieldName;
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        }
 
-	}
+        throw new FieldReflectionExcpetion(this, "Could not get field");
 
-	public boolean isFinal() {
+    }
 
-		return isFinal;
+    public String getFieldName() {
 
-	}
+        return fieldName;
 
-	public boolean isStatic() {
+    }
 
-		return isStatic;
+    public boolean isFinal() {
 
-	}
+        return isFinal;
 
-	public boolean isPrivate() {
+    }
 
-		return isPrivate;
+    public boolean isStatic() {
 
-	}
+        return isStatic;
 
-	public boolean isNmsObject() {
+    }
 
-		return nmsObject;
+    public boolean isPrivate() {
 
-	}
+        return isPrivate;
+
+    }
+
+    public boolean isNmsObject() {
+
+        return nmsObject;
+
+    }
 
 }

@@ -267,4 +267,6 @@ public interface ISQLTable {
      */
     void commit();
 
+    void setHandler(SQLHandler handler);
+
 }

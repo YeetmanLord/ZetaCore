@@ -7,8 +7,6 @@ import java.lang.reflect.Method;
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.reflection_api.nbt.NMSNBTTagCompoundReflection;
-import net.minecraft.server.v1_8_R3.Blocks;
-import net.minecraft.server.v1_8_R3.Items;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

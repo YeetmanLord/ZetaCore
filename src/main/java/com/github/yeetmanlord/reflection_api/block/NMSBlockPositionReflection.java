@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
@@ -15,20 +16,20 @@ import com.google.common.collect.ImmutableMap;
 
 public class NMSBlockPositionReflection extends NMSObjectReflection {
 
-	public ReflectedField<Double> x;
+	public ReflectedField<Integer> x;
 
-	public ReflectedField<Double> y;
+	public ReflectedField<Integer> y;
 
-	public ReflectedField<Double> z;
+	public ReflectedField<Integer> z;
 
 	public NMSBlockPositionReflection(double x, double y, double z) {
 
 		super(init(x, y, z));
 
 		try {
-			this.x = new ReflectedField<>(getField("a"), true, false, this);
-			this.y = new ReflectedField<>(getField("b"), true, false, this);
-			this.z = new ReflectedField<>(getField("c"), true, false, this);
+			this.x = new ReflectedField<>(getField("a"), true, false, this, "getX", "");
+			this.y = new ReflectedField<>(getField(ReflectionApi.version.isOlder("1.10") ? "c" : "b"), true, false, this, "getY", "");
+			this.z = new ReflectedField<>(getField(ReflectionApi.version.isOlder("1.10") ? "d" : "c"), true, false, this, "getZ", "");
 		}
 		catch (Exception exc) {
 			exc.printStackTrace();
@@ -41,9 +42,9 @@ public class NMSBlockPositionReflection extends NMSObjectReflection {
 		super(blockPosistion);
 
 		try {
-			this.x = new ReflectedField<>(getField("a"), true, false, this);
-			this.y = new ReflectedField<>(getField("b"), true, false, this);
-			this.z = new ReflectedField<>(getField("c"), true, false, this);
+			this.x = new ReflectedField<>(getField("a"), true, false, this, "getX", "");
+			this.y = new ReflectedField<>(getField(ReflectionApi.version.isOlder("1.10") ? "c" : "b"), true, false, this, "getY", "");
+			this.z = new ReflectedField<>(getField(ReflectionApi.version.isOlder("1.10") ? "d" : "c"), true, false, this, "getZ", "");
 		}
 		catch (Exception exc) {
 			exc.printStackTrace();
@@ -112,7 +113,7 @@ public class NMSBlockPositionReflection extends NMSObjectReflection {
 
 	}
 
-	public static final Class<?> staticClass = ReflectionApi.getNMSClass("BlockPosition");
+	public static final Class<?> staticClass = ReflectionApi.getNMSClass("BaseBlockPosition");
 
 	public static NMSBlockPositionReflection cast(NMSObjectReflection refl) {
 

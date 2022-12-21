@@ -6,8 +6,10 @@ import java.util.Properties;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
+import com.google.common.collect.ImmutableMap;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.pool.HikariPool;
 import org.bukkit.Bukkit;
 
 import javax.sql.DataSource;
@@ -73,8 +75,20 @@ public class SQLClient {
 
                     validated = this.dataSource.getConnection().isValid(3);
                     ZetaCore.LOGGER.info("&aDatabase is connected!");
-                } catch (SQLException e) {
-                    ZetaCore.LOGGER.error(e, "&aCould not connect to database. Caused by the following exception:");
+                } catch (RuntimeException e) {
+                    ZetaCore.LOGGER.error("Pool Initialization Failed! In most cases this means that the database service isn't running or the database connection information is wrong");
+                    ZetaCore.LOGGER.error("To enable a full stacktrace please enable debug mode.");
+                    if (ZetaCore.LOGGER.isDebugging()) {
+                        ZetaCore.LOGGER.debug("&fFull Stack Trace:");
+                        e.printStackTrace();
+                    }
+                }
+                catch (Exception e) {
+                    ZetaCore.LOGGER.error(e, "Could not connect to database. Caused by the following exception:");
+                    if (ZetaCore.LOGGER.isDebugging()) {
+                        ZetaCore.LOGGER.debug("&fFull Stack Trace:");
+                        e.printStackTrace();
+                    }
                     validated = false;
                 }
             });
@@ -123,4 +137,8 @@ public class SQLClient {
 
     }
 
+    @Override
+    public String toString() {
+        return "SQLClient" + ImmutableMap.of("connected", isConnected(), "username", username, "database", database, "hostname", hostname, "valid", validated);
+    }
 }

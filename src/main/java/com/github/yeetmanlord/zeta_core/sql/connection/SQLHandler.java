@@ -56,7 +56,7 @@ public class SQLHandler {
             final String valueFinal = value.trim();
             if (async) {
                 Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
-                    try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");")){
+                    try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");")) {
                         for (int x = 0; x < values.length; x++) {
                             statement.setObject(x + 1, values[x]);
                         }
@@ -96,7 +96,7 @@ public class SQLHandler {
 
         SQLBatchStatement batch = existing == null ? new SQLBatchStatement(statement) : existing;
 
-        batch.addBatch(Arrays.asList(values));
+        batch.addBatch(values);
         return batch;
 
     }
@@ -381,11 +381,10 @@ public class SQLHandler {
 
     public ArrayList<Row> getAllData(ISQLTable table) {
         ArrayList<Row> rows = new ArrayList<>();
-        if (this.client.isConnected()) {
-            if (client != null) {
-                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM `" + table + "`;")) {
+        if (client != null) {
+            if (this.client.isConnected()) {
+                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM `" + table.getName() + "`;")) {
                     ResultSet set = statement.executeQuery();
-
                     while (set.next()) {
                         Row row = new Row();
                         for (String key : table.getColumns().keySet()) {

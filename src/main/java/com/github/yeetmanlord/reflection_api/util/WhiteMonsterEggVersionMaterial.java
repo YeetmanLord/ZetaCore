@@ -5,6 +5,8 @@ import com.github.yeetmanlord.reflection_api.nbt.NMSNBTTagCompoundReflection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 public class WhiteMonsterEggVersionMaterial extends VersionMaterial {
     public WhiteMonsterEggVersionMaterial() {
         super("MONSTER_EGG", "GHAST_SPAWN_EGG", (byte) 56);
@@ -15,7 +17,10 @@ public class WhiteMonsterEggVersionMaterial extends VersionMaterial {
         NMSItemStackReflection nmsStack = new NMSItemStackReflection(stack);
         NMSNBTTagCompoundReflection nbt = nmsStack.getTag();
         NMSNBTTagCompoundReflection entityTag = new NMSNBTTagCompoundReflection();
-        entityTag.setString("id", EnumNMSEntityToBukkit.getEnumNMSEntityToBukkit(type).getNmsEntityType());
+        if (type == EntityType.IRON_GOLEM) {
+            type = EntityType.GHAST;
+        }
+        entityTag.setString("id", Objects.requireNonNull(EnumNMSEntityToBukkit.getEnumNMSEntityToBukkit(type)).getNmsEntityType());
         nbt.setCompound("EntityTag", entityTag);
         nmsStack.setTag(nbt);
         return nmsStack.asBukkit();

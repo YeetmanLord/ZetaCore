@@ -8,6 +8,11 @@ import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 
 public class NMSChatSerializerReflection 
 {
+	/**
+	 * Creates a chat component from a JSON string
+	 * @param string JSON string of the chat component
+	 * @return The chat component object created from the JSON string
+	 */
 	public static Object createChatComponentFromString(String string)
 	{
 		try
@@ -24,10 +29,10 @@ public class NMSChatSerializerReflection
 	}
 	
 	/**
-	 * This is easier to use as you just have to input text with color codes and it will automatically be translated into a usable form
+	 * This is easier to use as you just have to input text with color codes, and it will automatically be translated into a usable form
 	 * @return Returns an IChatBaseComponent
 	 */
-	public static Object createChatComponentFromRawText(String rawText)
+	public static Object createChatComponentFromText(String rawText)
 	{
 		return createChatComponentFromString("{\"text\": \"" + ChatColor.translateAlternateColorCodes('&', rawText) + "\"}");
 	}

@@ -1,5 +1,6 @@
 package com.github.yeetmanlord.reflection_api.mappings.types;
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.reflection_api.exceptions.MappingsException;
 import com.github.yeetmanlord.reflection_api.mappings.IMapping;
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import com.github.yeetmanlord.reflection_api.mappings.VersionRange;
 
 public class ArguementlessMethodMapping<ReturnType> implements IMapping<String> {
@@ -22,6 +24,7 @@ public class ArguementlessMethodMapping<ReturnType> implements IMapping<String> 
 		this.reflectionType = type;
 		this.mappings = mappings;
 		this.name = name;
+		Mappings.mappings.add(this);
 
 	}
 
@@ -29,6 +32,32 @@ public class ArguementlessMethodMapping<ReturnType> implements IMapping<String> 
 
 		this.mappings.put(versionRange, versionDependentMethodName);
 
+	}
+
+	public boolean testMapping() {
+		try {
+			for (VersionRange range : mappings.keySet()) {
+				Class<?> nmsClass;
+				try {
+					nmsClass = (Class<?>) reflectionType.getField("staticClass").get(null);
+				} catch (NoSuchFieldException | ClassCastException | IllegalAccessException e) {
+					throw new NMSObjectReflection.ImplementationException("The reflection type " + reflectionType.getName() + " does not have a staticClass field");
+				}
+				if (range.isWithinRange(ReflectionApi.version)) {
+					try {
+						nmsClass.getMethod(mappings.get(range));
+					} catch (NoSuchMethodException e) {
+						nmsClass.getDeclaredMethod(mappings.get(range));
+					}
+					return true;
+
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return false;
 	}
 
 	/**

@@ -1,9 +1,7 @@
 package com.github.yeetmanlord.zeta_core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
 
@@ -12,9 +10,13 @@ import com.github.yeetmanlord.zeta_core.data.LocalData;
 import com.github.yeetmanlord.zeta_core.events.ChatEvent;
 import com.github.yeetmanlord.zeta_core.events.HandleMenuInteractionEvent;
 import com.github.yeetmanlord.zeta_core.events.LeftClickEvent;
+import com.github.yeetmanlord.zeta_core.logging.ConsoleLogger;
+import com.github.yeetmanlord.zeta_core.menus.AbstractGUIMenu;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.github.yeetmanlord.reflection_api.chat_components.NMSChatSerializerReflection;
@@ -23,9 +25,7 @@ import com.github.yeetmanlord.reflection_api.entity.players.player_connection.NM
 import com.github.yeetmanlord.reflection_api.packets.chat.NMSChatPacketReflection;
 import com.github.yeetmanlord.reflection_api.packets.player.NMSTitlePacketReflection;
 import com.github.yeetmanlord.zeta_core.api.uitl.PlayerUtil;
-import com.github.yeetmanlord.zeta_core.data.DataBase;
 import com.github.yeetmanlord.zeta_core.data.DataStorer;
-import com.github.yeetmanlord.zeta_core.logging.Logger;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
 
 /**
@@ -51,13 +51,11 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
  */
 public class ZetaCore extends ZetaPlugin {
 
-    public static Logger LOGGER;
+    public static ConsoleLogger LOGGER;
 
     public static ZetaCore INSTANCE;
 
     private static final HashMap<String, ZetaPlugin> registeredPlugins = new HashMap<>();
-
-    public DataBase dataBase;
 
     public LocalData localSettings;
 
@@ -67,111 +65,65 @@ public class ZetaCore extends ZetaPlugin {
 
     private static final HashMap<ZetaPlugin, List<ISQLTableHandler<?>>> databaseDataHandlers = new HashMap<>();
 
+    /**
+     * Super config constructor must have a player utility as first slot and an AbstractGUIMenu parent
+     */
+    private static final HashMap<ZetaPlugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu>> superConfigs = new HashMap<>();
+
     @Override
     public void onEnable() {
 
-        ReflectionApi.init(this);
+        LOGGER = new ConsoleLogger(this, ChatColor.GREEN);
         INSTANCE = this;
-        LOGGER = new Logger(this, ChatColor.GREEN);
-        LOGGER.info("ZetaCore framework is pre-initializing");
         this.registerDataStorers();
+        LOGGER.setDebugging(localSettings.get().getBoolean("should_debug"));
+        LOGGER.debug("Registering data handlers");
+        LOGGER.debug("Initializing ReflectionAPI");
+        ReflectionApi.init(this);
         LOGGER.info("ZetaCore framework is initializing");
-        dataBase.read();
+        LOGGER.debug("Reading from local files");
         localSettings.read();
 
         getServer().getPluginManager().registerEvents(new HandleMenuInteractionEvent(), this);
         getServer().getPluginManager().registerEvents(new ChatEvent(), this);
         getServer().getPluginManager().registerEvents(new LeftClickEvent(), this);
 
-        getCommand("enable_debug").setExecutor((sender, command, label, args) -> {
+        getCommand("zeta_settings").setExecutor((sender, command, label, args) -> {
             if (sender.hasPermission("zeta.admin")) {
-                LOGGER.setDebugging(true);
-                sender.sendMessage(ChatColor.AQUA + "Debugging enabled");
-            }
-            return true;
-        });
-
-        getCommand("disable_debug").setExecutor((sender, command, label, args) -> {
-            if (sender.hasPermission("zeta.admin")) {
-                LOGGER.setDebugging(false);
-                sender.sendMessage(ChatColor.AQUA + "Debugging disabled");
-            }
-            return true;
-        });
-
-        getCommand("local_settings").setExecutor((sender, command, label, args) -> {
-            if (sender.hasPermission("zeta.admin") && sender instanceof Player) {
-                LocalSettingsMenu menu = new LocalSettingsMenu(getPlayerMenuUtility((Player) sender));
-                menu.open();
-            }
-            return true;
-        });
-
-        getCommand("get_disabled_plugins").setExecutor((sender, command, label, args) -> {
-            if (sender.hasPermission("zeta.admin")) {
-                sender.sendMessage(ChatColor.AQUA + "Disabled plugins: " + ChatColor.GOLD + Arrays.toString(localSettings.disabled_plugins.toArray()));
-            }
-            return true;
-        });
-
-        getCommand("get_enabled_plugins").setExecutor((sender, command, label, args) -> {
-            if (sender.hasPermission("zeta.admin")) {
-                List<String> enabledPlugins = new ArrayList<>();
-                for (ZetaPlugin plugin : registeredPlugins.values()) {
-                    if (!localSettings.disabled_plugins.contains(plugin.getName())) {
-                        enabledPlugins.add(plugin.getName());
-                    }
+                if (sender instanceof Player) {
+                    new LocalSettingsMenu(getPlayerMenuUtility((Player) sender)).open();
                 }
-                sender.sendMessage(ChatColor.AQUA + "Enabled plugins: " + ChatColor.GOLD + Arrays.toString(enabledPlugins.toArray()));
-            }
-            return true;
-        });
-
-        getCommand("disable_plugin").setExecutor((commandSender, command, s, args) -> {
-            if (commandSender.hasPermission("zeta.admin")) {
-                if (args.length == 1) {
-                    if (registeredPlugins.containsKey(args[0])) {
-                        if (!localSettings.disabled_plugins.contains(args[0])) {
-                            localSettings.disabled_plugins.add(args[0]);
-                            commandSender.sendMessage(ChatColor.AQUA + "Disabled plugin " + ChatColor.GOLD + args[0]);
-                            getServer().getPluginManager().disablePlugin(registeredPlugins.get(args[0]));
-                        } else {
-                            commandSender.sendMessage(ChatColor.AQUA + "Plugin " + ChatColor.GOLD + args[0] + ChatColor.AQUA + " is already disabled");
-                        }
-                    } else {
-                        commandSender.sendMessage(ChatColor.AQUA + "Plugin " + ChatColor.GOLD + args[0] + ChatColor.AQUA + " does not exist");
-                    }
-                } else {
-                    commandSender.sendMessage(ChatColor.AQUA + "Usage: /disable_plugin <plugin>");
+                else {
+                    sender.sendMessage(ChatColor.RED + "This command can only be run by players!");
                 }
             }
             return true;
         });
 
-        getCommand("enable_plugin").setExecutor((commandSender, command, s, args) -> {
-            if (commandSender.hasPermission("zeta.admin")) {
-                if (args.length == 1) {
-                    if (registeredPlugins.containsKey(args[0])) {
-                        if (localSettings.disabled_plugins.contains(args[0])) {
-                            localSettings.disabled_plugins.remove(args[0]);
-                            commandSender.sendMessage(ChatColor.AQUA + "Enabled plugin " + ChatColor.GOLD + args[0]);
-                            getServer().getPluginManager().enablePlugin(registeredPlugins.get(args[0]));
-                        } else {
-                            commandSender.sendMessage(ChatColor.AQUA + "Plugin " + ChatColor.GOLD + args[0] + ChatColor.AQUA + " is already enabled");
-                        }
-                    } else {
-                        commandSender.sendMessage(ChatColor.AQUA + "Plugin " + ChatColor.GOLD + args[0] + ChatColor.AQUA + " does not exist");
+        getCommand("test").setExecutor((sender, command, label, args) -> {
+            if (sender.hasPermission("zeta.admin")) {
+                if (sender instanceof Player) {
+                    Player player = (Player) sender;
+                    player.sendMessage("Running reflection tests");
+                    boolean result = ReflectionApi.runReflectionTests(player);
+                    if (result) {
+                        player.sendMessage(ChatColor.GREEN + "Reflection tests passed!");
                     }
-                } else {
-                    commandSender.sendMessage(ChatColor.AQUA + "Usage: /enable_plugin <plugin>");
+                    else {
+                        player.sendMessage(ChatColor.RED + "Reflection tests failed!");
+                    }
+                }
+                else {
+                    sender.sendMessage(ChatColor.RED + "This command can only be run by players!");
                 }
             }
             return true;
         });
+
     }
 
     @Override
-    public Logger getPluginLogger() {
+    public ConsoleLogger getPluginLogger() {
 
         return LOGGER;
 
@@ -181,11 +133,11 @@ public class ZetaCore extends ZetaPlugin {
     public void onDisable() {
 
         LOGGER.info("ZetaCore framework is disabling");
-        dataBase.write();
         localSettings.write();
 
         if (this.isConnectedToDatabase()) {
-            dataBase.client.disconnect();
+            LOGGER.debug("Disconnecting database client");
+            localSettings.client.disconnect();
         }
 
     }
@@ -193,24 +145,24 @@ public class ZetaCore extends ZetaPlugin {
     @Override
     public String getPluginName() {
 
-        return "ZetaCommons";
+        return "ZetaCore";
 
     }
 
-    public static void sendTitlePackets(Player bPlayer, String title, @Nullable String subtitle, @Nullable String actionBar) {
-        sendTitlePackets(bPlayer, title, subtitle, actionBar, 5, 400, 40);
+    public static void sendTitlePackets(Player player, String title, @Nullable String subtitle, @Nullable String actionBar) {
+        sendTitlePackets(player, title, subtitle, actionBar, 5, 400, 40);
     }
 
     public static void sendTitlePackets(Player bPlayer, String title, String subtitle, @Nullable String actionBar, int fadeIn, int stay, int fadeOut) {
 
         NMSPlayerReflection player = new NMSPlayerReflection(bPlayer);
         NMSPlayerConnectionReflection connection = player.getPlayerConnection();
-        NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection("TITLE", NMSChatSerializerReflection.createChatComponentFromRawText(title));
-        NMSTitlePacketReflection subtitlePacket = new NMSTitlePacketReflection("SUBTITLE", NMSChatSerializerReflection.createChatComponentFromRawText(subtitle));
+        NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection(NMSTitlePacketReflection.NMSEnumTitleAction.TITLE, NMSChatSerializerReflection.createChatComponentFromText(title));
+        NMSTitlePacketReflection subtitlePacket = new NMSTitlePacketReflection(NMSTitlePacketReflection.NMSEnumTitleAction.SUBTITLE, NMSChatSerializerReflection.createChatComponentFromText(subtitle));
         NMSChatPacketReflection actionBarPacket = null;
 
         if (actionBar != null) {
-            actionBarPacket = new NMSChatPacketReflection(NMSChatSerializerReflection.createChatComponentFromRawText(actionBar), (byte) 2);
+            actionBarPacket = new NMSChatPacketReflection(actionBar, NMSChatPacketReflection.EnumChatPosition.GAME_INFO);
         }
 
         NMSTitlePacketReflection timesPacket = new NMSTitlePacketReflection(fadeIn, stay, fadeOut);
@@ -328,9 +280,6 @@ public class ZetaCore extends ZetaPlugin {
     public static void registerPlugin(ZetaPlugin plugin) {
 
         registeredPlugins.put(plugin.getName(), plugin);
-        if (INSTANCE.localSettings.disabled_plugins.contains(plugin.getName())) {
-            LOGGER.info("Disabled plugin " + plugin.getName() + " because it was disabled in the config.");
-        }
 
     }
 
@@ -346,7 +295,11 @@ public class ZetaCore extends ZetaPlugin {
 
     }
 
-    public static Logger getLogger(String pluginName) {
+    public static List<ZetaPlugin> getPlugins() {
+        return new ArrayList<>(registeredPlugins.values());
+    }
+
+    public static ConsoleLogger getLogger(String pluginName) {
 
         return getPlugin(pluginName).getPluginLogger();
 
@@ -357,7 +310,7 @@ public class ZetaCore extends ZetaPlugin {
         ZetaPlugin plugin = storer.getPlugin();
         LOGGER.debug("Registering data handler for file, " + storer.getFileName() + ", for " + plugin.getName());
 
-        if (storer instanceof ISQLTableHandler && ZetaCore.INSTANCE.dataBase.initialized) {
+        if (storer instanceof ISQLTableHandler && ZetaCore.INSTANCE.localSettings.initialized) {
 
             if (!databaseDataHandlers.containsKey(plugin)) {
                 databaseDataHandlers.put(plugin, new ArrayList<>());
@@ -405,8 +358,6 @@ public class ZetaCore extends ZetaPlugin {
     @Override
     protected void registerDataStorers() {
 
-        dataBase = new DataBase(this);
-        dataBase.setup();
         localSettings = new LocalData(this);
         localSettings.setup();
         LOGGER.debug("Database and local settings initialized");
@@ -421,6 +372,11 @@ public class ZetaCore extends ZetaPlugin {
     @Override
     public boolean initializedFinished() {
         return true;
+    }
+
+    @Override
+    public ItemStack getIcon() {
+        return new ItemStack(Material.AIR);
     }
 
     public void readAll() {
@@ -484,7 +440,23 @@ public class ZetaCore extends ZetaPlugin {
     }
 
     public boolean isConnectedToDatabase() {
-        return dataBase.initialized && dataBase.client != null && dataBase.client.isConnected();
+        return localSettings.initialized && localSettings.client != null && localSettings.client.isConnected();
+    }
+
+    public static void registerSuperConfig(ZetaPlugin plugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> superConfigFactory) {
+        superConfigs.put(plugin, superConfigFactory);
+    }
+
+    public static Optional<AbstractGUIMenu> getSuperConfig(ZetaPlugin plugin, PlayerUtil utility, LocalSettingsMenu.PluginEditMenu menu) {
+        if (superConfigs.containsKey(plugin)) {
+            BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> constructorFunction = superConfigs.get(plugin);
+            return Optional.of(constructorFunction.apply(utility, menu));
+        }
+        return Optional.empty();
+    }
+
+    public static boolean hasSuperConfig(ZetaPlugin plugin) {
+        return superConfigs.containsKey(plugin);
     }
 
 }

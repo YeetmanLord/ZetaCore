@@ -1,11 +1,7 @@
 package com.github.yeetmanlord.reflection_api.util;
 
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public enum EnumNMSEntityToBukkit {
@@ -163,7 +159,9 @@ public enum EnumNMSEntityToBukkit {
 
     FROG("FROG", "frog", "frog"),
 
-    TADPOLE("TADPOLE", "tadpole", "tadpole");
+    TADPOLE("TADPOLE", "tadpole", "tadpole"),
+
+    SHULKER("SHULKER", "Shulker", "shulker");
 
 
     private String bukkitType, legacyNmsType, nmsType;

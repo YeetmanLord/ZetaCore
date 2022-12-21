@@ -17,73 +17,88 @@ import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
  * This is a type of {@link ISQLTableHandler} where there is no associated
  * {@link ISQLObjectHandler} and rather than handling java objects this
  * {@link DataStorer data storer} just stores general data in the database
- * 
- * @zeta.usage INTERNAL
- * 
- * @author YeetManLord
  *
+ * @author YeetManLord
+ * @zeta.usage INTERNAL
  */
 public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataStorer implements ISQLTableHandler<PrimaryKeyType> {
 
-	protected ISQLTable table;
+    protected ISQLTable table;
 
-	protected String tableName;
+    protected String tableName;
 
-	public AbstractUntypedSQLDataStorer(ZetaPlugin instanceIn, String name, String tableName) {
+    public AbstractUntypedSQLDataStorer(ZetaPlugin instanceIn, String name, String tableName) {
 
-		super(instanceIn, name);
-		this.tableName = instanceIn.getPluginName().toLowerCase() + "/" + tableName;
+        super(instanceIn, name);
+        this.tableName = instanceIn.getPluginName().toLowerCase() + "/" + tableName;
 
-	}
+    }
 
-	@Override
-	public ISQLTable getTable() {
+    @Override
+    public ISQLTable getTable() {
 
-		return this.table;
+        return this.table;
 
-	}
+    }
 
-	@Override
-	public Map<PrimaryKeyType, ISQL<?>> getData() {
+    @Override
+    public void setTable(ISQLTable table) {
+        this.table = table;
+    }
 
-		return null;
+    @Override
+    public String getTableName() {
+        return tableName;
+    }
 
-	}
+    @Override
+    public Map<PrimaryKeyType, ISQL<?>> getData() {
 
-	@Override
-	public ISQL<?> get(PrimaryKeyType primaryKey) {
+        return null;
 
-		return null;
+    }
 
-	}
+    @Override
+    public ISQL<?> get(PrimaryKeyType primaryKey) {
 
-	@Override
-	public void initializeDB(SQLHandler handler) {
+        return null;
 
-		this.table = new SQLTable(tableName, handler);
-		this.table.setPrimaryKey(this.getPrimaryKey());
-		this.table.setColumns(getColumns(handler));
-		this.table.initializeTable(handler);
+    }
 
-		if (this.table.getRows().isEmpty()) {
-			this.read();
-			this.writeToDB();
-		}
+    @Override
+    public void initializeDB(SQLHandler handler) {
 
-	}
+        this.table = new SQLTable(tableName, handler);
+        this.table.setPrimaryKey(this.getPrimaryKey());
+        this.table.setColumns(getColumns(handler));
+        this.table.initializeTable(handler);
 
-	public abstract List<SQLColumn<?>> getColumns(SQLHandler handler);
+        if (this.table.getRows().isEmpty()) {
+            this.read();
+            this.writeToDB();
+        }
 
-	public ISQLObjectHandler<?> getHandler() {
+    }
 
-		return null;
+    public ISQLObjectHandler<?> getHandler() {
 
-	}
+        return null;
 
-	public List<ISQL<?>> getISQLsWithValue(SQLValue<?> valueToCheck) {
+    }
 
-		return null;
+    public List<ISQL<?>> getISQLsWithValue(SQLValue<?> valueToCheck) {
 
-	}
+        return null;
 
+    }
+
+    @Override
+    public String toString() {
+        return "AbstractUntypedSQLDataStorer{" +
+                "table=" + table +
+                ", tableName='" + tableName + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", plugin=" + instance.getPluginName() +
+                '}';
+    }
 }

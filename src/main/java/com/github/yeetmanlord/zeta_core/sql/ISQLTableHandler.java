@@ -13,7 +13,7 @@ import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
  * 
  * @author YeetManLord
  *
- * @param <PrimaryKeyType> This is kinda self explanatory
+ * @param <PrimaryKeyType> This is kinda self-explanatory
  */
 public interface ISQLTableHandler<PrimaryKeyType> {
 
@@ -21,6 +21,13 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 	 * @return Table associated with this handler
 	 */
 	ISQLTable getTable();
+
+	String getTableName();
+
+	/**
+	 * Sets this table handler's table
+	 */
+	void setTable(ISQLTable table);
 
 	/**
 	 * @return Table's primary key
@@ -86,5 +93,7 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 	 *         passed in
 	 */
 	List<ISQL<?>> getISQLsWithValue(SQLValue<?> valueToCheck);
+
+	List<SQLColumn<?>> getColumns(SQLHandler handler);
 
 }

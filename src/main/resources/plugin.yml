@@ -2,52 +2,20 @@ name: ZetaCore
 version: 0.0.1
 author: YeetManLord
 main: com.github.yeetmanlord.zeta_core.ZetaCore
-description: All Zeta series plugins rely on this for functioning and code consistentcy
+description: All Zeta series plugins rely on this for functioning and code consistency. This also acts as a management plugin to enable, disable, and change the settings of various Zeta plugins.
 
 permissions:
-    zetacore.admin:
+    zeta.admin:
         description: Allows access to all ZetaCore commands
         default: op
 
 commands:
-  enable_debug:
-    description: Enables debug logging
-    usage: /<command>
-    permission: zetacore.admin
-    aliases: [edbg, debug_on]
-
-  disable_debug:
-    description: Disables debug logging
-    usage: /<command>
-    permission: zetacore.admin
-    aliases: [dsbbg, debug_off]
-
-  get_disabled_plugins:
-    description: Gets a list of all disabled plugins
-    usage: /<command>
-    permission: zetacore.admin
-    aliases: [gdp, get_disabled]
-
-  get_enabled_plugins:
-    description: Gets a list of all enabled plugins
-    usage: /<command>
-    permission: zetacore.admin
-    aliases: [gep, get_enabled]
-
-  enable_plugin:
-    description: Enables a plugin
-    usage: /<command> <plugin>
-    permission: zetacore.admin
-    aliases: [enable]
-
-  disable_plugin:
-    description: Disables a plugin
-    usage: /<command> <plugin>
-    permission: zetacore.admin
-    aliases: [disable]
-
-  local_settings:
+  zeta_settings:
     description: Opens the local settings gui
     usage: /<command>
-    permission: zetacore.admin
-    aliases: [local_settings_gui]
+    permission: zeta.admin
+    aliases: [zeta, zeta_local_settings]
+  test:
+    description: Test command. Runs test cases on reflection api
+    usage: /<command>
+    permission: zeta.admin

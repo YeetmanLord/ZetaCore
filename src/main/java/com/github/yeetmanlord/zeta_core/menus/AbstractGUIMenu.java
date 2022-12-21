@@ -6,10 +6,8 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.github.yeetmanlord.reflection_api.packets.NMSPacketReflection;
 import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
-import net.minecraft.server.v1_8_R3.PacketPlayOutCloseWindow;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

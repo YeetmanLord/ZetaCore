@@ -6,6 +6,7 @@ import java.util.Map;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.reflection_api.exceptions.MappingsException;
 import com.github.yeetmanlord.reflection_api.mappings.IMapping;
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import com.github.yeetmanlord.reflection_api.mappings.VersionRange;
 
 public class ValueMapping<Type> implements IMapping<Type> {
@@ -18,6 +19,7 @@ public class ValueMapping<Type> implements IMapping<Type> {
 
 		this.mappings = mappings;
 		this.name = name;
+		Mappings.mappings.add(this);
 
 	}
 
@@ -81,4 +83,8 @@ public class ValueMapping<Type> implements IMapping<Type> {
 
 	}
 
+	@Override
+	public boolean testMapping() {
+		return true;
+	}
 }

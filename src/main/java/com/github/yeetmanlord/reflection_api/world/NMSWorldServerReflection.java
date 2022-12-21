@@ -42,8 +42,7 @@ public class NMSWorldServerReflection extends NMSObjectReflection {
 		try {
 			getServer = nmsObject.getClass().getMethod("getMinecraftServer");
 			return getServer.invoke(nmsObject);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -59,7 +58,7 @@ public class NMSWorldServerReflection extends NMSObjectReflection {
 
 	/**
 	 * Gets the list of entities for a server world
-	 * 
+	 *
 	 * @return The entity list of a server but as reflected entities
 	 */
 	public List<NMSEntityReflection> entityList() {
@@ -75,13 +74,11 @@ public class NMSWorldServerReflection extends NMSObjectReflection {
 
 				if (NMSPlayerReflection.isInstance(entity)) {
 					reflectedEntityList.add(new NMSPlayerReflection(entityList.get(x)));
-				}
-				else reflectedEntityList.add(entity);
+				} else reflectedEntityList.add(entity);
 
 			}
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -93,8 +90,7 @@ public class NMSWorldServerReflection extends NMSObjectReflection {
 
 		try {
 			nmsObject.getClass().getMethod("addEntity", ReflectionApi.getNMSClass("Entity")).invoke(nmsObject, entity.getNmsEntity());
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -104,8 +100,7 @@ public class NMSWorldServerReflection extends NMSObjectReflection {
 
 		try {
 			nmsObject.getClass().getMethod("removeEntity", ReflectionApi.getNMSClass("Entity")).invoke(nmsObject, entity.getNmsEntity());
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

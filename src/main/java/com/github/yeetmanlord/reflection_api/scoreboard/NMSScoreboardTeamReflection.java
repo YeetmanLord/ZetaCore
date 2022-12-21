@@ -66,7 +66,6 @@ public class NMSScoreboardTeamReflection extends NMSObjectReflection {
 		try {
 			Object value = clazz.getField(visibility.name().toUpperCase()).get(null);
 			Mappings.SET_NAMETAG_VISIBILITY_MAPPING.runMethod(this, value);
-			invokeMethodForNmsObject("b", new Class<?>[] { clazz }, new Object[] { value });
 		}
 		catch (Exception e) {
 			e.printStackTrace();

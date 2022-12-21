@@ -26,7 +26,7 @@ public class NMSTitlePacketReflection extends NMSPacketReflection {
 	 */
 	public NMSTitlePacketReflection(int fadeIn, int timeShown, int fadeOut) {
 
-		this("TIMES", ReflectionApi.getNMSClass("IChatBaseComponent").cast(null), fadeIn, timeShown, fadeOut);
+		this(NMSEnumTitleAction.TIMES, ReflectionApi.getNMSClass("IChatBaseComponent").cast(null), fadeIn, timeShown, fadeOut);
 
 	}
 
@@ -37,11 +37,11 @@ public class NMSTitlePacketReflection extends NMSPacketReflection {
 	 *                        SUBTITLE, TIMES, CLEAR, and RESET
 	 * @param chatComponent   An NMS IChatBaseComponent gotten either by
 	 *                        {@link NMSChatSerializerReflection#createChatComponentFromString(String)},
-	 *                        {@link NMSChatSerializerReflection#createChatComponentFromRawText(String)},
+	 *                        {@link NMSChatSerializerReflection#createChatComponentFromText(String)},
 	 *                        or
 	 *                        {@link NMSChatComponentTextReflection#getComponent()}
 	 */
-	public NMSTitlePacketReflection(String enumTitleAction, Object chatComponent) {
+	public NMSTitlePacketReflection(NMSEnumTitleAction enumTitleAction, Object chatComponent) {
 
 		this(enumTitleAction, chatComponent, -1, -1, -1);
 
@@ -55,7 +55,7 @@ public class NMSTitlePacketReflection extends NMSPacketReflection {
 	 *                        SUBTITLE, TIMES, CLEAR, and RESET
 	 * @param chatComponent   An NMS IChatBaseComponent gotten either by
 	 *                        {@link NMSChatSerializerReflection#createChatComponentFromString(String)},
-	 *                        {@link NMSChatSerializerReflection#createChatComponentFromRawText(String)},
+	 *                        {@link NMSChatSerializerReflection#createChatComponentFromText(String)},
 	 *                        or
 	 *                        {@link NMSChatComponentTextReflection#getComponent()}
 	 * @param fadeIn          Time in ticks it takes for the title to fade in.
@@ -63,17 +63,17 @@ public class NMSTitlePacketReflection extends NMSPacketReflection {
 	 * @param fadeOut         Time in ticks it takes for the title to fade out and
 	 *                        disappear
 	 */
-	public NMSTitlePacketReflection(String enumTitleAction, Object chatComponent, int fadeIn, int timeShow, int fadeOut) {
+	public NMSTitlePacketReflection(NMSEnumTitleAction enumTitleAction, Object chatComponent, int fadeIn, int timeShow, int fadeOut) {
 
 		super("PacketPlayOutTitle", classes, getTitleAction(enumTitleAction), chatComponent, fadeIn, timeShow, fadeOut);
 
 	}
 
-	private static Object getTitleAction(String enumField) {
+	private static Object getTitleAction(NMSEnumTitleAction enumField) {
 
 		try {
 			Class<?> clazz = Mappings.ENUM_TITLE_ACTION_CLASS_MAPPING.getNMSClassMapping();
-			return clazz.getField(enumField).get(null);
+			return clazz.getField(enumField.name()).get(null);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -85,7 +85,7 @@ public class NMSTitlePacketReflection extends NMSPacketReflection {
 
 	public static NMSTitlePacketReflection clear() {
 
-		return new NMSTitlePacketReflection("CLEAR", ReflectionApi.getNMSClass("IChatBaseComponent").cast(null));
+		return new NMSTitlePacketReflection(NMSEnumTitleAction.CLEAR, ReflectionApi.getNMSClass("IChatBaseComponent").cast(NMSChatSerializerReflection.createChatComponentFromText("&6")));
 
 	}
 
@@ -103,8 +103,12 @@ public class NMSTitlePacketReflection extends NMSPacketReflection {
 			return new NMSTitlePacketReflection(refl.getNmsObject());
 		}
 
-		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSTitlePacketReflection");
+		throw new ClassCastException("Cannot cast " + refl + " to NMSTitlePacketReflection");
 
+	}
+
+	public enum NMSEnumTitleAction {
+		TITLE, SUBTITLE, TIMES, CLEAR, RESET
 	}
 
 }

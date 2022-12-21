@@ -8,11 +8,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="X:/Coding/BedwarsPlugin/Server/server.jar"/>
-	<classpathentry kind="lib" path="X:/Coding/BedwarsPlugin/Server/plugins/reflection_api.jar" sourcepath="X:/Coding/BedwarsPlugin/Server/plugins/reflection_api.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/X:/Coding/BedwarsPlugin/ReflectionAPI/ReflectionAPI/doc/"/>
-			<attribute name="source_encoding" value="UTF-8"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -56,7 +56,7 @@ public class NMSDataWatcherReflection extends NMSObjectReflection {
 			if (ReflectionApi.version.isNewer("1.9")) {
 				Object obj = ReflectionApi.getNMSClass("DataWatcherRegistry").getField(registryType).get(null);
 				Object obj1 = ReflectionApi.getNMSClass("DataWatcherSerializer").getMethod("a", int.class).invoke(obj, index);
-				((Map<Integer, Object>) this.getFieldFromNmsObject("c")).remove(index);
+				((Map<Integer, Object>) this.getFieldFromNmsObject(ReflectionApi.version.isOlder("1.10") ? "c" : "d")).remove(index);
 				staticClass.getMethod("register", ReflectionApi.getNMSClass("DataWatcherObject"), Object.class).invoke(this.nmsObject, obj1, data);
 				staticClass.getMethod("set", ReflectionApi.getNMSClass("DataWatcherObject"), Object.class).invoke(this.nmsObject, obj1, data);
 			}

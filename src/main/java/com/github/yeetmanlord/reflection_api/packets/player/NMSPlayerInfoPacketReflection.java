@@ -1,5 +1,6 @@
 package com.github.yeetmanlord.reflection_api.packets.player;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
@@ -27,12 +28,12 @@ public class NMSPlayerInfoPacketReflection extends NMSPacketReflection {
 	/**
 	 * @param infoValue allowed values for ADD_PLAYER, UPDATE_GAME_MODE,
 	 *                  UPDATE_LATENCY, UPDATE_DISPLAY_NAME, REMOVE_PLAYER;
-	 * @param player    should be {@link NMSPlayerReflection#getNmsPlayer()}
+	 * @param player    should be {@link NMSPlayerReflection}
 	 * @throws Exception when invalid data is passed into the constructor
 	 */
-	public NMSPlayerInfoPacketReflection(String infoValue, Object... players) throws Exception {
+	public NMSPlayerInfoPacketReflection(EnumPlayerInfoPacketAction infoValue, NMSPlayerReflection... players) throws Exception {
 
-		super("PacketPlayOutPlayerInfo", specialClasses, enumPlayerActionClass().getField(infoValue.toUpperCase()).get(null), ReflectionApi.castArrayToNMS("EntityPlayer", players));
+		super("PacketPlayOutPlayerInfo", specialClasses, enumPlayerActionClass().getField(infoValue.name()).get(null), ReflectionApi.castArrayToNMS("EntityPlayer", Arrays.stream(players).map(NMSPlayerReflection::getNmsPlayer).toArray()));
 
 	}
 
@@ -65,6 +66,10 @@ public class NMSPlayerInfoPacketReflection extends NMSPacketReflection {
 
 		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSPlayerInfoPacketReflection");
 
+	}
+
+	public enum EnumPlayerInfoPacketAction {
+		ADD_PLAYER, UPDATE_GAME_MODE, UPDATE_LATENCY, UPDATE_DISPLAY_NAME, REMOVE_PLAYER;
 	}
 
 }

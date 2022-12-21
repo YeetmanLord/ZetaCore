@@ -107,9 +107,7 @@ public abstract class DataStorer {
 	@Override
 	public String toString() {
 
-		Map<String, Object> values = YAMLUtil.getJSONFromYAML(this.config, null);
-		values.put("file", this.fileName);
-		return "DataStorer" + values.toString();
+		return "DataStorer{" + "filename: " + fileName + ", plugin: " + instance.getPluginName() + "}";
 
 	}
 

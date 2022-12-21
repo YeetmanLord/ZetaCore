@@ -22,6 +22,13 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 
 	protected String tableName;
 
+	public AbstractSQLDataStorer(ZetaPlugin instanceIn, String name, String tableName) {
+
+		super(instanceIn, name);
+		this.tableName = instanceIn.getPluginName().toLowerCase() + "/" + tableName;
+
+	}
+
 	@Override
 	public ISQLTable getTable() {
 
@@ -29,11 +36,14 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 
 	}
 
-	public AbstractSQLDataStorer(ZetaPlugin instanceIn, String name, String tableName) {
+	@Override
+	public void setTable(ISQLTable table) {
+		this.table = table;
+	}
 
-		super(instanceIn, name);
-		this.tableName = instanceIn.getPluginName().toLowerCase() + "/" + tableName;
-
+	@Override
+	public String getTableName() {
+		return tableName;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -69,8 +79,6 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 
 	}
 
-	public abstract List<SQLColumn<?>> getColumns(SQLHandler handler);
-
 	@Override
 	public ISQL<?> get(PrimaryKeyType primaryKey) {
 
@@ -92,4 +100,13 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
 
 	}
 
+	@Override
+	public String toString() {
+		return "AbstractSQLDataStorer{" +
+				"table=" + table +
+				", tableName='" + tableName + '\'' +
+				", fileName='" + fileName + '\'' +
+				", plugin=" + instance.getPluginName() +
+				'}';
+	}
 }

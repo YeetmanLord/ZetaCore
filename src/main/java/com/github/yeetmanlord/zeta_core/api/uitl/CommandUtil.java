@@ -1,9 +1,12 @@
 package com.github.yeetmanlord.zeta_core.api.uitl;
 
+import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+
+import java.lang.reflect.Method;
 
 public class CommandUtil {
 
@@ -59,7 +62,14 @@ public class CommandUtil {
         Material material = Material.matchMaterial(string.toUpperCase().trim());
 
         if (material == null) {
-            material = Bukkit.getUnsafe().getMaterialFromInternalName(string.trim());
+            if (ReflectionApi.version.isOlder("1.13")) {
+                try {
+                    Method m = Bukkit.getUnsafe().getClass().getMethod("getMaterialFromInternalName", String.class);
+                    material = (Material) m.invoke(Bukkit.getUnsafe(), string.trim());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         if (material != null) {

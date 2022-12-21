@@ -29,7 +29,7 @@ public class ChatEvent implements Listener {
 
 			NMSPlayerReflection entityPlayer = new NMSPlayerReflection(player);
 			NMSPlayerConnectionReflection connection = entityPlayer.getPlayerConnection();
-			NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection("CLEAR", ReflectionApi.getNMSClass("IChatBaseComponent").cast(null));
+			NMSTitlePacketReflection titlePacket = NMSTitlePacketReflection.clear();
 
 			connection.sendPacket(titlePacket);
 
@@ -43,7 +43,7 @@ public class ChatEvent implements Listener {
 
 			NMSPlayerReflection entityPlayer = new NMSPlayerReflection(player);
 			NMSPlayerConnectionReflection connection = entityPlayer.getPlayerConnection();
-			NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection("CLEAR", ReflectionApi.getNMSClass("IChatBaseComponent").cast(null));
+			NMSTitlePacketReflection titlePacket = NMSTitlePacketReflection.clear();
 
 			connection.sendPacket(titlePacket);
 

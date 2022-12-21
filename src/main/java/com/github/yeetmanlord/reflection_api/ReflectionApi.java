@@ -3,10 +3,36 @@ package com.github.yeetmanlord.reflection_api;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.github.yeetmanlord.reflection_api.block.NMSBlockPositionReflection;
+import com.github.yeetmanlord.reflection_api.chat_components.NMSChatSerializerReflection;
+import com.github.yeetmanlord.reflection_api.entity.players.NMSPlayerInteractManagerReflection;
+import com.github.yeetmanlord.reflection_api.entity.players.NMSPlayerReflection;
+import com.github.yeetmanlord.reflection_api.entity.players.player_connection.NMSPlayerConnectionReflection;
+import com.github.yeetmanlord.reflection_api.inventory.NMSItemStackReflection;
+import com.github.yeetmanlord.reflection_api.mappings.IMapping;
+import com.github.yeetmanlord.reflection_api.nbt.NMSNBTTagCompoundReflection;
+import com.github.yeetmanlord.reflection_api.packets.chat.NMSChatPacketReflection;
+import com.github.yeetmanlord.reflection_api.packets.entity.NMSEntityDestroyPacketReflection;
+import com.github.yeetmanlord.reflection_api.packets.entity.NMSEntityEquipmentPacketReflection;
+import com.github.yeetmanlord.reflection_api.packets.entity.NMSNamedEntitySpawnPacketReflection;
+import com.github.yeetmanlord.reflection_api.packets.entity.NMSPacketPlayOutRelEntityMove;
+import com.github.yeetmanlord.reflection_api.packets.network.NMSNetworkManagerReflection;
+import com.github.yeetmanlord.reflection_api.packets.player.NMSPlayerInfoPacketReflection;
+import com.github.yeetmanlord.reflection_api.packets.player.NMSScoreboardTeamPacketReflection;
+import com.github.yeetmanlord.reflection_api.packets.player.NMSTitlePacketReflection;
+import com.github.yeetmanlord.reflection_api.scoreboard.NMSScoreboardTeamReflection;
+import com.github.yeetmanlord.reflection_api.util.EnumEquipmentSlot;
+import com.github.yeetmanlord.reflection_api.util.ParticleUtility;
+import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
+import com.github.yeetmanlord.reflection_api.world.NMSWorldServerReflection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.github.yeetmanlord.reflection_api.exceptions.IllegalVersionException;
@@ -31,6 +57,96 @@ public class ReflectionApi {
 
 		return null;
 
+	}
+
+	public static boolean runReflectionTests(Player executer) {
+		try {
+			// Chat packets
+			NMSChatPacketReflection packet = new NMSChatPacketReflection(ChatColor.RED + "Hello World!", NMSChatPacketReflection.EnumChatPosition.CHAT);
+
+			// Entity packets
+			NMSEntityDestroyPacketReflection entityPacket = new NMSEntityDestroyPacketReflection(1, 2, 3);
+			NMSEntityEquipmentPacketReflection equipmentPacketReflection = new NMSEntityEquipmentPacketReflection(1, EnumEquipmentSlot.HEAD, new ItemStack(Material.AIR));
+			NMSNamedEntitySpawnPacketReflection spawnPacket = new NMSNamedEntitySpawnPacketReflection(new NMSPlayerReflection(executer));
+			NMSPacketPlayOutRelEntityMove movePacket = new NMSPacketPlayOutRelEntityMove(1, 0L, 0L, 0L, (byte) 127, (byte) 0, false);
+
+			// Player connection
+			NMSPlayerConnectionReflection connection = new NMSPlayerConnectionReflection(new NMSPlayerReflection(executer));
+
+			// Network manager
+			NMSNetworkManagerReflection networkManager = new NMSNetworkManagerReflection(NMSNetworkManagerReflection.EnumNetworkDirection.SERVERBOUND);
+
+			// Send packets
+			connection.sendPacket(packet);
+
+			// Player tests
+			NMSPlayerReflection player = new NMSPlayerReflection(executer);
+			player.setLocation(executer.getLocation().add(0, 1, 0));
+
+			// Player packets
+			NMSPlayerInfoPacketReflection infoPacket = new NMSPlayerInfoPacketReflection(NMSPlayerInfoPacketReflection.EnumPlayerInfoPacketAction.ADD_PLAYER, player);
+
+			/// Teams
+			NMSScoreboardTeamReflection team = new NMSScoreboardTeamReflection(Bukkit.getScoreboardManager().getMainScoreboard(), "test");
+			NMSScoreboardTeamPacketReflection removePacket = new NMSScoreboardTeamPacketReflection(team, NMSScoreboardTeamPacketReflection.TeamPacketAction.REMOVE);
+			NMSScoreboardTeamPacketReflection addPacket = new NMSScoreboardTeamPacketReflection(team, new ArrayList(Arrays.asList("123", "456")), NMSScoreboardTeamPacketReflection.TeamPacketAction.ADD_PLAYERS);
+
+			/// Title
+			NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection(NMSTitlePacketReflection.NMSEnumTitleAction.TITLE, NMSChatSerializerReflection.createChatComponentFromText(ChatColor.RED + "Hello World!"));
+			NMSTitlePacketReflection subtitlePacket = new NMSTitlePacketReflection(NMSTitlePacketReflection.NMSEnumTitleAction.SUBTITLE, NMSChatSerializerReflection.createChatComponentFromText(ChatColor.RED + "Hello World!"));
+			NMSTitlePacketReflection timesPacket = new NMSTitlePacketReflection(10, 20, 10);
+
+			/// Actionbar
+			NMSChatPacketReflection actionbarPacket = new NMSChatPacketReflection(ChatColor.RED + "Hello World!", NMSChatPacketReflection.EnumChatPosition.GAME_INFO);
+
+			connection.sendPacket(actionbarPacket);
+
+			/// NBT tests
+			NMSItemStackReflection item = new NMSItemStackReflection(new ItemStack(Material.DIAMOND));
+			NMSNBTTagCompoundReflection tag = new NMSNBTTagCompoundReflection();
+			tag.setString("test", "test");
+			item.setTag(tag);
+			executer.getInventory().addItem(item.asBukkit());
+
+			// Interact manager
+			NMSPlayerInteractManagerReflection interactManager = new NMSPlayerInteractManagerReflection(player);
+
+			// Block position
+			NMSBlockPositionReflection blockPosition = new NMSBlockPositionReflection(executer.getLocation());
+
+			// World & server
+			NMSWorldServerReflection world = new NMSWorldServerReflection(executer.getWorld());
+			NMSServerReflection server = new NMSServerReflection(Bukkit.getServer());
+
+			// Particle
+			ParticleUtility.spawnParticle(executer.getLocation(), ParticleUtility.ParticleTypes.CRIT_MAGIC, 1, 1, 1, 1, 1, 30);
+
+			boolean testsPassed = true;
+			// Material tests
+			for (VersionMaterial material : VersionMaterial.stringMaterialMap.values()) {
+				try {
+					System.out.println(material.getFlatMaterial() + " " + material.getMaterial());
+				} catch (Exception e) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + material.getFlatMaterial() + " " + e.getMessage());
+				}
+			}
+
+			// Mappings tests
+			for (IMapping mappings : Mappings.mappings) {
+				boolean passed = mappings.testMapping();
+				if (passed) {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Mapping `" + mappings.getName() + "` tests passed");
+				} else {
+					Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Mapping `" + mappings.getName() + "` tests failed");
+					testsPassed = false;
+				}
+			}
+
+			return testsPassed;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	public static Version version;

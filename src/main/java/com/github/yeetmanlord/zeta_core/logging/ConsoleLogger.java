@@ -13,7 +13,7 @@ import com.github.yeetmanlord.zeta_core.ZetaPlugin;
  * @author YeetManLord
  * @zeta.usage INTERNAL
  */
-public class Logger {
+public class ConsoleLogger {
 
     private ZetaPlugin plugin;
 
@@ -21,7 +21,7 @@ public class Logger {
 
     private boolean debug;
 
-    public Logger(ZetaPlugin plugin, ChatColor defaultColor) {
+    public ConsoleLogger(ZetaPlugin plugin, ChatColor defaultColor) {
 
         this.plugin = plugin;
         this.defaultColor = defaultColor;
@@ -33,7 +33,11 @@ public class Logger {
         this.debug = debug;
     }
 
-    public Logger(ZetaPlugin plugin) {
+    public boolean isDebugging() {
+        return this.debug;
+    }
+
+    public ConsoleLogger(ZetaPlugin plugin) {
 
         this(plugin, ChatColor.WHITE);
 
@@ -49,6 +53,21 @@ public class Logger {
         if (debug) {
             Bukkit.getConsoleSender().sendMessage((defaultColor + "[" + plugin.getClass().getName() + "/DEBUG] " + ChatColor.translateAlternateColorCodes('&', convertToString(args))));
         }
+    }
+
+    public void warn(Object... args) {
+        Bukkit.getConsoleSender().sendMessage((ChatColor.GOLD + "[" + plugin.getClass().getName() + "/WARN] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
+    }
+
+    public void warn(Throwable throwable, Object... args) {
+
+        Bukkit.getConsoleSender().sendMessage((ChatColor.GOLD + "[" + plugin.getClass().getName() + "/WARN] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
+        String[] exc = getStackTrace(throwable);
+
+        for (String string : exc) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + "[" + plugin.getClass().getName() + "/WARN] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string)));
+        }
+
     }
 
     public void error(Object... args) {
@@ -76,6 +95,7 @@ public class Logger {
 
     public void fatal(Throwable throwable, Object... args) {
 
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[" + plugin.getClass().getName() + "/FATAL] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args))));
         String[] exc = getStackTrace(throwable);
 
         for (String string : exc) {
@@ -86,26 +106,38 @@ public class Logger {
 
     public void log(LogType type, @Nullable Throwable error, Object... args) {
 
-        if (type == LogType.INFO) {
-            info(args);
-        } else if (type == LogType.DEBUG) {
-            debug(args);
-        } else if (type == LogType.ERROR) {
+        switch (type) {
+            case INFO:
+                info(args);
+                break;
 
-            if (error != null) {
-                error(error, args);
-            } else {
-                error(args);
-            }
+            case DEBUG:
+                debug(args);
+                break;
 
-        } else {
+            case WARN:
+                if (error != null) {
+                    warn(error, args);
+                } else {
+                    warn(args);
+                }
+                break;
 
-            if (error != null) {
-                fatal(error, args);
-            } else {
-                fatal(args);
-            }
+            case ERROR:
+                if (error != null) {
+                    error(error, args);
+                } else {
+                    error(args);
+                }
+                break;
 
+            case FATAL:
+                if (error != null) {
+                    fatal(error, args);
+                } else {
+                    fatal(args);
+                }
+                break;
         }
 
     }
@@ -116,20 +148,20 @@ public class Logger {
             return "null";
         }
 
-        String str = "";
+        StringBuilder str = new StringBuilder();
 
         for (int x = 0; x < objects.length; x++) {
             Object obj = objects[x];
 
             if (x == objects.length - 1) {
-                str += obj.toString() + " ";
+                str.append(obj.toString()).append(" ").append(defaultColor.toString());
             } else {
-                str += obj.toString();
+                str.append(obj.toString()).append(defaultColor.toString());
             }
 
         }
 
-        return str;
+        return str.toString();
 
     }
 
@@ -146,7 +178,7 @@ public class Logger {
     }
 
     public enum LogType {
-        INFO, DEBUG, ERROR, FATAL;
+        INFO, DEBUG, ERROR, FATAL, WARN;
     }
 
 
@@ -156,4 +188,7 @@ public class Logger {
 
     }
 
+    public ChatColor getColor() {
+        return defaultColor;
+    }
 }

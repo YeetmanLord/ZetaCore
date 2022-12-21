@@ -1,11 +1,7 @@
 package com.github.yeetmanlord.reflection_api.nbt;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
-import net.minecraft.server.v1_8_R3.NBTTagCompound;
 
 public class NMSNBTTagCompoundReflection extends NMSObjectReflection {
 

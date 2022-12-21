@@ -12,9 +12,9 @@ import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
  * This type extends {@link HashMap} and is here
  * just to condense that into an easier form just for ease of use. {@link Row}
  * also contains {@link #createRow(Map)} just to convert normal maps into rows
- * more quickly. I am not sure if you would use this in your extention APIs, but
+ * more quickly. I am not sure if you would use this in your extension APIs, but
  * I just use it when dealing with more raw rows in {@link SQLHandler} as well
- * as {@link ISQLTableHandler#writeDB() writing to tables}-
+ * as {@link ISQLTableHandler#writeDB() writing to tables} and reading data.
  * 
  * @author YeetManLord
  */
