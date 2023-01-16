@@ -9,6 +9,7 @@ import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.reflection_api.exceptions.MappingsException;
 import com.github.yeetmanlord.reflection_api.mappings.types.ClassNameMapping;
+import com.github.yeetmanlord.reflection_api.mappings.types.PackageMapping;
 import com.github.yeetmanlord.reflection_api.packets.entity.NMSEntityDestroyPacketReflection;
 import com.github.yeetmanlord.reflection_api.packets.entity.NMSEntityPacketReflection;
 import com.github.yeetmanlord.reflection_api.packets.entity.NMSNamedEntitySpawnPacketReflection;
@@ -38,16 +39,20 @@ public class NMSPacketReflection extends NMSObjectReflection {
         natives.put(Double.class, double.class);
         natives.put(Float.class, float.class);
         natives.put(Byte.class, byte.class);
+        natives.put(Short.class, short.class);
         natives.put(Integer[].class, int[].class);
         natives.put(Boolean[].class, boolean[].class);
         natives.put(Double[].class, double[].class);
         natives.put(Float[].class, float[].class);
         natives.put(Byte[].class, byte[].class);
         natives.put(Long[].class, long[].class);
+        natives.put(Short[].class, short[].class);
     }
 
     /**
      * For reflecting NMS packets
+     *
+     * @param mapping The package mapping of the packet (Most of the time it's {@link com.github.yeetmanlord.reflection_api.mappings.Mappings#PACKET_PLAY_PACKAGE_MAPPING})
      *
      * @param packetName is the name of the packet you are reflecting although
      *                   special packets have separate classes These classes are
@@ -63,9 +68,9 @@ public class NMSPacketReflection extends NMSObjectReflection {
      *                   if you have something null you wish to pass in to the constructor please use a different
      *                   NMS Packet Reflection constructor.</b>
      */
-    public NMSPacketReflection(String packetName, @Nullable Object... args) {
+    public NMSPacketReflection(PackageMapping mapping, String packetName, @Nullable Object... args) {
 
-        super(packetName, init(args), args);
+        super(getClassName(mapping, packetName), init(args), args);
         nmsPacket = nmsObject;
         this.name = packetName;
 
@@ -121,12 +126,34 @@ public class NMSPacketReflection extends NMSObjectReflection {
      * @see NMSPlayerInfoPacketReflection to see how this would work
      * @see NMSScoreboardTeamPacketReflection as well for another example
      */
-    public NMSPacketReflection(String packetName, HashMap<Class<?>, Integer> specialClassForObject, Object... args) {
+    public NMSPacketReflection(PackageMapping mapping, String packetName, HashMap<Class<?>, Integer> specialClassForObject, Object... args) {
 
-        super(init(packetName, specialClassForObject, args));
+        super(init(getClassName(mapping, packetName), specialClassForObject, args));
         nmsPacket = nmsObject;
         this.name = packetName;
 
+    }
+
+    public NMSPacketReflection(ClassNameMapping packetMapping, HashMap<Class<?>, Integer> specialConstructorClasses, Object... args) {
+        this(packetMapping.getPackageMapping(), getPacketClass(packetMapping), specialConstructorClasses, args);
+    }
+
+    private static String getPacketClass(ClassNameMapping mapping) {
+        try {
+            return mapping.get();
+        } catch (MappingsException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    private static String getClassName(PackageMapping mapping, String packetName) {
+        try {
+            return mapping.getNMSSubPackage() + packetName;
+        } catch (MappingsException e) {
+            e.printStackTrace();
+            return packetName;
+        }
     }
 
     private static Object init(String packetName, HashMap<Class<?>, Integer> specialClassForObject, Object[] args) {
@@ -162,10 +189,12 @@ public class NMSPacketReflection extends NMSObjectReflection {
         }
 
         try {
-            Constructor<?> packetConstructor = ReflectionApi.getNMSClass(packetName).getConstructor();
+            Constructor<?> packetConstructor;
 
             if (classes.length != 0) {
                 packetConstructor = ReflectionApi.getNMSClass(packetName).getConstructor(classes);
+            } else {
+                packetConstructor = ReflectionApi.getNMSClass(packetName).getConstructor();
             }
 
             return packetConstructor.newInstance(args);
@@ -183,8 +212,8 @@ public class NMSPacketReflection extends NMSObjectReflection {
      *                   They are in the order that they appear in the wanted constructor.
      * @param args       List of arguments to fill into the constructor. (In the order they appear in the constructor)
      */
-    public NMSPacketReflection(String packetName, Class<?>[] classes, Object... args) {
-        super(packetName, classes, args);
+    public NMSPacketReflection(PackageMapping mapping, String packetName, Class<?>[] classes, Object... args) {
+        super(getClassName(mapping, packetName), classes, args);
         nmsPacket = nmsObject;
         this.name = packetName;
     }
@@ -208,10 +237,10 @@ public class NMSPacketReflection extends NMSObjectReflection {
     public String toString() {
 
         HashMap<String, Object> values = new HashMap<>();
-        values.put("type", nmsObject.getClass());
+        values.put("type", nmsObject.getClass().getName());
         values.put("packet", nmsPacket);
-        values.put("packetName", name);
-        return "PacketReflection" + values.toString();
+        values.put("packetName", nmsObject.getClass().getSimpleName());
+        return "PacketReflection" + values;
 
     }
 
@@ -219,8 +248,8 @@ public class NMSPacketReflection extends NMSObjectReflection {
 
         Class<?> clazz = ReflectionApi.getNMSClass(packetName);
 
-        if (clazz.isInstance(refl.getNmsObject())) {
-            return new NMSPacketReflection(refl.getNmsObject());
+        if (clazz.isInstance(refl.getNMSObject())) {
+            return new NMSPacketReflection(refl.getNMSObject());
         }
 
         throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSPacketReflection(" + packetName + ")");

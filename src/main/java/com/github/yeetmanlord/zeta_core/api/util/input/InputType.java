@@ -1,4 +1,4 @@
-package com.github.yeetmanlord.zeta_core.api.uitl;
+package com.github.yeetmanlord.zeta_core.api.util.input;
 
 /**
  * Represents the type of input a player should give. This doesn't necessarily mean that the input will be that type. It is more of a code readability thing.

@@ -1,16 +1,13 @@
 package com.github.yeetmanlord.zeta_core.menus;
 
-import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import com.github.yeetmanlord.zeta_core.CommonEventFactory;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu.MenuSetItemsEvent;
-import com.github.yeetmanlord.zeta_core.api.uitl.InputType;
-import com.github.yeetmanlord.zeta_core.api.uitl.PlayerUtil;
+import com.github.yeetmanlord.zeta_core.api.util.input.PlayerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public abstract class HopperMenu extends AbstractGUIMenu {
 
@@ -46,7 +43,8 @@ public abstract class HopperMenu extends AbstractGUIMenu {
     public void open() {
 
         menuUtil.setMenuToInputTo(null);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.INSTANCE, () -> {
+        menuUtil.setGUIMenu(false);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.getInstance(), () -> {
             owner.closeInventory();
             this.inv = Bukkit.createInventory(this, InventoryType.HOPPER, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
             this.setItems();

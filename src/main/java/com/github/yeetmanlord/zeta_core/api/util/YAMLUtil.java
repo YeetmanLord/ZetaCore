@@ -1,4 +1,4 @@
-package com.github.yeetmanlord.zeta_core.api.uitl;
+package com.github.yeetmanlord.zeta_core.api.util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +19,11 @@ import com.github.yeetmanlord.zeta_core.data.DataStorer;
 @SuppressWarnings("unchecked")
 public class YAMLUtil {
 
+	/**
+	 * @param config The {@link FileConfiguration} to read from
+	 * @param path The config path to read from
+	 * @return A JSON object containing the data at the specified path
+	 */
 	public static JSONObject getJSONFromYAML(FileConfiguration config, @Nullable String path) {
 
 		Map<String, Object> map = new HashMap<>();
@@ -57,6 +62,11 @@ public class YAMLUtil {
 
 	}
 
+	/**
+	 * @param dataStorer The config to write to
+	 * @param path The section to write to
+	 * @param json The JSON data to write
+	 */
 	public static void writeYAMLFromJSON(DataStorer dataStorer, @Nullable String path, JSONObject json) {
 
 		FileConfiguration config = dataStorer.get();

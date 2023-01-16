@@ -27,7 +27,7 @@ public class SQLBatchStatement {
 
     public void execute(final SQLHandler handler, boolean async) {
         if (async) {
-            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> this.execute(handler));
+            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> this.execute(handler));
         } else {
             this.execute(handler);
         }

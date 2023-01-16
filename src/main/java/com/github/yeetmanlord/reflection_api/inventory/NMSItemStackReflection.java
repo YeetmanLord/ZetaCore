@@ -3,9 +3,12 @@ package com.github.yeetmanlord.reflection_api.inventory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
+import com.github.yeetmanlord.reflection_api.exceptions.MappingsException;
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import com.github.yeetmanlord.reflection_api.nbt.NMSNBTTagCompoundReflection;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -59,13 +62,24 @@ public class NMSItemStackReflection extends NMSObjectReflection {
     private static Object init(ItemStack stack) {
 
         try {
+            if (stack == null) {
+                throw new IllegalArgumentException("ItemStack cannot be null");
+            }
             if (stack.getType() != Material.AIR) {
                 Method asNMSCopy = ReflectionApi.getCraftBukkitClass("CraftItemStack", "inventory").getMethod("asNMSCopy", ItemStack.class);
                 return asNMSCopy.invoke(null, stack);
-            }
-            else {
-                Constructor<?> constr = staticClass.getConstructor(ReflectionApi.getNMSClass("Block"));
-                Object airBlock = ReflectionApi.getNMSClass("Blocks").getField("AIR").get(null);
+            } else {
+                Constructor<?> constr;
+                if (ReflectionApi.version.isOlder(ReflectionApi.v1_13)) {
+                    constr = staticClass.getConstructor(ReflectionApi.getNMSClass(Mappings.BLOCK_PACKAGE_MAPPING, "Block"));
+                } else {
+                    constr = staticClass.getConstructor(ReflectionApi.getNMSClass(Mappings.WORLD_LEVEL_PACKAGE_MAPPING, "IMaterial"));
+                }
+                String airField = "AIR";
+                if (ReflectionApi.version.isNewer(ReflectionApi.v1_17)) {
+                    airField = "a";
+                }
+                Object airBlock = ReflectionApi.getNMSClass(Mappings.BLOCK_PACKAGE_MAPPING, "Blocks").getField(airField).get(null);
                 return constr.newInstance(airBlock);
             }
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException |
@@ -77,12 +91,12 @@ public class NMSItemStackReflection extends NMSObjectReflection {
 
     }
 
-    public static final Class<?> staticClass = ReflectionApi.getNMSClass("ItemStack");
+    public static final Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.ITEM_PACKAGE_MAPPING, "ItemStack");
 
     public static NMSItemStackReflection cast(NMSObjectReflection refl) {
 
-        if (staticClass.isInstance(refl.getNmsObject())) {
-            return new NMSItemStackReflection(refl.getNmsObject());
+        if (staticClass.isInstance(refl.getNMSObject())) {
+            return new NMSItemStackReflection(refl.getNMSObject());
         }
 
         throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSItemStackReflection");
@@ -91,12 +105,15 @@ public class NMSItemStackReflection extends NMSObjectReflection {
 
     public NMSNBTTagCompoundReflection getTag() {
         try {
-            Object o = invokeMethodForNmsObject("getTag");
+            if (this.nmsObject == null) {
+                throw new IllegalStateException("NMS ItemStack is null and cannot be used");
+            }
+            Object o = Mappings.ITEM_STACK_GET_NBT_TAG_MAPPING.runMethod(this);
             if (o == null) {
                 return new NMSNBTTagCompoundReflection();
             }
             return new NMSNBTTagCompoundReflection(o);
-        } catch (NoSuchMethodException exc) {
+        } catch (MappingsException exc) {
             exc.printStackTrace();
         }
         return null;
@@ -106,7 +123,7 @@ public class NMSItemStackReflection extends NMSObjectReflection {
         Class<?> craftItemStack = ReflectionApi.getCraftBukkitClass("CraftItemStack", "inventory");
         try {
             Method asCraftMirror = craftItemStack.getMethod("asCraftMirror", staticClass);
-            return (ItemStack) asCraftMirror.invoke(null, this.getNmsObject());
+            return (ItemStack) asCraftMirror.invoke(null, this.getNMSObject());
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException |
                  InvocationTargetException e) {
             e.printStackTrace();
@@ -116,8 +133,8 @@ public class NMSItemStackReflection extends NMSObjectReflection {
 
     public void setTag(NMSNBTTagCompoundReflection tag) {
         try {
-            this.invokeMethodForNmsObject("setTag", new Class<?>[]{NMSNBTTagCompoundReflection.staticClass}, new Object[]{tag.getNmsObject()});
-        } catch (NoSuchMethodException exc) {
+            Mappings.ITEM_STACK_SET_NBT_TAG_MAPPING.runMethod(this, tag.getNMSObject());
+        } catch (MappingsException exc) {
             exc.printStackTrace();
         }
     }

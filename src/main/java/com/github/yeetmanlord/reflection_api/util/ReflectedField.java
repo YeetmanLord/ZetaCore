@@ -6,8 +6,6 @@ import java.lang.reflect.Modifier;
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.exceptions.FieldReflectionExcpetion;
 
-import javax.annotation.Nullable;
-
 public class ReflectedField<Type> {
 
     private final NMSObjectReflection holder;
@@ -58,7 +56,7 @@ public class ReflectedField<Type> {
         }
 
         if (fieldReflection == null) {
-            throw new FieldReflectionExcpetion("The specified field name, " + fieldName + " is not a field in class " + holder.getNmsObject().getClass());
+            throw new FieldReflectionExcpetion("The specified field name, " + fieldName + ", is not a field in class " + holder.getNMSObject().getClass());
         }
 
         isFinal = Modifier.isFinal(fieldReflection.getModifiers());
@@ -93,7 +91,7 @@ public class ReflectedField<Type> {
                     if (value == null) {
                         field.set(null, null);
                     } else {
-                        field.set(null, ((NMSObjectReflection) value).getNmsObject());
+                        field.set(null, ((NMSObjectReflection) value).getNMSObject());
                     }
                 } else {
                     field.set(null, value);
@@ -103,12 +101,12 @@ public class ReflectedField<Type> {
 
                 if (nmsObject) {
                     if (value == null) {
-                        field.set(holder.getNmsObject(), null);
+                        field.set(holder.getNMSObject(), null);
                     } else {
-                        field.set(holder.getNmsObject(), ((NMSObjectReflection) value).getNmsObject());
+                        field.set(holder.getNMSObject(), ((NMSObjectReflection) value).getNMSObject());
                     }
                 } else {
-                    field.set(holder.getNmsObject(), value);
+                    field.set(holder.getNMSObject(), value);
                 }
 
             }
@@ -142,7 +140,7 @@ public class ReflectedField<Type> {
                 if (isStatic) {
                     value = (Type) field.get(null);
                 } else {
-                    value = (Type) field.get(holder.getNmsObject());
+                    value = (Type) field.get(holder.getNMSObject());
                 }
 
                 if (isPrivate) {

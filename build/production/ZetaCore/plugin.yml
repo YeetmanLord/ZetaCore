@@ -3,6 +3,7 @@ version: 0.0.1
 author: YeetManLord
 main: com.github.yeetmanlord.zeta_core.ZetaCore
 description: All Zeta series plugins rely on this for functioning and code consistency. This also acts as a management plugin to enable, disable, and change the settings of various Zeta plugins.
+api-version: 1.13
 
 permissions:
     zeta.admin:

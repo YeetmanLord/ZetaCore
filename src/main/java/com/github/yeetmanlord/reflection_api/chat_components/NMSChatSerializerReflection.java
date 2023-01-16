@@ -13,7 +13,7 @@ public class NMSChatSerializerReflection
 	 * @param string JSON string of the chat component
 	 * @return The chat component object created from the JSON string
 	 */
-	public static Object createChatComponentFromString(String string)
+	public static Object createChatComponentFromJSON(String string)
 	{
 		try
 		{
@@ -34,6 +34,6 @@ public class NMSChatSerializerReflection
 	 */
 	public static Object createChatComponentFromText(String rawText)
 	{
-		return createChatComponentFromString("{\"text\": \"" + ChatColor.translateAlternateColorCodes('&', rawText) + "\"}");
+		return createChatComponentFromJSON("{\"text\": \"" + ChatColor.translateAlternateColorCodes('&', rawText) + "\"}");
 	}
 }

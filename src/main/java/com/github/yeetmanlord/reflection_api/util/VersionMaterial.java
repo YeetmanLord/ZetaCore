@@ -1,21 +1,21 @@
 package com.github.yeetmanlord.reflection_api.util;
 
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.UnsafeValues;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class VersionMaterial {
     public static final HashMap<String, VersionMaterial> stringMaterialMap = new HashMap<>();
 
     public static final HashMap<String, VersionMaterial> legacyStringMaterialMap = new HashMap<>();
-    public static final boolean IS_FLAT = ReflectionApi.version.isNewer("1.13");
-    private String legacyMaterial, flatMaterial;
-    private byte data;
+    public static final boolean IS_FLAT = ReflectionApi.version.isNewer(ReflectionApi.v1_13);
+    private final String legacyMaterial, flatMaterial;
+    private final byte data;
 
     public VersionMaterial(String legacyMaterial, String flatMaterial, byte data) {
         this.legacyMaterial = legacyMaterial.toUpperCase();
@@ -39,9 +39,9 @@ public class VersionMaterial {
 
     public Material getMaterial() {
         if (IS_FLAT) {
-            return Material.valueOf(this.flatMaterial.toLowerCase());
+            return Material.matchMaterial(this.flatMaterial.toUpperCase());
         } else {
-            return Material.valueOf(this.legacyMaterial.toUpperCase());
+            return Material.matchMaterial(this.legacyMaterial.toUpperCase());
         }
     }
 
@@ -54,7 +54,7 @@ public class VersionMaterial {
     }
 
     public static VersionMaterial valueOf(String material) {
-            return IS_FLAT ? stringMaterialMap.get(material) : legacyStringMaterialMap.get(material);
+        return IS_FLAT ? stringMaterialMap.get(material) : legacyStringMaterialMap.get(material);
     }
 
     public static final VersionMaterial WHITE_WOOL = new VersionMaterial("wool", "white_wool", (byte) 0);
@@ -108,8 +108,8 @@ public class VersionMaterial {
     public static final VersionMaterial RED_STAINED_GLASS_PANE = new VersionMaterial("stained_glass_pane", "red_stained_glass_pane", (byte) 14);
     public static final VersionMaterial BLACK_STAINED_GLASS_PANE = new VersionMaterial("stained_glass_pane", "black_stained_glass_pane", (byte) 15);
 
-    public static final VersionMaterial SKELETON_HEAD = new VersionMaterial("skull_item", "skeleton_head", (byte) 0);
-    public static final VersionMaterial WITHER_SKELETON_HEAD = new VersionMaterial("skull_item", "wither_skeleton_head", (byte) 1);
+    public static final VersionMaterial SKELETON_HEAD = new VersionMaterial("skull_item", "skeleton_skull", (byte) 0);
+    public static final VersionMaterial WITHER_SKELETON_HEAD = new VersionMaterial("skull_item", "wither_skeleton_skull", (byte) 1);
     public static final VersionMaterial ZOMBIE_HEAD = new VersionMaterial("skull_item", "zombie_head", (byte) 2);
     public static final VersionMaterial PLAYER_HEAD = new VersionMaterial("skull_item", "player_head", (byte) 3);
     public static final VersionMaterial CREEPER_HEAD = new VersionMaterial("skull_item", "creeper_head", (byte) 4);
@@ -168,14 +168,14 @@ public class VersionMaterial {
     public static final VersionMaterial STONE_SHOVEL = new VersionMaterial("stone_spade", "stone_shovel", (byte) 0);
 
     public static final VersionMaterial GRASS_BLOCK = new VersionMaterial("grass", "grass_block", (byte) 0);
-    public static final VersionMaterial OAK_SIGN = new VersionMaterial("sign", "oak_sign", (byte) 0);
-    public static final VersionMaterial SPRUCE_SIGN = new VersionMaterial("sign", "spruce_sign", (byte) 0);
-    public static final VersionMaterial BIRCH_SIGN = new VersionMaterial("sign", "birch_sign", (byte) 0);
-    public static final VersionMaterial JUNGLE_SIGN = new VersionMaterial("sign", "jungle_sign", (byte) 0);
-    public static final VersionMaterial ACACIA_SIGN = new VersionMaterial("sign", "acacia_sign", (byte) 0);
-    public static final VersionMaterial DARK_OAK_SIGN = new VersionMaterial("sign", "dark_oak_sign", (byte) 0);
-    public static final VersionMaterial CRIMSON_SIGN = new VersionMaterial("sign", "crimson_sign", (byte) 0);
-    public static final VersionMaterial WARPED_SIGN = new VersionMaterial("sign", "warped_sign", (byte) 0);
+    public static final SignMaterial OAK_SIGN = new SignMaterial("sign", "oak_sign", (byte) 0);
+    public static final SignMaterial SPRUCE_SIGN = new SignMaterial("sign", "spruce_sign", (byte) 0);
+    public static final SignMaterial BIRCH_SIGN = new SignMaterial("sign", "birch_sign", (byte) 0);
+    public static final SignMaterial JUNGLE_SIGN = new SignMaterial("sign", "jungle_sign", (byte) 0);
+    public static final SignMaterial ACACIA_SIGN = new SignMaterial("sign", "acacia_sign", (byte) 0);
+    public static final SignMaterial DARK_OAK_SIGN = new SignMaterial("sign", "dark_oak_sign", (byte) 0);
+    public static final SignMaterial CRIMSON_SIGN = new SignMaterial("sign", "crimson_sign", (byte) 0);
+    public static final SignMaterial WARPED_SIGN = new SignMaterial("sign", "warped_sign", (byte) 0);
 
     public static final VersionMaterial COMMAND_BLOCK = new VersionMaterial("command", "command_block", (byte) 0);
     public static final VersionMaterial REPEATING_COMMAND_BLOCK = new VersionMaterial("command", "repeating_command_block", (byte) 0);
@@ -201,7 +201,7 @@ public class VersionMaterial {
     public static final VersionMaterial CLOCK = new VersionMaterial("watch", "clock", (byte) 0);
     public static final VersionMaterial ENCHANTING_TABLE = new VersionMaterial("enchantment_table", "enchanting_table", (byte) 0);
 
-    public static final WhiteMonsterEggVersionMaterial WHITE_MONSTER_EGG = new WhiteMonsterEggVersionMaterial();
+    public static final MonsterEggVersionMaterial MONSTER_EGG = new MonsterEggVersionMaterial();
 
     public static final VersionMaterial WHITE_BANNER = new VersionMaterial("banner", "white_banner", (byte) 15);
     public static final VersionMaterial ORANGE_BANNER = new VersionMaterial("banner", "orange_banner", (byte) 14);
@@ -222,8 +222,12 @@ public class VersionMaterial {
 
     public static final VersionMaterial REDSTONE_TORCH = new VersionMaterial("redstone_torch_on", "redstone_torch", (byte) 0);
 
+    public static final VersionMaterial FIRE_CHARGE = new VersionMaterial("fireball", "fire_charge", (byte) 0);
 
-    public static VersionMaterial getWool(DyeColor color) {
+    public static  final VersionMaterial BED_BLOCK = new VersionMaterial("bed_block", "white_bed", (byte) 0);
+
+    public static VersionMaterial getWool(DyeColor dyeColor) {
+        CrossVersionDyeColor color = CrossVersionDyeColor.fromBukkit(dyeColor);
         switch (color) {
             case WHITE:
                 return WHITE_WOOL;
@@ -255,15 +259,22 @@ public class VersionMaterial {
                 return RED_WOOL;
             case BLACK:
                 return BLACK_WOOL;
+            case LIGHT_GRAY:
+                return LIGHT_GRAY_WOOL;
             default:
-                if (color.name().equalsIgnoreCase("LIGHT_GRAY") || color.name().equalsIgnoreCase("SILVER")) {
-                    return LIGHT_GRAY_WOOL;
-                }
                 throw new IllegalArgumentException("Unknown color " + color);
         }
     }
 
-    public static VersionMaterial getBed(DyeColor color) {
+    public static VersionMaterial getBedBlock(DyeColor color) {
+        if (ReflectionApi.version.isNewer("1.12")) {
+            return getBed(color);
+        }
+        return BED_BLOCK;
+    }
+
+    public static VersionMaterial getBed(DyeColor dyeColor) {
+        CrossVersionDyeColor color = CrossVersionDyeColor.fromBukkit(dyeColor);
         if (ReflectionApi.version.isNewer("1.12")) {
             switch (color) {
                 case WHITE:
@@ -296,15 +307,64 @@ public class VersionMaterial {
                     return RED_BED;
                 case BLACK:
                     return BLACK_BED;
+                case LIGHT_GRAY:
+                    return LIGHT_GRAY_BED;
                 default:
-                    if (color.name().equalsIgnoreCase("LIGHT_GRAY") || color.name().equalsIgnoreCase("SILVER")) {
-                        return LIGHT_GRAY_BED;
-                    }
                     throw new IllegalArgumentException("Unknown color " + color);
             }
-        }
-        else {
+        } else {
             return WHITE_BED;
+        }
+    }
+
+    public static Material getFromString(String material) {
+        if (valueOf(material) != null) {
+            return valueOf(material).getMaterial();
+        }
+        if (material.equalsIgnoreCase("AIR")) {
+            return Material.AIR;
+        }
+        if (ReflectionApi.version.isNewer(ReflectionApi.v1_13)) {
+            try {
+                Material mat = Material.getMaterial(material.toUpperCase());
+                if (mat == null || mat == Material.AIR) {
+                    mat = (Material) Material.class.getMethod("getMaterial", String.class, boolean.class).invoke(null, material.toUpperCase(), true);
+                }
+                if (mat == null || mat == Material.AIR) {
+                    mat = Material.valueOf(material.toUpperCase());
+                }
+                return mat;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            UnsafeValues unsafe = Bukkit.getUnsafe();
+            try {
+                Material mat = (Material) unsafe.getClass().getMethod("getMaterialFromInternalName", String.class).invoke(unsafe, material);
+                if (mat == null || mat == Material.AIR) {
+                    mat = Material.getMaterial(material.toUpperCase());
+                }
+                return mat;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+    public static class SignMaterial extends VersionMaterial {
+        public SignMaterial(String material, String material1_14, byte data) {
+            super(material, material1_14, data);
+        }
+
+        @Override
+        public Material getMaterial() {
+            if (ReflectionApi.version.isOlder(ReflectionApi.v1_14)) {
+                return Material.matchMaterial(this.getLegacyMaterial().toUpperCase());
+            } else {
+                return super.getMaterial();
+            }
         }
     }
 

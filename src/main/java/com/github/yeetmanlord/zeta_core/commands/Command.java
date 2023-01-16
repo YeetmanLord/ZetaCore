@@ -3,7 +3,11 @@ package com.github.yeetmanlord.zeta_core.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.yeetmanlord.reflection_api.ReflectionApi;
+import com.google.common.collect.Lists;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.UnsafeValues;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.util.StringUtil;
@@ -36,7 +40,11 @@ public abstract class Command implements TabExecutor {
 			if (cmd.getIndex() == 0 && args.length == 1 && sender.hasPermission(cmd.getPermission())) {
 				add(strings, cmd.getName(), args[0]);
 			}
-
+			else if(args.length >= 2 && sender.hasPermission(cmd.getPermission())) {
+				for (String s : cmd.getTabComplete(sender, args)) {
+					add(strings, s, args[args.length - 1]);
+				}
+			}
 		}
 
 		add(strings, "help", args[0]);
@@ -105,5 +113,21 @@ public abstract class Command implements TabExecutor {
 	protected abstract String getDesc();
 
 	protected abstract String getSyntax();
+
+	public static List<String> tabCompleteInternalMaterialName(String arg, List<String> list) {
+		if (ReflectionApi.version.isOlder(ReflectionApi.v1_13)) {
+			return Lists.newArrayList();
+		}
+		else {
+			UnsafeValues unsafe = Bukkit.getUnsafe();
+			try {
+				return (List<String>) unsafe.getClass().getMethod("tabCompleteInternalMaterialName", String.class, List.class).invoke(unsafe, arg, list);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				return Lists.newArrayList();
+			}
+		}
+	}
 
 }

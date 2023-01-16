@@ -1,8 +1,7 @@
-package com.github.yeetmanlord.zeta_core.api.uitl.raycast;
+package com.github.yeetmanlord.zeta_core.api.util.raycast;
 
 import com.github.yeetmanlord.reflection_api.entity.NMSAxisAlignedBBReflection;
 import com.github.yeetmanlord.reflection_api.entity.NMSEntityReflection;
-import com.github.yeetmanlord.zeta_core.api.uitl.DistanceUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

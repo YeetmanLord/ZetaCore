@@ -9,7 +9,6 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
 import com.google.common.collect.ImmutableMap;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.pool.HikariPool;
 import org.bukkit.Bukkit;
 
 import javax.sql.DataSource;
@@ -58,7 +57,7 @@ public class SQLClient {
     public void connect() {
 
         if (!isConnected()) {
-            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
                 Properties props = new Properties();
                 props.setProperty("dataSourceClassName", "org.mariadb.jdbc.MariaDbDataSource");
                 props.setProperty("dataSource.url", String.format("jdbc:%s://%s:%s/%s", "mariadb", hostname, port, database));
@@ -74,19 +73,19 @@ public class SQLClient {
                     handler = new SQLHandler(this);
 
                     validated = this.dataSource.getConnection().isValid(3);
-                    ZetaCore.LOGGER.info("&aDatabase is connected!");
+                    ZetaCore.getInstance().getPluginLogger().info("&aDatabase is connected!");
                 } catch (RuntimeException e) {
-                    ZetaCore.LOGGER.error("Pool Initialization Failed! In most cases this means that the database service isn't running or the database connection information is wrong");
-                    ZetaCore.LOGGER.error("To enable a full stacktrace please enable debug mode.");
-                    if (ZetaCore.LOGGER.isDebugging()) {
-                        ZetaCore.LOGGER.debug("&fFull Stack Trace:");
+                    ZetaCore.getInstance().getPluginLogger().error("Pool Initialization Failed! In most cases this means that the database service isn't running or the database connection information is wrong");
+                    ZetaCore.getInstance().getPluginLogger().error("To enable a full stacktrace please enable debug mode.");
+                    if (ZetaCore.getInstance().getPluginLogger().isDebugging()) {
+                        ZetaCore.getInstance().getPluginLogger().debug("&fFull Stack Trace:");
                         e.printStackTrace();
                     }
                 }
                 catch (Exception e) {
-                    ZetaCore.LOGGER.error(e, "Could not connect to database. Caused by the following exception:");
-                    if (ZetaCore.LOGGER.isDebugging()) {
-                        ZetaCore.LOGGER.debug("&fFull Stack Trace:");
+                    ZetaCore.getInstance().getPluginLogger().error(e, "Could not connect to database. Caused by the following exception:");
+                    if (ZetaCore.getInstance().getPluginLogger().isDebugging()) {
+                        ZetaCore.getInstance().getPluginLogger().debug("&fFull Stack Trace:");
                         e.printStackTrace();
                     }
                     validated = false;
@@ -115,25 +114,25 @@ public class SQLClient {
 
     public void readData(ZetaPlugin plugin) {
 
-        ZetaCore.getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::readDB);
+        ZetaCore.getInstance().getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::readDB);
 
     }
 
     public void readData() {
 
-        ZetaCore.getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::readDB));
+        ZetaCore.getInstance().getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::readDB));
 
     }
 
     public void writeData() {
 
-        ZetaCore.getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::writeToDB));
+        ZetaCore.getInstance().getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::writeToDB));
 
     }
 
     public void writeData(ZetaPlugin plugin) {
 
-        ZetaCore.getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeToDB);
+        ZetaCore.getInstance().getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeToDB);
 
     }
 

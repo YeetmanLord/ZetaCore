@@ -1,4 +1,4 @@
-package com.github.yeetmanlord.zeta_core.api.uitl;
+package com.github.yeetmanlord.zeta_core.api.util.input;
 
 import org.bukkit.entity.Player;
 
@@ -39,36 +39,54 @@ public class PlayerUtil {
 
 	}
 
+	/**
+	 * @return Whether a {@link AbstractGUIMenu} is currently open
+	 */
 	public boolean isGUIMenu() {
 
 		return isGUIMenu;
 
 	}
 
+	/**
+	 * @param isGUIMenu Whether a {@link AbstractGUIMenu} is currently open
+	 */
 	public void setGUIMenu(boolean isGUIMenu) {
 
 		this.isGUIMenu = isGUIMenu;
 
 	}
 
+	/**
+	 * @return Whether the player is currently taking chat input either for a command or a {@link AbstractGUIMenu}
+	 */
 	public boolean isTakingChatInput() {
 
 		return takingChatInput;
 
 	}
 
+	/**
+	 * @param takingChatInput Whether the player is currently taking chat input either for a command or a {@link AbstractGUIMenu}
+	 */
 	public void setTakingChatInput(boolean takingChatInput) {
 
 		this.takingChatInput = takingChatInput;
 
 	}
 
+	/**
+	 * @return The {@link AbstractGUIMenu} that the player is currently taking input for
+	 */
 	public AbstractGUIMenu getMenuToInputTo() {
 
 		return menuToInputTo;
 
 	}
 
+	/**
+	 * @param menuToInputTo The {@link AbstractGUIMenu} that the player is currently taking input for
+	 */
 	public void setMenuToInputTo(AbstractGUIMenu menuToInputTo) {
 
 		this.menuToInputTo = menuToInputTo;
@@ -82,24 +100,36 @@ public class PlayerUtil {
 
 	}
 
+	/**
+	 * @return The object that the player is currently taking input for (In most cases this is a command)
+	 */
 	public IChatInputable getInputObject() {
 
 		return inputObject;
 
 	}
 
+	/**
+	 * @param inputObject The object that the player is currently taking input for (In most cases this is a command)
+	 */
 	public void setInputObject(IChatInputable inputObject) {
 
 		this.inputObject = inputObject;
 
 	}
 
+	/**
+	 * @return The type of input that the player is currently taking input for
+	 */
 	public InputType getInputObjectType() {
 
 		return inputObjectType;
 
 	}
 
+	/**
+	 * @param inputObjectType The type of input that the player is currently taking input for
+	 */
 	public void setInputObjectType(InputType inputObjectType) {
 
 		this.inputObjectType = inputObjectType;

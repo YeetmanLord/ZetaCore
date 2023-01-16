@@ -55,7 +55,7 @@ public class SQLHandler {
 
             final String valueFinal = value.trim();
             if (async) {
-                Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
                     try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("REPLACE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");")) {
                         for (int x = 0; x < values.length; x++) {
                             statement.setObject(x + 1, values[x]);
@@ -113,7 +113,7 @@ public class SQLHandler {
         if (this.client.isConnected()) {
             if (client != null) {
                 if (async) {
-                    Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                    Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
                         try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;")) {
                             statement.setObject(1, value);
                             statement.executeUpdate();
@@ -150,7 +150,7 @@ public class SQLHandler {
 
 
             if (async) {
-                Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
                     try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("INSERT IGNORE INTO `" + tableName + "` (" + tableParams + ") VALUES (" + valueFinal + ");")) {
                         for (int x = 0; x < values.length; x++) {
                             statement.setObject(x + 1, values[x]);
@@ -199,7 +199,7 @@ public class SQLHandler {
 
     public void asyncExecuteStatement(final String sqlCode) {
         if (this.client.isConnected()) {
-            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> executeStatement(sqlCode));
+            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> executeStatement(sqlCode));
         }
     }
 
@@ -356,7 +356,7 @@ public class SQLHandler {
         if (this.client.isConnected()) {
             if (client != null) {
                 if (async) {
-                    Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.INSTANCE, () -> {
+                    Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
                         try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + value.getKey() + "=?" + " WHERE " + whereValue.getKey() + "=?;")) {
                             statement.setObject(1, value.getValue());
                             statement.setObject(2, whereValue.getValue());

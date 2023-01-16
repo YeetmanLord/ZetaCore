@@ -11,10 +11,15 @@ public class MappingsException extends Exception {
 		this(mapping, "This means your plugin uses an unsupported version or mappings have not been added for your version");
 
 	}
-	
+
 	public MappingsException(IMapping<?> mapping, String extraInfo) {
 
 		super("Failed to load " + mapping.getName() + "\nFull Data: " + mapping.toString() + "\n" + extraInfo);
+
+	}
+	public MappingsException(IMapping<?> mapping, String extraInfo, Throwable cause) {
+
+		super("Failed to load " + mapping.getName() + "\nFull Data: " + mapping.toString() + "\n" + extraInfo, cause);
 
 	}
 

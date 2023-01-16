@@ -2,7 +2,6 @@ package com.github.yeetmanlord.zeta_core.data;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,7 +9,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
-import com.github.yeetmanlord.zeta_core.api.uitl.YAMLUtil;
 
 /**
  * All {@link DataStorer}s are for INTERNAL USE ONLY! Refrain from using any
@@ -57,7 +55,7 @@ public abstract class DataStorer {
 		config = YamlConfiguration.loadConfiguration(file);
 		this.setDefaults();
 		this.save();
-		ZetaCore.registerDataHandler(this);
+		ZetaCore.getInstance().registerDataHandler(this);
 
 	}
 

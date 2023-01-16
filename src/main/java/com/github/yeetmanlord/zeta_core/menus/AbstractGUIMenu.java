@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
+import com.github.yeetmanlord.zeta_core.api.util.PluginUtilities;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -21,12 +22,12 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import com.github.yeetmanlord.zeta_core.CommonEventFactory;
 import com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu.MenuSetItemsEvent;
-import com.github.yeetmanlord.zeta_core.api.uitl.InputType;
-import com.github.yeetmanlord.zeta_core.api.uitl.PlayerUtil;
+import com.github.yeetmanlord.zeta_core.api.util.input.InputType;
+import com.github.yeetmanlord.zeta_core.api.util.input.PlayerUtil;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-//TODO: Add ability to animate menu items and title
+// TODO: Add ability to animate menu items and title
 public abstract class AbstractGUIMenu implements InventoryHolder {
 
     protected Inventory inv;
@@ -87,7 +88,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
         menuUtil.setMenuToInputTo(null);
         menuUtil.setGUIMenu(false);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.INSTANCE, () -> {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.getInstance(), () -> {
             owner.closeInventory();
             this.inv = Bukkit.createInventory(this, slots, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
             this.setItems();
@@ -106,7 +107,20 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
     }
 
+    /**
+     * Called whenever a player clicks on an item in the menu.
+     * @see #handleClickAnywhere(InventoryClickEvent) for handling clicks anywhere in the inventory, including empty slots.
+     * @param e The InventoryClickEvent
+     */
     public abstract void handleClick(InventoryClickEvent e);
+
+    /**
+     * Called whenever a player clicks anywhere in the menu, including empty slots and filled slots.
+     * @param e The InventoryClickEvent
+     */
+    public void handleClickAnywhere(InventoryClickEvent e) {
+
+    }
 
     public String getMenuName() {
 
@@ -275,7 +289,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
     public void sendTitlePackets(String title, String subtitle, @Nullable String actionBar) {
 
-        ZetaCore.sendTitlePackets(owner, title, subtitle, actionBar);
+        PluginUtilities.sendTitlePackets(owner, title, subtitle, actionBar);
 
     }
 
@@ -297,7 +311,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
     @Override
     public String toString() {
 
-        return this.getClass().getName() + ": {\"Menu Title\": " + this.getMenuName() + "\"Slot Number\": " + this.getSlots() + this.getPlayerUtil().toString() + "}";
+        return this.getClass().getName() + ": {\"Menu Title\": " + this.getMenuName() + ", \"Slot Number\": " + this.getSlots() + ", " + this.getPlayerUtil().toString() + "}";
 
     }
 
@@ -355,7 +369,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
      * Note 2: The {@link #open() open method} already accounts for this error, so you shouldn't have to call this method before using the open method. Basically, you should try to replace the owner.closeInventory() method with this method.
      */
     public void syncClose() {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.INSTANCE, () -> {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.getInstance(), () -> {
             this.owner.closeInventory();
         });
     }

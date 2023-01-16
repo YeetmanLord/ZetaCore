@@ -1,15 +1,20 @@
-package com.github.yeetmanlord.zeta_core.api.uitl;
+package com.github.yeetmanlord.zeta_core.api.util;
 
-import com.github.yeetmanlord.reflection_api.ReflectionApi;
-import org.bukkit.Bukkit;
+import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 
-import java.lang.reflect.Method;
-
 public class CommandUtil {
 
+    /**
+     * Parses an integer from a string, and sends a message to the sender if it fails
+     *
+     * @param sender       The sender to send the message to
+     * @param string       The string to parse
+     * @param errorMessage The message to send if the parse fails
+     * @return A {@link Parsed} object containing the parsed integer and whether it was successful.
+     */
     public static Parsed<Integer> parseInteger(CommandSender sender, String string, String errorMessage) {
         try {
             return new Parsed<>(Integer.parseInt(string.trim()), true);
@@ -19,6 +24,14 @@ public class CommandUtil {
         return new Parsed<>(0, false);
     }
 
+    /**
+     * Parses a double from a string, and sends a message to the sender if it fails
+     *
+     * @param sender       The sender to send the message to
+     * @param string       The string to parse
+     * @param errorMessage The message to send if the parse fails
+     * @return A {@link Parsed} object containing the parsed double and whether it was successful.
+     */
     public static Parsed<Double> parseDouble(CommandSender sender, String string, String errorMessage) {
         try {
             return new Parsed<>(Double.parseDouble(string.trim()), true);
@@ -28,6 +41,14 @@ public class CommandUtil {
         return new Parsed<>(0D, false);
     }
 
+    /**
+     * Parses a float from a string, and sends a message to the sender if it fails
+     *
+     * @param sender       The sender to send the message to
+     * @param string       The string to parse
+     * @param errorMessage The message to send if the parse fails
+     * @return A {@link Parsed} object containing the parsed float and whether it was successful.
+     */
     public static Parsed<Float> parseFloat(CommandSender sender, String string, String errorMessage) {
         try {
             return new Parsed<>(Float.parseFloat(string.trim()), true);
@@ -37,6 +58,14 @@ public class CommandUtil {
         return new Parsed<>(0F, false);
     }
 
+    /**
+     * Parses a boolean from a string, and sends a message to the sender if it fails
+     *
+     * @param sender       The sender to send the message to
+     * @param string       The string to parse
+     * @param errorMessage The message to send if the parse fails
+     * @return A {@link Parsed} object containing the parsed boolean and whether it was successful.
+     */
     public static Parsed<Boolean> parseBoolean(CommandSender sender, String string, String errorMessage) {
         string = string.trim();
         if (string.equalsIgnoreCase("true") || string.equalsIgnoreCase("1") || string.equalsIgnoreCase("yes")) {
@@ -49,6 +78,14 @@ public class CommandUtil {
         }
     }
 
+    /**
+     * Parses a chat color from a string, and sends a message to the sender if it fails
+     *
+     * @param sender       The sender to send the message to
+     * @param string       The string to parse
+     * @param errorMessage The message to send if the parse fails
+     * @return A {@link Parsed} object containing the parsed chat color and whether it was successful.
+     */
     public static Parsed<ChatColor> parseChatColor(CommandSender sender, String string, String errorMessage) {
         try {
             return new Parsed<>(ChatColor.valueOf(string.toUpperCase().trim()), true);
@@ -58,19 +95,16 @@ public class CommandUtil {
         return new Parsed<>(ChatColor.WHITE, false);
     }
 
+    /**
+     * Parses a material from a string, and sends a message to the sender if it fails
+     *
+     * @param sender       The sender to send the message to
+     * @param string       The string to parse
+     * @param errorMessage The message to send if the parse fails
+     * @return A {@link Parsed} object containing the material float and whether it was successful.
+     */
     public static Parsed<Material> parseMaterial(CommandSender sender, String string, String errorMessage) {
-        Material material = Material.matchMaterial(string.toUpperCase().trim());
-
-        if (material == null) {
-            if (ReflectionApi.version.isOlder("1.13")) {
-                try {
-                    Method m = Bukkit.getUnsafe().getClass().getMethod("getMaterialFromInternalName", String.class);
-                    material = (Material) m.invoke(Bukkit.getUnsafe(), string.trim());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        Material material = VersionMaterial.getFromString(string);
 
         if (material != null) {
             return new Parsed<>(material, true);
@@ -81,6 +115,10 @@ public class CommandUtil {
         }
     }
 
+    /**
+     * A class that contains a parsed value and whether it was successful
+     * @param <Type> The type of the parsed value
+     */
     public static class Parsed<Type> {
         private Type value;
         private boolean success;

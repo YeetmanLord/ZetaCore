@@ -4,6 +4,25 @@ import com.github.yeetmanlord.reflection_api.exceptions.VersionFormatException;
 
 public class Version implements Comparable<Version> {
 
+	/**
+	 * The minimum version supported by this API. I cannot guarantee that this API will work on older versions.
+	 * This is the bare minimum for functionality, but I also cannot guarantee that this API will properly function
+	 * from 1.8 - 1.8.8. I have not tested this API on those versions, and I don't intend to support it. If possible
+	 * use 1.8.8 or higher.
+	 */
+	public static final Version UNSUPPORTED_MIN = new Version(8, 0);
+
+	/**
+	 * The start of the core API support. Below this version support is not actively maintained
+	 * but may still work. Above this version support is actively maintained.
+	 */
+	public static final Version SUPPORTED_MIN = new Version(8, 8);
+
+	/**
+	 * The maximum version supported by this API
+	 */
+	public static final Version MAX = new Version(20, 0);
+
 	private String version;
 
 	private int majorVersion, minorVersion;
@@ -64,7 +83,7 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * @param version String of version
-	 * @return Returns true if the current server version is older than the inputed
+	 * @return Returns true if the current server version is older than the inputted
 	 *         version. This does not return true if the version is the same.
 	 */
 	public boolean isOlder(Version version) {
@@ -76,7 +95,7 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * @param version String of version
-	 * @return Returns true if the current server version is older than the inputed
+	 * @return Returns true if the current server version is older than the inputted
 	 *         version. This does not return true if the version is the same.
 	 */
 	public boolean isOlder(String version) {
@@ -94,11 +113,12 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * @param version String of version
-	 * @return Returns true if the current server version is newer than the inputed
+	 * @return Returns true if the current server version is newer than the inputted
 	 *         version.
 	 * @apiNote This will also return true if the versions are the same.
 	 * @implNote If you are checking for version 1.16 for things like netherite. The
-	 *           way to check for 1.16 would be {@link Version#isNewer("1.16")}.
+	 *           way to check for 1.16 would be
+	 *           version.isNewer({@link Version#Version(int, int) new Version(16, 0)}).
 	 */
 	public boolean isNewer(Version version) {
 
@@ -109,11 +129,11 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * @param version String of version
-	 * @return Returns true if the current server version is newer than the inputed
+	 * @return Returns true if the current server version is newer than the inputted
 	 *         version.
 	 * @apiNote This will also return true if the versions are the same.
 	 * @implNote If you are checking for version 1.16 for things like netherite. The
-	 *           way to check for 1.16 would be {@link Version#isNewer("1.16")}.
+	 *           way to check for 1.16 would be version.isNewer("1.16").
 	 */
 	public boolean isNewer(String version) {
 

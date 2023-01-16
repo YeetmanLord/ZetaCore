@@ -1,10 +1,9 @@
 package com.github.yeetmanlord.zeta_core.events;
 
-import com.github.yeetmanlord.reflection_api.chat_components.NMSChatSerializerReflection;
 import com.github.yeetmanlord.reflection_api.entity.players.player_connection.NMSPlayerConnectionReflection;
 import com.github.yeetmanlord.reflection_api.packets.player.NMSTitlePacketReflection;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
-import com.github.yeetmanlord.zeta_core.api.uitl.PlayerUtil;
+import com.github.yeetmanlord.zeta_core.api.util.input.PlayerUtil;
 import com.github.yeetmanlord.zeta_core.menus.AbstractGUIMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +20,7 @@ public class LeftClickEvent implements Listener {
 
         if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
             Player player = event.getPlayer();
-            PlayerUtil util = ZetaCore.getPlayerMenuUtility(player);
+            PlayerUtil util = ZetaCore.getInstance().getPlayerMenuUtility(player);
 
             if (util.isTakingChatInput()) {
                 util.setTakingChatInput(false);

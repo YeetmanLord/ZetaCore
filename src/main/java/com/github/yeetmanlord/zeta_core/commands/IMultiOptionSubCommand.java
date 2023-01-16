@@ -7,14 +7,14 @@ import org.bukkit.command.CommandSender;
 
 public interface IMultiOptionSubCommand extends ISubCommand {
 
-	public List<ISubCommand> subCmds();
+	List<ISubCommand> subCmds();
 
-	public String getParentCommand();
+	String getParentCommand();
 
-	public List<String> tabComplete(CommandSender sender, String args[]);
+	List<String> tabComplete(CommandSender sender, String args[]);
 
 	@Override
-	public default void run(CommandSender sender, String[] args) {
+	default void run(CommandSender sender, String[] args) {
 
 		if (args.length > 1) {
 
@@ -36,7 +36,7 @@ public interface IMultiOptionSubCommand extends ISubCommand {
 
 	}
 
-	public default void getHelp(CommandSender sender) {
+	default void getHelp(CommandSender sender) {
 
 		sender.sendMessage(ChatColor.GOLD + "---------------");
 		sender.sendMessage(ChatColor.RED + "Help page for " + getName());

@@ -24,7 +24,7 @@ public class SQLText extends SQLColumn<String> {
 		this.textMaxLength = textMaxLength;
 
 		if (settings.hasIndex() && textMaxLength > 768) {
-			ZetaCore.LOGGER.error("SQL ERROR: KEY LENGTH FOR SQL LENGTH IS TOO BIG TO BE INDEXED!!!");
+			ZetaCore.getInstance().getPluginLogger().error("SQL ERROR: KEY LENGTH FOR SQL LENGTH IS TOO BIG TO BE INDEXED!!!");
 		}
 
 	}

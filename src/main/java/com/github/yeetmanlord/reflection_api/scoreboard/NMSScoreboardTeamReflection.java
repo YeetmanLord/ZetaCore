@@ -1,8 +1,10 @@
 package com.github.yeetmanlord.reflection_api.scoreboard;
 
 import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.HashMap;
 
+import com.github.yeetmanlord.reflection_api.chat_components.NMSChatSerializerReflection;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
@@ -14,259 +16,258 @@ import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 
 public class NMSScoreboardTeamReflection extends NMSObjectReflection {
 
-	public NMSScoreboardTeamReflection(Scoreboard scoreboard, String name) {
+    public NMSScoreboardTeamReflection(Scoreboard scoreboard, String name) {
 
-		super(init(scoreboard, name));
+        super(init(scoreboard, name));
 
-	}
+    }
 
-	private static Object init(Scoreboard scoreboard, String name) {
+    private static Object init(Scoreboard scoreboard, String name) {
 
-		Object nmsScoreboard = ReflectionApi.getHandle(scoreboard);
+        Object nmsScoreboard = ReflectionApi.getHandle(scoreboard);
 
-		try {
-			Constructor<?> constr = ReflectionApi.getNMSClass("ScoreboardTeam").getConstructor(ReflectionApi.getNMSClass("Scoreboard"), String.class);
-			return constr.newInstance(nmsScoreboard, name);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+        try {
+            Constructor<?> constr = ReflectionApi.getNMSClass(Mappings.SCOREBOARD_PACKAGE_MAPPING, "ScoreboardTeam").getConstructor(ReflectionApi.getNMSClass(Mappings.SCOREBOARD_PACKAGE_MAPPING,"Scoreboard"), String.class);
+            return constr.newInstance(nmsScoreboard, name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		return null;
+        return null;
 
-	}
+    }
 
-	public NMSScoreboardTeamReflection(Object nmsObject) {
+    public NMSScoreboardTeamReflection(Object nmsObject) {
 
-		super(nmsObject);
+        super(nmsObject);
 
-	}
+    }
 
-	public Object getTeam() {
+    public Object getTeam() {
 
-		return nmsObject;
+        return nmsObject;
 
-	}
+    }
 
-	/**
-	 * @param visibility Allowed values are ALWAYS, NEVER, HIDE_FOR_OTHER_TEAMS,
-	 *                   HIDE_FOR_OWN_TEAM
-	 */
-	public void setNametagVisibility(NameTagVisibility visibility) {
+    /**
+     * @param visibility Allowed values are ALWAYS, NEVER, HIDE_FOR_OTHER_TEAMS,
+     *                   HIDE_FOR_OWN_TEAM
+     */
+    public void setNametagVisibility(NameTagVisibility visibility) {
 
-		Class<?> clazz = null;
+        Class<?> clazz = null;
 
-		try {
-			clazz = Mappings.NAMETAG_VISIBILTY_CLASS_MAPPING.getNMSClassMapping();
-		}
-		catch (MappingsException e1) {
-			e1.printStackTrace();
-		}
+        try {
+            clazz = Mappings.NAMETAG_VISIBILTY_CLASS_MAPPING.getNMSClassMapping();
+        } catch (MappingsException e1) {
+            e1.printStackTrace();
+        }
 
-		try {
-			Object value = clazz.getField(visibility.name().toUpperCase()).get(null);
-			Mappings.SET_NAMETAG_VISIBILITY_MAPPING.runMethod(this, value);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+        try {
+            Object value = clazz.getEnumConstants()[visibility.ordinal()];
+            Mappings.SET_NAMETAG_VISIBILITY_MAPPING.runMethod(this, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	/**
-	 * Takes in a color
-	 * 
-	 * @param color
-	 */
-	public void setChatFormat(String color) {
+    /**
+     * Takes in a color
+     *
+     * @param color Color to set chat format
+     */
+    public void setChatFormat(ChatColor color) {
+        Class<?> clazz = ReflectionApi.getNMSClass(Mappings.BASE_PACKAGE, "EnumChatFormat");
 
-		Class<?> clazz = ReflectionApi.getNMSClass("EnumChatFormat");
+        try {
+            Object value = clazz.getEnumConstants()[color.ordinal()];
+            invokeMethodForNmsObject("a", new Class<?>[]{clazz}, new Object[]{value});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		try {
-			Object value = clazz.getField(color.toUpperCase()).get(null);
-			invokeMethodForNmsObject("a", new Class<?>[] { clazz }, new Object[] { value });
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+    }
 
-	}
+    public void addPlayerToTeam(String playerName) {
+        try {
+            Collection<String> names = Mappings.TEAM_GET_PLAYER_LIST_MAPPING.runMethod(this);
+            names.add(playerName);
 
-	public void setSuffix(String suffix) {
+        } catch (MappingsException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-		suffix = ChatColor.translateAlternateColorCodes('&', suffix);
+    public void setSuffix(String suffix) {
 
-		try {
-			invokeMethodForNmsObject("setSuffix", new Class<?>[] { String.class }, new Object[] { suffix });
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+        suffix = ChatColor.translateAlternateColorCodes('&', suffix);
 
-	}
+        try {
+            invokeMethodForNmsObject("setSuffix", new Class<?>[]{String.class}, new Object[]{suffix});
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
-	public void setPrefix(String prefix) {
+    }
 
-		prefix = ChatColor.translateAlternateColorCodes('&', prefix);
+    public void setPrefix(String prefix) {
 
-		try {
-			invokeMethodForNmsObject("setPrefix", new Class<?>[] { String.class }, new Object[] { prefix });
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+        prefix = ChatColor.translateAlternateColorCodes('&', prefix);
 
-	}
+        try {
+            if (ReflectionApi.version.isOlder(ReflectionApi.v1_13)) {
+                Mappings.TEAM_SET_PREFIX_MAPPING.runMethod(this, prefix);
+            }
+            else {
+                Mappings.TEAM_SET_PREFIX_MAPPING.runMethod(this, NMSChatSerializerReflection.createChatComponentFromText(prefix));
+            }
+        } catch (MappingsException e) {
+            e.printStackTrace();
+        }
 
-	public void setDisplayName(String name) {
+    }
 
-		name = ChatColor.translateAlternateColorCodes('&', name);
+    public void setDisplayName(String name) {
 
-		try {
-			invokeMethodForNmsObject("setDisplayName", new Class<?>[] { String.class }, new Object[] { name });
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+        name = ChatColor.translateAlternateColorCodes('&', name);
 
-	}
+        try {
+            invokeMethodForNmsObject("setDisplayName", new Class<?>[]{String.class}, new Object[]{name});
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
-	public void setAllowFriendlyFire(boolean allow) {
+    }
 
-		try {
-			invokeMethodForNmsObject("setAllowFriendlyFire", new Class<?>[] { boolean.class }, new Object[] { allow });
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+    public void setAllowFriendlyFire(boolean allow) {
 
-	}
+        try {
+            invokeMethodForNmsObject("setAllowFriendlyFire", new Class<?>[]{boolean.class}, new Object[]{allow});
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
-	public void setCanSeeFriendlyInvisibles(boolean allow) {
+    }
 
-		try {
-			invokeMethodForNmsObject("setCanSeeFriendlyInvisibles", new Class<?>[] { boolean.class }, new Object[] { allow });
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+    public void setCanSeeFriendlyInvisibles(boolean allow) {
 
-	}
+        try {
+            invokeMethodForNmsObject("setCanSeeFriendlyInvisibles", new Class<?>[]{boolean.class}, new Object[]{allow});
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
-	public String getSuffix() {
+    }
 
-		try {
-			return (String) invokeMethodForNmsObject("getSuffix");
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+    public String getSuffix() {
 
-		return null;
+        try {
+            return (String) invokeMethodForNmsObject("getSuffix");
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
-	}
+        return null;
 
-	public String getPrefix() {
+    }
 
-		try {
-			return (String) invokeMethodForNmsObject("getPrefix");
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+    public String getPrefix() {
 
-		return null;
+        try {
+            return (String) invokeMethodForNmsObject("getPrefix");
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
-	}
+        return null;
 
-	public String getDisplayName() {
+    }
 
-		try {
-			return (String) invokeMethodForNmsObject("getDisplayName");
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+    public String getDisplayName() {
 
-		return null;
+        try {
+            return (String) invokeMethodForNmsObject("getDisplayName");
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
-	}
+        return null;
 
-	public boolean allowFriendlyFire() {
+    }
 
-		try {
-			return (boolean) invokeMethodForNmsObject("allowFriendlyFire");
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+    public boolean allowFriendlyFire() {
 
-		return true;
+        try {
+            return (boolean) invokeMethodForNmsObject("allowFriendlyFire");
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
 
-	}
+        return true;
 
-	public NameTagVisibility getNametagVisibility() {
+    }
 
-		try {
-			return NameTagVisibility.valueOf(Mappings.GET_NAMETAG_VISIBILITY_MAPPING.runMethod(this).toString());
-		}
-		catch (MappingsException e) {
-			e.printStackTrace();
-		}
+    public NameTagVisibility getNametagVisibility() {
 
-		return null;
+        try {
+            return NameTagVisibility.valueOf(Mappings.GET_NAMETAG_VISIBILITY_MAPPING.runMethod(this).toString());
+        } catch (MappingsException e) {
+            e.printStackTrace();
+        }
 
-	}
+        return null;
 
-	public Object getChatFormat() {
+    }
 
-		try {
-			return invokeMethodForNmsObject("l");
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+    public ChatColor getChatFormat() {
 
-		return null;
+        try {
+            Object chatFormat = Mappings.GET_TEAM_COLOR_MAPPING.runMethod(this);
+            return ChatColor.values()[((Enum<?>) chatFormat).ordinal()];
+        } catch (MappingsException e) {
+            e.printStackTrace();
+        }
 
-	}
+        return null;
 
-	public boolean canSeeFriendlyInvisibles() {
-		try {
-			return (boolean) invokeMethodForNmsObject("canSeeFriendlyInvisibles");
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+    }
 
-	@Override
-	public String toString() {
+    public boolean canSeeFriendlyInvisibles() {
+        try {
+            return (boolean) invokeMethodForNmsObject("canSeeFriendlyInvisibles");
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
-		HashMap<String, Object> values = new HashMap<>();
-		values.put("type", nmsObject.getClass());
-		values.put("team", nmsObject);
-		values.put("prefix", getPrefix());
-		values.put("chatFormat", getChatFormat());
-		values.put("displayName", getDisplayName());
-		values.put("nametagVisibility", getNametagVisibility());
-		values.put("suffix", getSuffix());
-		values.put("allowsFriendlyFire", allowFriendlyFire());
-		return "ScoreboardTeamReflection" + values.toString();
+    @Override
+    public String toString() {
 
-	}
+        HashMap<String, Object> values = new HashMap<>();
+        values.put("type", nmsObject.getClass());
+        values.put("team", nmsObject);
+        values.put("prefix", getPrefix());
+        values.put("chatFormat", getChatFormat());
+        values.put("displayName", getDisplayName());
+        values.put("nametagVisibility", getNametagVisibility());
+        values.put("suffix", getSuffix());
+        values.put("allowsFriendlyFire", allowFriendlyFire());
+        return "ScoreboardTeamReflection" + values;
 
-	public static final Class<?> staticClass = ReflectionApi.getNMSClass("ScoreboardTeam");
+    }
 
-	public static NMSScoreboardTeamReflection cast(NMSObjectReflection refl) {
+    public static final Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.SCOREBOARD_PACKAGE_MAPPING, "ScoreboardTeam");
 
-		if (staticClass.isInstance(refl.getNmsObject())) {
-			return new NMSScoreboardTeamReflection(refl.getNmsObject());
-		}
+    public static NMSScoreboardTeamReflection cast(NMSObjectReflection refl) {
 
-		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSScoreboardTeamReflection");
+        if (staticClass.isInstance(refl.getNMSObject())) {
+            return new NMSScoreboardTeamReflection(refl.getNMSObject());
+        }
 
-	}
+        throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSScoreboardTeamReflection");
+
+    }
 
 }

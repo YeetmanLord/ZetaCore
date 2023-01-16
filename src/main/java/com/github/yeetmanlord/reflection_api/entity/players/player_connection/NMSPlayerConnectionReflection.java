@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -70,8 +71,7 @@ public class NMSPlayerConnectionReflection extends NMSObjectReflection {
 	public Object nmsNetworkManager() {
 
 		try {
-			Field network = nmsPlayerConnection.getClass().getField("networkManager");
-			return network.get(nmsPlayerConnection);
+			return Mappings.PLAYER_CONNECTION_NETWORK_MANAGER_MAPPING.getField(this);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -84,13 +84,12 @@ public class NMSPlayerConnectionReflection extends NMSObjectReflection {
 	public void sendPacket(NMSPacketReflection packet) {
 
 		try {
-			Method sendPacket = nmsPlayerConnection.getClass().getMethod("sendPacket", ReflectionApi.getNMSClass("Packet"));
-			sendPacket.invoke(nmsPlayerConnection, packet.getNmsPacket());
+			Mappings.PLAYER_CONNECTION_SEND_PACKET_MAPPING.runMethod(this, packet.getNmsPacket());
 		}
 		catch (Exception e) {
-			Bukkit.getConsoleSender().sendMessage(packet.getNmsPacket().getClass().toString());
-			Bukkit.getConsoleSender().sendMessage(packet.toString());
-			Bukkit.getConsoleSender().sendMessage(packet.getNmsPacket().toString());
+			Bukkit.getConsoleSender().sendMessage("§c[ReflectionAPI/ERROR] Failed to send packet! Packet Type: " + packet.getNmsPacket().getClass().getSimpleName());
+			Bukkit.getConsoleSender().sendMessage("§c[ReflectionAPI/ERROR] Packet Reflection: " + packet);
+			Bukkit.getConsoleSender().sendMessage("§c[ReflectionAPI/ERROR] NMS Packet: " + packet.getNmsPacket().toString());
 			e.printStackTrace();
 		}
 
@@ -113,7 +112,8 @@ public class NMSPlayerConnectionReflection extends NMSObjectReflection {
 	private static Object instance(Player player) {
 
 		try {
-			return ReflectionApi.getNMSClass("EntityPlayer").getField("playerConnection").get(ReflectionApi.getHandle(player));
+			NMSPlayerReflection playerReflection = new NMSPlayerReflection(player);
+			return playerReflection.getPlayerConnection().nmsPlayerConnection;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -126,7 +126,7 @@ public class NMSPlayerConnectionReflection extends NMSObjectReflection {
 	public static Object getConnection(NMSPlayerReflection player) {
 
 		try {
-			return player.getNmsPlayer().getClass().getField("playerConnection").get(player.getNmsPlayer());
+			return Mappings.ENTITY_PLAYER_CONNECTION_MAPPING.getField(player);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -152,12 +152,12 @@ public class NMSPlayerConnectionReflection extends NMSObjectReflection {
 
 	}
 
-	public static final Class<?> staticClass = ReflectionApi.getNMSClass("PlayerConnection");
+	public static final Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.SERVER_NETWORK_PACKAGE_MAPPING, "PlayerConnection");
 
 	public static NMSPlayerConnectionReflection cast(NMSObjectReflection refl) {
 
-		if (staticClass.isInstance(refl.getNmsObject())) {
-			return new NMSPlayerConnectionReflection(refl.getNmsObject());
+		if (staticClass.isInstance(refl.getNMSObject())) {
+			return new NMSPlayerConnectionReflection(refl.getNMSObject());
 		}
 
 		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSPlayerConnectionReflection");

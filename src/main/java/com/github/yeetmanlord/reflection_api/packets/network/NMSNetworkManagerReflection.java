@@ -10,8 +10,8 @@ import io.netty.channel.Channel;
 public class NMSNetworkManagerReflection extends NMSObjectReflection {
 
 	/**
-	 * @param value Allowed values are SERVERBOUND and CLIENTBOUND although case
-	 *              doesn't matter
+	 * @param value The network direction to use. The values in the replacement EnumNetworkDirection match their counterparts
+	 *                 in the original EnumProtocolDirection.
 	 */
 	public NMSNetworkManagerReflection(EnumNetworkDirection value) {
 
@@ -28,8 +28,8 @@ public class NMSNetworkManagerReflection extends NMSObjectReflection {
 	private static Object init(EnumNetworkDirection value) {
 
 		try {
-			Class<?> enumProtocolDirection = ReflectionApi.getNMSClass("EnumProtocolDirection");
-			Object direction = enumProtocolDirection.getField(value.name()).get(null);
+			Class<?> enumProtocolDirection = ReflectionApi.getNMSClass(Mappings.PROTOCOL_PACKAGE_MAPPING, "EnumProtocolDirection");
+			Object direction = enumProtocolDirection.getEnumConstants()[value.ordinal()];
 			Constructor<?> managerConstructor = staticClass.getConstructor(enumProtocolDirection);
 			return managerConstructor.newInstance(direction);
 		}
@@ -62,12 +62,12 @@ public class NMSNetworkManagerReflection extends NMSObjectReflection {
 	}
 
 
-	public static Class<?> staticClass = ReflectionApi.getNMSClass("NetworkManager");
+	public static Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.NETWORK_PACKAGE_MAPPING, "NetworkManager");
 
 	public static NMSNetworkManagerReflection cast(NMSObjectReflection refl) {
 
-		if (staticClass.isInstance(refl.getNmsObject())) {
-			return new NMSNetworkManagerReflection(refl.getNmsObject());
+		if (staticClass.isInstance(refl.getNMSObject())) {
+			return new NMSNetworkManagerReflection(refl.getNMSObject());
 		}
 
 		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSNetworkManagerReflection");
@@ -76,6 +76,8 @@ public class NMSNetworkManagerReflection extends NMSObjectReflection {
 
 	public enum EnumNetworkDirection {
 		SERVERBOUND, CLIENTBOUND;
+
+
 	}
 
 }

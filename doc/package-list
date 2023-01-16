@@ -1,7 +1,7 @@
 com.github.yeetmanlord.zeta_core
 com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu
-com.github.yeetmanlord.zeta_core.api.uitl
-com.github.yeetmanlord.zeta_core.api.uitl.raycast
+com.github.yeetmanlord.zeta_core.api.util
+com.github.yeetmanlord.zeta_core.api.util.raycast
 com.github.yeetmanlord.zeta_core.commands
 com.github.yeetmanlord.zeta_core.data
 com.github.yeetmanlord.zeta_core.events

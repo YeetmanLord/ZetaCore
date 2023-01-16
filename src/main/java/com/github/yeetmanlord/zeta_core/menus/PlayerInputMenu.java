@@ -33,7 +33,7 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
     @Override
     public void playerInventoryInput(InventoryClickEvent e) {
 
-        if (this.parent instanceof IPlayerInputMenuInputable) {
+        if (this.parent instanceof IPlayerInputMenuInputable && e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR) {
             ((IPlayerInputMenuInputable) parent).setInputValuesFromInputMenu(e);
             this.inv.setItem(4, new ItemStack(e.getCurrentItem().getType()));
             this.parent.open();
@@ -62,7 +62,8 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
     public void open() {
 
         menuUtil.setMenuToInputTo(null);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.INSTANCE, () -> {
+        menuUtil.setGUIMenu(false);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ZetaCore.getInstance(), () -> {
             owner.closeInventory();
             this.inv = Bukkit.createInventory(this, InventoryType.DISPENSER, ChatColor.translateAlternateColorCodes('&', this.getMenuName()));
             this.setItems();

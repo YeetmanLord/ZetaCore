@@ -1,10 +1,9 @@
 package com.github.yeetmanlord.reflection_api.world;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import org.bukkit.World;
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
@@ -14,119 +13,132 @@ import com.github.yeetmanlord.reflection_api.server.NMSServerReflection;
 
 public class NMSWorldServerReflection extends NMSObjectReflection {
 
-	private NMSServerReflection server;
+    private NMSServerReflection server;
 
-	public NMSWorldServerReflection(World bukkitWorld) {
+    public NMSWorldServerReflection(World bukkitWorld) {
 
-		super(bukkitWorld, "getHandle");
-		this.server = new NMSServerReflection(this);
+        super(bukkitWorld, "getHandle");
+        this.server = new NMSServerReflection(this);
 
-	}
+    }
 
-	public NMSWorldServerReflection(Object nmsObject) {
+    public NMSWorldServerReflection(Object nmsObject) {
 
-		super(nmsObject);
+        super(nmsObject);
 
-	}
+    }
 
-	public Object getNmsWorldServer() {
+    public Object getNmsWorldServer() {
 
-		return nmsObject;
+        return nmsObject;
 
-	}
+    }
 
-	public Object getNMSServer() {
+    public Object getNMSServer() {
 
-		Method getServer;
+        try {
+            return Mappings.WORLD_SERVER_GET_SERVER_MAPPING.runMethod(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		try {
-			getServer = nmsObject.getClass().getMethod("getMinecraftServer");
-			return getServer.invoke(nmsObject);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        return null;
 
-		return null;
+    }
 
-	}
+    public NMSServerReflection getServer() {
 
-	public NMSServerReflection getServer() {
+        return server;
 
-		return server;
+    }
 
-	}
+    /**
+     * Gets the list of entities for a server world
+     *
+     * @return The entity list of a server but as reflected entities
+     */
+    public List<NMSEntityReflection> entityList() {
 
-	/**
-	 * Gets the list of entities for a server world
-	 *
-	 * @return The entity list of a server but as reflected entities
-	 */
-	public List<NMSEntityReflection> entityList() {
+        List<NMSEntityReflection> reflectedEntityList = new ArrayList<>();
+        List<Object> entityList;
 
-		List<NMSEntityReflection> reflectedEntityList = new ArrayList<>();
-		List<Object> entityList;
+        try {
+            if (ReflectionApi.version.isNewer(ReflectionApi.v1_17)) {
+                Iterable<?> entityIterator = Mappings.WORLD_SERVER_ENTITY_ITERABLE_MAPPING.runMethod(this);
+                for (Object entity : entityIterator) {
+                    reflectedEntityList.add(new NMSEntityReflection(entity));
+                }
+                return reflectedEntityList;
+            } else if (ReflectionApi.version.isNewer(ReflectionApi.v1_16)) {
+                entityList = new ArrayList<>(((Map<UUID, Object>) Mappings.WORLD_SERVER_ENTITY_LIST_MAPPING.getField(this)).values());
+            } else {
+                entityList = (List<Object>) Mappings.WORLD_SERVER_ENTITY_LIST_MAPPING.getField(this);
+            }
 
-		try {
-			entityList = (List<Object>) nmsObject.getClass().getField("entityList").get(nmsObject);
+            for (Object o : entityList) {
+                NMSEntityReflection entity = new NMSEntityReflection(o);
 
-			for (int x = 0; x < entityList.size(); x++) {
-				NMSEntityReflection entity = new NMSEntityReflection(entityList.get(x));
+                if (NMSPlayerReflection.isInstance(entity)) {
+                    reflectedEntityList.add(new NMSPlayerReflection(o));
+                } else reflectedEntityList.add(entity);
 
-				if (NMSPlayerReflection.isInstance(entity)) {
-					reflectedEntityList.add(new NMSPlayerReflection(entityList.get(x)));
-				} else reflectedEntityList.add(entity);
+            }
 
-			}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        return reflectedEntityList;
 
-		return reflectedEntityList;
+    }
 
-	}
+    public void addEntity(NMSEntityReflection entity) {
 
-	public void addEntity(NMSEntityReflection entity) {
+        try {
+            Mappings.WORLD_SERVER_ADD_ENTITY_MAPPING.runMethod(this, entity.getNmsEntity());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		try {
-			nmsObject.getClass().getMethod("addEntity", ReflectionApi.getNMSClass("Entity")).invoke(nmsObject, entity.getNmsEntity());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    }
 
-	}
+    public void removeEntity(NMSEntityReflection entity) {
 
-	public void removeEntity(NMSEntityReflection entity) {
+        try {
+            if (ReflectionApi.version.isOlder(ReflectionApi.v1_17)) {
+                this.invokeMethodForNmsObject("removeEntity", new Class[]{NMSEntityReflection.staticClass}, new Object[]{entity.getNmsEntity()});
+            } else {
+                Class<?> removalReasonClass = ReflectionApi.getNMSClass("world.entity.Entity$RemovalReason");
+                Object removalReason = removalReasonClass.getEnumConstants()[1];
+                entity.invokeMethodForNmsObject("a", new Class[]{removalReasonClass}, new Object[]{removalReason});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		try {
-			nmsObject.getClass().getMethod("removeEntity", ReflectionApi.getNMSClass("Entity")).invoke(nmsObject, entity.getNmsEntity());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    }
 
-	}
+    @Override
+    public String toString() {
 
-	@Override
-	public String toString() {
+        HashMap<String, Object> values = new HashMap<>();
+        values.put("type", nmsObject.getClass());
+        values.put("worldServer", nmsObject);
+        values.put("server", server.toString());
+        return "WorldServerReflection" + values;
 
-		HashMap<String, Object> values = new HashMap<>();
-		values.put("type", nmsObject.getClass());
-		values.put("worldServer", nmsObject);
-		values.put("server", server.toString());
-		return "WorldServerReflection" + values.toString();
+    }
 
-	}
+    public static final Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.SERVER_LEVEL_PACKAGE_MAPPING, "WorldServer");
 
-	public static final Class<?> staticClass = ReflectionApi.getNMSClass("WorldServer");
+    public static NMSWorldServerReflection cast(NMSObjectReflection refl) {
 
-	public static NMSWorldServerReflection cast(NMSObjectReflection refl) {
+        if (staticClass.isInstance(refl.getNMSObject())) {
+            return new NMSWorldServerReflection(refl.getNMSObject());
+        }
 
-		if (staticClass.isInstance(refl.getNmsObject())) {
-			return new NMSWorldServerReflection(refl.getNmsObject());
-		}
+        throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSWorldServerReflection");
 
-		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSWorldServerReflection");
-
-	}
+    }
 
 }

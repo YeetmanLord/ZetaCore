@@ -33,24 +33,24 @@ public abstract class ZetaPlugin extends JavaPlugin {
     public void onEnable() {
 
         super.onEnable();
-        this.pluginSetting = ZetaCore.INSTANCE.localSettings.getPluginSettings(this);
+        this.pluginSetting = ZetaCore.getInstance().localSettings.getPluginSettings(this);
         this.logger.setDebugging(this.pluginSetting.isDebugLogging());
-        ZetaCore.registerPlugin(this);
+        ZetaCore.getInstance().registerPlugin(this);
         if (this.pluginSetting.isDisabled()) {
-            ZetaCore.LOGGER.debug(this.getPluginName() + " has been disabled in settings. Disabling...");
+            ZetaCore.getInstance().getPluginLogger().debug(this.getPluginName() + " has been disabled in settings. Disabling...");
             this.setEnabled(false);
             return;
         }
-        ZetaCore.LOGGER.debug("Registering data handlers for " + this.getPluginName());
+        ZetaCore.getInstance().getPluginLogger().debug("Registering data handlers for " + this.getPluginName());
         this.registerDataStorers();
-        ZetaCore.LOGGER.debug("Initializing databases for " + this.getPluginName() +  " if necessary ");
+        ZetaCore.getInstance().getPluginLogger().debug("Initializing databases for " + this.getPluginName() +  " if necessary ");
         this.initDB();
 
     }
     
     public LocalData.PluginSetting getSettings() {
         if (this.pluginSetting == null) {
-            return ZetaCore.INSTANCE.localSettings.getPluginSettings(this);
+            return ZetaCore.getInstance().localSettings.getPluginSettings(this);
         }
         return this.pluginSetting;
     }
@@ -58,14 +58,14 @@ public abstract class ZetaPlugin extends JavaPlugin {
     private void initDB() {
         final LocalDateTime end = LocalDateTime.now().plus(3200, ChronoUnit.MILLIS);
 
-        if (ZetaCore.INSTANCE.localSettings.initialized && this.pluginSetting.isSyncDatabase()) {
+        if (ZetaCore.getInstance().localSettings.initialized && this.pluginSetting.isSyncDatabase()) {
             Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
 
-                while (!ZetaCore.INSTANCE.isConnectedToDatabase()) {
+                while (!ZetaCore.getInstance().isConnectedToDatabase()) {
                     if (LocalDateTime.now().isAfter(end)) break;
                 }
-                if (ZetaCore.INSTANCE.isConnectedToDatabase()) {
-                    ZetaCore.getDatabaseDataHandlers(this).forEach(d -> d.initializeDB(ZetaCore.INSTANCE.localSettings.client.handler));
+                if (ZetaCore.getInstance().isConnectedToDatabase()) {
+                    ZetaCore.getInstance().getDatabaseDataHandlers(this).forEach(d -> d.initializeDB(ZetaCore.getInstance().localSettings.client.handler));
                 }
 
                 this.readData();
@@ -82,12 +82,12 @@ public abstract class ZetaPlugin extends JavaPlugin {
 
         super.onDisable();
 
-        if (ZetaCore.INSTANCE.localSettings.initialized && ZetaCore.INSTANCE.localSettings.client != null && ZetaCore.INSTANCE.localSettings.client.isConnected() && this.pluginSetting.isSyncDatabase()) {
-            ZetaCore.INSTANCE.localSettings.client.writeData(this);
+        if (ZetaCore.getInstance().localSettings.initialized && ZetaCore.getInstance().localSettings.client != null && ZetaCore.getInstance().localSettings.client.isConnected() && this.pluginSetting.isSyncDatabase()) {
+            ZetaCore.getInstance().localSettings.client.writeData(this);
         }
 
         logger.debug("Writing data for " + this.getPluginName());
-        ZetaCore.getDataHandlers(this).forEach(DataStorer::write);
+        ZetaCore.getInstance().getDataHandlers(this).forEach(DataStorer::write);
 
     }
 
@@ -103,26 +103,26 @@ public abstract class ZetaPlugin extends JavaPlugin {
 
     protected void readData() {
 
-        final LocalData db = ZetaCore.INSTANCE.localSettings;
+        final LocalData db = ZetaCore.getInstance().localSettings;
         this.logger.info("Reading data for " + this.getPluginName());
 
         final LocalDateTime end = LocalDateTime.now().plus(3200, ChronoUnit.MILLIS);
 
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             if (db.initialized && this.pluginSetting.isSyncDatabase()) {
-                while (!ZetaCore.INSTANCE.isConnectedToDatabase()) {
+                while (!ZetaCore.getInstance().isConnectedToDatabase()) {
                     if (LocalDateTime.now().isAfter(end)) break;
                 }
-                if (ZetaCore.INSTANCE.isConnectedToDatabase()) {
+                if (ZetaCore.getInstance().isConnectedToDatabase()) {
                     logger.debug("[ASYNC] Connected to database and reading data");
                     db.client.readData(this);
                 } else {
                     logger.debug("[ASYNC] Connection to database failed. Reading data from local files");
-                    Bukkit.getScheduler().runTask(this, () -> ZetaCore.getDataHandlers(this).forEach(DataStorer::read));
+                    Bukkit.getScheduler().runTask(this, () -> ZetaCore.getInstance().getDataHandlers(this).forEach(DataStorer::read));
                 }
             } else {
                 logger.debug("[ASYNC] Reading data from local files");
-                Bukkit.getScheduler().runTask(this, () -> ZetaCore.getDataHandlers(this).forEach(DataStorer::read));
+                Bukkit.getScheduler().runTask(this, () -> ZetaCore.getInstance().getDataHandlers(this).forEach(DataStorer::read));
             }
             logger.debug("[ASYNC] Data read finished.");
             Bukkit.getScheduler().runTask(this, this::onDataReadFinish);
@@ -131,13 +131,13 @@ public abstract class ZetaPlugin extends JavaPlugin {
     }
 
     protected void writeData() {
-        LocalData db = ZetaCore.INSTANCE.localSettings;
+        LocalData db = ZetaCore.getInstance().localSettings;
 
-        if (db.initialized && ZetaCore.INSTANCE.localSettings.client.isConnected() && this.pluginSetting.isSyncDatabase()) {
-            ZetaCore.getDataHandlers(this).forEach(DataStorer::write);
+        if (db.initialized && ZetaCore.getInstance().localSettings.client.isConnected() && this.pluginSetting.isSyncDatabase()) {
+            ZetaCore.getInstance().getDataHandlers(this).forEach(DataStorer::write);
             db.client.writeData(this);
         } else {
-            ZetaCore.getDataHandlers(this).forEach(DataStorer::write);
+            ZetaCore.getInstance().getDataHandlers(this).forEach(DataStorer::write);
         }
     }
 

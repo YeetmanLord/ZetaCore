@@ -4,6 +4,7 @@ import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.reflection_api.block.NMSBlockPositionReflection;
 import com.github.yeetmanlord.reflection_api.exceptions.FieldReflectionExcpetion;
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import org.bukkit.Location;
 
 import java.lang.reflect.Constructor;
@@ -31,7 +32,7 @@ public class NMSVec3DReflection extends NMSObjectReflection {
     private static Object init(double x, double y, double z) {
 
         try {
-            Constructor<?> constr = ReflectionApi.getNMSClass("Vec3D").getConstructor(double.class, double.class, double.class);
+            Constructor<?> constr = staticClass.getConstructor(double.class, double.class, double.class);
             return constr.newInstance(x, y, z);
         } catch (Exception e) {
             e.printStackTrace();
@@ -39,7 +40,7 @@ public class NMSVec3DReflection extends NMSObjectReflection {
         return null;
     }
 
-    public static final Class<?> staticClass = ReflectionApi.getNMSClass("Vec3D");
+    public static final Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.WORLD_PHYSICS_PACKAGE_MAPPING, "Vec3D");
 
     public static final NMSVec3DReflection ZERO = new NMSVec3DReflection(0, 0, 0);
 }

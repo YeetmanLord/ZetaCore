@@ -4,10 +4,11 @@ import java.lang.reflect.Constructor;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 
 public class NMSChatComponentTextReflection extends NMSObjectReflection {
 
-	public static final Class<?> staticClass = ReflectionApi.getNMSClass("ChatComponentText");
+	public static final Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.CHAT_PACKAGE_MAPPING, "ChatComponentText");
 
 	public NMSChatComponentTextReflection(String text) {
 
@@ -43,8 +44,8 @@ public class NMSChatComponentTextReflection extends NMSObjectReflection {
 
 	public static NMSChatComponentTextReflection cast(NMSObjectReflection refl) {
 
-		if (staticClass.isInstance(refl.getNmsObject())) {
-			return new NMSChatComponentTextReflection(refl.getNmsObject());
+		if (staticClass.isInstance(refl.getNMSObject())) {
+			return new NMSChatComponentTextReflection(refl.getNMSObject());
 		}
 
 		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSChatComponentTextReflection");

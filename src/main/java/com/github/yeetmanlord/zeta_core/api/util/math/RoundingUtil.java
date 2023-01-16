@@ -1,4 +1,4 @@
-package com.github.yeetmanlord.zeta_core.api.uitl;
+package com.github.yeetmanlord.zeta_core.api.util.math;
 
 import org.bukkit.Location;
 
@@ -82,6 +82,11 @@ public class RoundingUtil {
 
 	}
 
+	/**
+	 * Centers a location on the block it is in. Depending on location it will either be centered to the center or one of the corners.
+	 * @param loc The location to center.
+	 * @return The centered location.
+	 */
 	public static Location center(Location loc) {
 
 		double x = loc.getX();

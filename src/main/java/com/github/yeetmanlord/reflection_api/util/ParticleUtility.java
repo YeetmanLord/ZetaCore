@@ -11,7 +11,7 @@ public class ParticleUtility {
 
     public static void spawnParticle(Location location, ParticleTypes particle, float offsetX, float offsetY, float offsetZ, float speed, int particleCount, int radius) {
         World.Spigot spigotWorld = location.getWorld().spigot();
-        if (ReflectionApi.version.isOlder("1.9")) {
+        if (ReflectionApi.version.isOlder(ReflectionApi.v1_9)) {
             try {
                 Method playEffect = World.Spigot.class.getMethod("playEffect", Location.class, Effect.class, int.class, int.class, float.class, float.class, float.class, float.class, int.class, int.class);
                 playEffect.invoke(spigotWorld, location, Effect.valueOf(particle.getLegacyName()), 0, 0, offsetX, offsetY, offsetZ, speed, particleCount, radius);

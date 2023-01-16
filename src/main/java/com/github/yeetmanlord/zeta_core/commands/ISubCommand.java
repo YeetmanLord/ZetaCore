@@ -3,24 +3,31 @@ package com.github.yeetmanlord.zeta_core.commands;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface ISubCommand {
 
-	public int getIndex();
+    int getIndex();
 
-	public String getName();
+    String getName();
 
-	public String getDesc();
+    String getDesc();
 
-	public String getSyntax();
+    String getSyntax();
 
-	public String getPermission();
+    String getPermission();
 
-	public void run(CommandSender sender, String[] args);
+    void run(CommandSender sender, String[] args);
 
-	public default String getHelpMessage(String cmd) {
+    default List<String> getTabComplete(CommandSender sender, String[] args) {
+        return new ArrayList<String>();
+    }
 
-		return ChatColor.RED + "Help for " + cmd + " " + getName() + "\n" + getSyntax() + "\n" + getDesc();
+    default String getHelpMessage(String cmd) {
 
-	}
+        return ChatColor.RED + "Help for " + cmd + " " + getName() + "\n" + getSyntax() + "\n" + getDesc();
+
+    }
 
 }

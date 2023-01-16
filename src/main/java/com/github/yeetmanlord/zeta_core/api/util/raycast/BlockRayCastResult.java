@@ -1,4 +1,4 @@
-package com.github.yeetmanlord.zeta_core.api.uitl.raycast;
+package com.github.yeetmanlord.zeta_core.api.util.raycast;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;

@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import com.github.yeetmanlord.reflection_api.exceptions.MappingsException;
 import com.github.yeetmanlord.reflection_api.mappings.types.ClassNameMapping;
+import com.github.yeetmanlord.reflection_api.mappings.types.PackageMapping;
 
 /**
  * @implNote If you were to ever extend this class and create mappings for it, I recommend following this rule:
@@ -92,17 +93,29 @@ public class NMSObjectReflection {
 
     }
 
+    public NMSObjectReflection(PackageMapping mapping, String className, @Nullable Class<?>[] classes, Object[] args) {
+        this(getClassName(mapping, className), classes, args);
+    }
+
+    private static String getClassName(PackageMapping mapping, String className) {
+        try {
+            return mapping.getNMSSubPackage() + className;
+        } catch (MappingsException e) {
+            e.printStackTrace();
+        }
+        return className;
+    }
+
     public NMSObjectReflection(ClassNameMapping mapping, @Nullable Class<?>[] classes, Object[] args) {
 
         try {
             Class<?> clazz = mapping.getNMSClassMapping();
-            String className = clazz.getName().replaceFirst(clazz.getPackage().getName() + ".", "");
             Constructor<?> constr;
 
             if (classes == null) {
 
                 try {
-                    constr = ReflectionApi.getNMSClass(className).getConstructor();
+                    constr = clazz.getConstructor();
                     this.nmsObject = constr.newInstance();
 
                 } catch (Exception e) {
@@ -114,7 +127,7 @@ public class NMSObjectReflection {
                 if (args != null) {
 
                     try {
-                        constr = ReflectionApi.getNMSClass(className).getConstructor(classes);
+                        constr = clazz.getConstructor(classes);
                         this.nmsObject = constr.newInstance(args);
 
                     } catch (Exception e) {
@@ -324,7 +337,7 @@ public class NMSObjectReflection {
     /**
      * @return Returns the NMS object that is associated with this reflection
      */
-    public Object getNmsObject() {
+    public Object getNMSObject() {
 
         return nmsObject;
 
@@ -347,11 +360,11 @@ public class NMSObjectReflection {
         }
 
         public ImplementationException(Class<? extends NMSObjectReflection> clazz, String message) {
-            super(clazz.getSimpleName() + " - " + message);
+            this(clazz.getSimpleName() + " - " + message);
         }
 
         public ImplementationException(Class<? extends NMSObjectReflection> clazz) {
-            super(clazz.getSimpleName() + " - " + "This class does not follow the implementation rules. Please contact the developer or check the documentation.");
+            this(clazz.getSimpleName() + " - " + "This class does not follow the implementation rules. Please contact the developer or check the documentation.");
         }
 
     }

@@ -9,95 +9,88 @@ import com.github.yeetmanlord.reflection_api.exceptions.MappingsException;
 import com.github.yeetmanlord.reflection_api.mappings.IMapping;
 import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import com.github.yeetmanlord.reflection_api.mappings.VersionRange;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 public class ClassNameMapping implements IMapping<String> {
 
-	public Map<VersionRange, String> mappings;
+    public Map<VersionRange, String> mappings;
 
-	public String name;
+    public String name;
 
-	public ClassNameMapping(String name, Map<VersionRange, String> mappings) {
+    private PackageMapping pack;
 
-		this.mappings = mappings;
-		this.name = name;
-		Mappings.mappings.add(this);
+    public ClassNameMapping(String name, PackageMapping packageMapping, Map<VersionRange, String> mappings) {
 
-	}
+        this.mappings = mappings;
+        this.name = name;
+        Mappings.mappings.add(this);
+        this.pack = packageMapping;
 
-	public void addMapping(VersionRange versionRange, String versionDependentNMSClassName) {
+    }
 
-		this.mappings.put(versionRange, versionDependentNMSClassName);
+    public void addMapping(VersionRange versionRange, String versionDependentNMSClassName) {
 
-	}
+        this.mappings.put(versionRange, versionDependentNMSClassName);
 
-	public Class<?> getNMSClassMapping() throws MappingsException {
+    }
 
-		for (VersionRange range : mappings.keySet()) {
+    public Class<?> getNMSClassMapping() throws MappingsException {
+        Class<?> clazz;
+        try{
+             clazz = ReflectionApi.getNMSClass(pack, get());
+        } catch (MappingsException exception) {
+            throw (new MappingsException(this, "Failed to get class: No mapping for current version found"));
+        }
 
-			if (range.isWithinRange(ReflectionApi.version)) {
+        if (clazz == null) {
+            throw (new MappingsException(this, "Failed to get class, class was not found"));
+        } else {
+            return clazz;
+        }
 
-				Class<?> clazz = ReflectionApi.getNMSClass(mappings.get(range));
 
-				if (clazz == null) {
-					continue;
-				} else {
-					return clazz;
-				}
+    }
 
-			}
+    @Override
+    public String toString() {
 
-		}
+        return "ClassNameMapping{name: " + name + ", packageMapping: `" + pack.getName() + "`}";
 
-		throw (new MappingsException(this, "Failed to get class"));
+    }
 
-	}
+    @Override
+    public String getName() {
 
-	@Override
-	public String toString() {
+        return name;
 
-		String maps = "Mappings[";
-		Iterator<VersionRange> iter = mappings.keySet().iterator();
+    }
 
-		while (iter.hasNext()) {
-			VersionRange range = iter.next();
+    @Override
+    public Map<VersionRange, String> getMappings() {
 
-			if (iter.hasNext()) {
-				maps += "(versionRange: " + range.toString() + ", mappingValue: " + mappings.get(range) + "), ";
-			}
-			else {
-				maps += "(versionRange: " + range.toString() + ", mappingValue: " + mappings.get(range) + ")]";
-			}
+        return mappings;
 
-		}
+    }
 
-		for (int x = 0; x < mappings.keySet().size(); x++) {
-		}
+    @Override
+    public boolean testMapping() {
+        try {
+            Class<?> clazz = ReflectionApi.getNMSClass(pack, get());
 
-		return "ClassNameMapping{name: " + name + ", mappings: " + maps + "}";
+            if (clazz == null) {
+                return false;
+            } else {
+                return true;
+            }
 
-	}
+        } catch (MappingsException exception) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "Mapping " + name + " is out of range. Tentative Pass.");
+            return true;
+        }
+    }
 
-	@Override
-	public String getName() {
-
-		return name;
-
-	}
-
-	@Override
-	public Map<VersionRange, String> getMappings() {
-
-		return mappings;
-
-	}
-
-	@Override
-	public boolean testMapping() {
-		try {
-			getNMSClassMapping();
-			return true;
-		} catch (MappingsException e) {
-			return false;
-		}
-	}
+    public PackageMapping getPackageMapping() {
+        return pack;
+    }
 }

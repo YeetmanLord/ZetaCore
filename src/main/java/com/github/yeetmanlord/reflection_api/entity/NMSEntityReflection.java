@@ -1,171 +1,142 @@
 package com.github.yeetmanlord.reflection_api.entity;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 
+import com.github.yeetmanlord.reflection_api.exceptions.MappingsException;
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
-import com.github.yeetmanlord.reflection_api.util.ReflectedField;
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
-import com.github.yeetmanlord.reflection_api.exceptions.FieldReflectionExcpetion;
 import com.google.common.collect.ImmutableMap;
 
 public class NMSEntityReflection extends NMSObjectReflection {
 
-	private NMSDataWatcherReflection dataWatcher;
+    private NMSDataWatcherReflection dataWatcher;
 
-	public ReflectedField<Double> locX;
+    public NMSEntityReflection(Entity entity) {
 
-	public ReflectedField<Double> locY;
+        super(entity, "getHandle");
+        this.dataWatcher = new NMSDataWatcherReflection(this);
 
-	public ReflectedField<Double> locZ;
+    }
 
-	public NMSEntityReflection(Entity entity) {
+    public NMSEntityReflection(Object nmsEntity) {
 
-		super(entity, "getHandle");
-		this.dataWatcher = new NMSDataWatcherReflection(this);
+        super(nmsEntity);
 
-		try {
-			locX = new ReflectedField<>("locX", false, false, this);
-			locY = new ReflectedField<>("locY", false, false, this);
-			locZ = new ReflectedField<>("locZ", false, false, this);
-		}
-		catch (FieldReflectionExcpetion e) {
-			e.printStackTrace();
-		}
+        if (staticClass.isInstance(nmsEntity)) {
+            this.dataWatcher = new NMSDataWatcherReflection(this);
+        } else {
+            throw (new IllegalArgumentException(nmsEntity.toString() + " is not an instance of net.minecraft.server.Entity"));
+        }
 
-	}
+    }
 
-	public NMSEntityReflection(Object nmsEntity) {
+    public void setLocation(double x, double y, double z, float yaw, float pitch) {
 
-		super(nmsEntity);
+        try {
+            Mappings.ENTITY_SET_LOCATION_MAPPING.runMethod(this, x, y, z, yaw, pitch);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		if (staticClass.isInstance(nmsEntity)) {
-			this.dataWatcher = new NMSDataWatcherReflection(this);
+    }
 
-			try {
+    public void setLocation(Location location) {
 
-				try {
-					locX = new ReflectedField<>("locX", false, false, this);
-					locY = new ReflectedField<>("locY", false, false, this);
-					locZ = new ReflectedField<>("locZ", false, false, this);
-				}
-				catch (FieldReflectionExcpetion e) {
-					e.printStackTrace();
-				}
+        try {
+            this.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-			}
-			catch (IllegalArgumentException | SecurityException e) {
-				throw (new IllegalArgumentException(nmsEntity.toString() + " does not the correct data"));
-			}
+    }
 
-		}
-		else {
-			throw (new IllegalArgumentException(nmsEntity.toString() + " is not an instance of net.minecraft.server.Entity"));
-		}
+    public Location getLocation() {
+        try {
+            Entity e = (Entity) invokeMethodForNmsObject("getBukkitEntity");
+            return e.getLocation();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	}
+    public NMSDataWatcherReflection getDataWatcher() {
 
-	public void setLocation(double x, double y, double z, float yaw, float pitch) {
+        return this.dataWatcher;
 
-		try {
-			nmsObject.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class).invoke(nmsObject, x, y, z, yaw, pitch);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+    }
 
-	}
+    public Object getNmsEntity() {
 
-	public void setLocation(Location location) {
+        return this.nmsObject;
 
-		setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+    }
 
-	}
+    public int getId() {
 
-	public NMSDataWatcherReflection getDataWatcher() {
+        try {
+            Entity e = (Entity) invokeMethodForNmsObject("getBukkitEntity");
+            return e.getEntityId();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		return this.dataWatcher;
+        return 0;
 
-	}
+    }
 
-	public Object getNmsEntity() {
+    public String getName() {
 
-		return this.nmsObject;
+        try {
+            Entity e = (Entity) invokeMethodForNmsObject("getBukkitEntity");
+            return e.getName();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	}
+        return null;
 
-	public int getId() {
+    }
 
-		try {
-			Method getId = nmsObject.getClass().getMethod("getId");
-			return (int) getId.invoke(nmsObject);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+    @Override
+    public String toString() {
 
-		return 0;
+        HashMap<String, Object> values = new HashMap<>();
+        values.put("type", nmsObject.getClass());
+        values.put("entity", this.nmsObject);
 
-	}
+        values.put("location", ImmutableMap.of("x", this.getLocation().getX(), "y", this.getLocation().getY(), "z", this.getLocation().getZ()));
 
-	public String getName() {
+        return "EntityReflection" + values;
 
-		try {
-			Method getName = nmsObject.getClass().getMethod("getName");
-			return (String) getName.invoke(nmsObject);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+    }
 
-		return null;
+    public static final Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.ENTITY_PACKAGE_MAPPING, "Entity");
 
-	}
+    public static NMSEntityReflection cast(NMSObjectReflection refl) {
 
-	@Override
-	public String toString() {
+        if (staticClass.isInstance(refl.getNMSObject())) {
+            return new NMSEntityReflection(refl.getNMSObject());
+        }
 
-		HashMap<String, Object> values = new HashMap<>();
-		values.put("type", nmsObject.getClass());
-		values.put("entity", this.nmsObject);
+        throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSEntityReflection");
 
-		try {
-			values.put("location", ImmutableMap.of("x", locX.get(), "y", locY.get(), "z", locZ.get()));
-		}
-		catch (FieldReflectionExcpetion e) {
-			e.printStackTrace();
-		}
+    }
 
-		return "EntityReflection" + values.toString();
+    public NMSAxisAlignedBBReflection getBoundingBox() {
 
-	}
+        try {
+            return new NMSAxisAlignedBBReflection(Mappings.ENTITY_GET_BOUNDING_BOX_MAPPING.runMethod(this));
+        } catch (MappingsException e) {
+            e.printStackTrace();
+        }
 
-	public static final Class<?> staticClass = ReflectionApi.getNMSClass("Entity");
+        return null;
 
-	public static NMSEntityReflection cast(NMSObjectReflection refl) {
-
-		if (staticClass.isInstance(refl.getNmsObject())) {
-			return new NMSEntityReflection(refl.getNmsObject());
-		}
-
-		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSEntityReflection");
-
-	}
-
-	public NMSAxisAlignedBBReflection getBoundingBox() {
-
-		try {
-			return new NMSAxisAlignedBBReflection(this.invokeMethodForNmsObject("getBoundingBox"));
-		}
-		catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
-
-		return null;
-
-	}
+    }
 
 }

@@ -4,8 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
@@ -28,8 +28,8 @@ public class NMSBlockPositionReflection extends NMSObjectReflection {
 
 		try {
 			this.x = new ReflectedField<>(getField("a"), true, false, this, "getX", "");
-			this.y = new ReflectedField<>(getField(ReflectionApi.version.isOlder("1.10") ? "c" : "b"), true, false, this, "getY", "");
-			this.z = new ReflectedField<>(getField(ReflectionApi.version.isOlder("1.10") ? "d" : "c"), true, false, this, "getZ", "");
+			this.y = new ReflectedField<>(getField(ReflectionApi.version.isOlder(ReflectionApi.v1_10) ? "c" : "b"), true, false, this, "getY", "");
+			this.z = new ReflectedField<>(getField(ReflectionApi.version.isOlder(ReflectionApi.v1_10) ? "d" : "c"), true, false, this, "getZ", "");
 		}
 		catch (Exception exc) {
 			exc.printStackTrace();
@@ -43,8 +43,8 @@ public class NMSBlockPositionReflection extends NMSObjectReflection {
 
 		try {
 			this.x = new ReflectedField<>(getField("a"), true, false, this, "getX", "");
-			this.y = new ReflectedField<>(getField(ReflectionApi.version.isOlder("1.10") ? "c" : "b"), true, false, this, "getY", "");
-			this.z = new ReflectedField<>(getField(ReflectionApi.version.isOlder("1.10") ? "d" : "c"), true, false, this, "getZ", "");
+			this.y = new ReflectedField<>(getField(ReflectionApi.version.isOlder(ReflectionApi.v1_10) ? "c" : "b"), true, false, this, "getY", "");
+			this.z = new ReflectedField<>(getField(ReflectionApi.version.isOlder(ReflectionApi.v1_10) ? "d" : "c"), true, false, this, "getZ", "");
 		}
 		catch (Exception exc) {
 			exc.printStackTrace();
@@ -113,12 +113,12 @@ public class NMSBlockPositionReflection extends NMSObjectReflection {
 
 	}
 
-	public static final Class<?> staticClass = ReflectionApi.getNMSClass("BaseBlockPosition");
+	public static final Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.CORE_PACKAGE_MAPPING, "BaseBlockPosition");
 
 	public static NMSBlockPositionReflection cast(NMSObjectReflection refl) {
 
-		if (staticClass.isInstance(refl.getNmsObject())) {
-			return new NMSBlockPositionReflection(refl.getNmsObject());
+		if (staticClass.isInstance(refl.getNMSObject())) {
+			return new NMSBlockPositionReflection(refl.getNMSObject());
 		}
 
 		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSBlockPositionReflection");

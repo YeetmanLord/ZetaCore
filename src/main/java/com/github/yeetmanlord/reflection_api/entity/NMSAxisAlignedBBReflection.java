@@ -1,9 +1,10 @@
 package com.github.yeetmanlord.reflection_api.entity;
 
 import com.github.yeetmanlord.reflection_api.NMSObjectReflection;
+import com.github.yeetmanlord.reflection_api.ReflectionApi;
+import com.github.yeetmanlord.reflection_api.mappings.Mappings;
 import org.bukkit.Location;
 
-import javax.annotation.Nullable;
 
 public class NMSAxisAlignedBBReflection extends NMSObjectReflection {
 
@@ -17,7 +18,7 @@ public class NMSAxisAlignedBBReflection extends NMSObjectReflection {
 
 
     public NMSAxisAlignedBBReflection(double x1, double y1, double z1, double x2, double y2, double z2) {
-        super("AxisAlignedBB", new Class[]{double.class, double.class, double.class, double.class, double.class, double.class}, new Object[]{x1, y1, z1, x2, y2, z2});
+        super(Mappings.WORLD_PHYSICS_PACKAGE_MAPPING, "AxisAlignedBB", new Class[]{double.class, double.class, double.class, double.class, double.class, double.class}, new Object[]{x1, y1, z1, x2, y2, z2});
         this.x1 = Math.min(x1, x2);
         this.y1 = Math.min(y1, y2);
         this.z1 = Math.min(z1, z2);
@@ -33,13 +34,23 @@ public class NMSAxisAlignedBBReflection extends NMSObjectReflection {
     public NMSAxisAlignedBBReflection(Object nmsObject) {
         super(nmsObject);
         try {
-            this.x1 = (double) this.getFieldFromNmsObject("a");
-            this.y1 = (double) this.getFieldFromNmsObject("b");
-            this.z1 = (double) this.getFieldFromNmsObject("c");
+            if (ReflectionApi.version.isNewer(ReflectionApi.v1_13) && ReflectionApi.version.isOlder(ReflectionApi.v1_17)) {
+                this.x1 = (double) this.getFieldFromNmsObject("minX");
+                this.y1 = (double) this.getFieldFromNmsObject("minY");
+                this.z1 = (double) this.getFieldFromNmsObject("minZ");
 
-            this.x2 = (double) this.getFieldFromNmsObject("d");
-            this.y2 = (double) this.getFieldFromNmsObject("e");
-            this.z2 = (double) this.getFieldFromNmsObject("f");
+                this.x2 = (double) this.getFieldFromNmsObject("maxX");
+                this.y2 = (double) this.getFieldFromNmsObject("maxY");
+                this.z2 = (double) this.getFieldFromNmsObject("maxZ");
+            } else {
+                this.x1 = (double) this.getFieldFromNmsObject("a");
+                this.y1 = (double) this.getFieldFromNmsObject("b");
+                this.z1 = (double) this.getFieldFromNmsObject("c");
+
+                this.x2 = (double) this.getFieldFromNmsObject("d");
+                this.y2 = (double) this.getFieldFromNmsObject("e");
+                this.z2 = (double) this.getFieldFromNmsObject("f");
+            }
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
@@ -77,5 +88,7 @@ public class NMSAxisAlignedBBReflection extends NMSObjectReflection {
     public Location getEnding() {
         return new Location(null, this.x2, this.y2, this.z2);
     }
+
+    public static final Class<?> staticClass = ReflectionApi.getNMSClass(Mappings.WORLD_PHYSICS_PACKAGE_MAPPING, "AxisAlignedBB");
 
 }

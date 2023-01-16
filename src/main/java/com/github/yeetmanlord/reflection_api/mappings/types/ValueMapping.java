@@ -54,32 +54,14 @@ public class ValueMapping<Type> implements IMapping<Type> {
 
 		}
 		
-		throw new MappingsException(this, "Failed to get mapping value");
+		throw new MappingsException(this, "Failed to get mapping value: No mapping for current version found");
 
 	}
 
 	@Override
 	public String toString() {
 
-		String maps = "Mappings[";
-		Iterator<VersionRange> iter = mappings.keySet().iterator();
-
-		while (iter.hasNext()) {
-			VersionRange range = iter.next();
-
-			if (iter.hasNext()) {
-				maps += "(versionRange: " + range.toString() + ", mappingValue: " + mappings.get(range) + "), ";
-			}
-			else {
-				maps += "(versionRange: " + range.toString() + ", mappingValue: " + mappings.get(range) + ")]";
-			}
-
-		}
-
-		for (int x = 0; x < mappings.keySet().size(); x++) {
-		}
-
-		return "ValueMapping{name: " + name + ", mappings: " + maps + "}";
+		return "ValueMapping{name: " + name + "}";
 
 	}
 

@@ -46,7 +46,7 @@ public class LocalData extends DataStorer {
     @Override
     public void write() {
         this.config.set("should_debug", this.shouldDebug);
-        for (ZetaPlugin plugin : ZetaCore.getPlugins()) {
+        for (ZetaPlugin plugin : ZetaCore.getInstance().getPlugins()) {
             PluginSetting settings = plugin.getSettings();
             String path = "plugins." + plugin.getPluginName() + ".";
             this.config.set(path + "disabled", settings.disabled);

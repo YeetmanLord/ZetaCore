@@ -3,8 +3,6 @@ package com.github.yeetmanlord.zeta_core;
 import java.util.*;
 import java.util.function.BiFunction;
 
-import javax.annotation.Nullable;
-
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
 import com.github.yeetmanlord.zeta_core.events.ChatEvent;
@@ -17,14 +15,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import com.github.yeetmanlord.reflection_api.chat_components.NMSChatSerializerReflection;
-import com.github.yeetmanlord.reflection_api.entity.players.NMSPlayerReflection;
-import com.github.yeetmanlord.reflection_api.entity.players.player_connection.NMSPlayerConnectionReflection;
-import com.github.yeetmanlord.reflection_api.packets.chat.NMSChatPacketReflection;
-import com.github.yeetmanlord.reflection_api.packets.player.NMSTitlePacketReflection;
-import com.github.yeetmanlord.zeta_core.api.uitl.PlayerUtil;
+import com.github.yeetmanlord.zeta_core.api.util.input.PlayerUtil;
 import com.github.yeetmanlord.zeta_core.data.DataStorer;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
 
@@ -51,37 +43,41 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
  */
 public class ZetaCore extends ZetaPlugin {
 
-    public static ConsoleLogger LOGGER;
+    private ConsoleLogger logger;
 
-    public static ZetaCore INSTANCE;
+    private static ZetaCore instance;
 
-    private static final HashMap<String, ZetaPlugin> registeredPlugins = new HashMap<>();
+    private final HashMap<String, ZetaPlugin> registeredPlugins = new HashMap<>();
 
     public LocalData localSettings;
 
-    private static final HashMap<Player, PlayerUtil> playerUtils = new HashMap<>();
+    private final HashMap<Player, PlayerUtil> playerUtils = new HashMap<>();
 
-    private static final HashMap<ZetaPlugin, List<DataStorer>> dataHandlers = new HashMap<>();
+    private final HashMap<ZetaPlugin, List<DataStorer>> dataHandlers = new HashMap<>();
 
-    private static final HashMap<ZetaPlugin, List<ISQLTableHandler<?>>> databaseDataHandlers = new HashMap<>();
+    private final HashMap<ZetaPlugin, List<ISQLTableHandler<?>>> databaseDataHandlers = new HashMap<>();
 
     /**
      * Super config constructor must have a player utility as first slot and an AbstractGUIMenu parent
      */
-    private static final HashMap<ZetaPlugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu>> superConfigs = new HashMap<>();
+    private final HashMap<ZetaPlugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu>> superConfigs = new HashMap<>();
+
+    @Override
+    public void onLoad() {
+        instance = this;
+    }
 
     @Override
     public void onEnable() {
 
-        LOGGER = new ConsoleLogger(this, ChatColor.GREEN);
-        INSTANCE = this;
+        logger = new ConsoleLogger(this, ChatColor.GREEN);
         this.registerDataStorers();
-        LOGGER.setDebugging(localSettings.get().getBoolean("should_debug"));
-        LOGGER.debug("Registering data handlers");
-        LOGGER.debug("Initializing ReflectionAPI");
+        logger.setDebugging(localSettings.get().getBoolean("should_debug"));
+        logger.debug("Registering data handlers");
+        logger.debug("Initializing ReflectionAPI");
         ReflectionApi.init(this);
-        LOGGER.info("ZetaCore framework is initializing");
-        LOGGER.debug("Reading from local files");
+        logger.info("ZetaCore framework is initializing");
+        logger.debug("Reading from local files");
         localSettings.read();
 
         getServer().getPluginManager().registerEvents(new HandleMenuInteractionEvent(), this);
@@ -125,18 +121,18 @@ public class ZetaCore extends ZetaPlugin {
     @Override
     public ConsoleLogger getPluginLogger() {
 
-        return LOGGER;
+        return logger;
 
     }
 
     @Override
     public void onDisable() {
 
-        LOGGER.info("ZetaCore framework is disabling");
+        logger.info("ZetaCore framework is disabling");
         localSettings.write();
 
         if (this.isConnectedToDatabase()) {
-            LOGGER.debug("Disconnecting database client");
+            logger.debug("Disconnecting database client");
             localSettings.client.disconnect();
         }
 
@@ -149,60 +145,6 @@ public class ZetaCore extends ZetaPlugin {
 
     }
 
-    public static void sendTitlePackets(Player player, String title, @Nullable String subtitle, @Nullable String actionBar) {
-        sendTitlePackets(player, title, subtitle, actionBar, 5, 400, 40);
-    }
-
-    public static void sendTitlePackets(Player bPlayer, String title, String subtitle, @Nullable String actionBar, int fadeIn, int stay, int fadeOut) {
-
-        NMSPlayerReflection player = new NMSPlayerReflection(bPlayer);
-        NMSPlayerConnectionReflection connection = player.getPlayerConnection();
-        NMSTitlePacketReflection titlePacket = new NMSTitlePacketReflection(NMSTitlePacketReflection.NMSEnumTitleAction.TITLE, NMSChatSerializerReflection.createChatComponentFromText(title));
-        NMSTitlePacketReflection subtitlePacket = new NMSTitlePacketReflection(NMSTitlePacketReflection.NMSEnumTitleAction.SUBTITLE, NMSChatSerializerReflection.createChatComponentFromText(subtitle));
-        NMSChatPacketReflection actionBarPacket = null;
-
-        if (actionBar != null) {
-            actionBarPacket = new NMSChatPacketReflection(actionBar, NMSChatPacketReflection.EnumChatPosition.GAME_INFO);
-        }
-
-        NMSTitlePacketReflection timesPacket = new NMSTitlePacketReflection(fadeIn, stay, fadeOut);
-
-        if (actionBarPacket != null) {
-            connection.sendPacket(actionBarPacket);
-        }
-
-        connection.sendPacket(timesPacket);
-        connection.sendPacket(titlePacket);
-        connection.sendPacket(subtitlePacket);
-
-    }
-
-    public static String titleCase(String initial) {
-
-        StringBuilder builder = new StringBuilder();
-        initial = initial.replaceAll("_", " ");
-
-        for (String s : initial.split(" ")) {
-
-            for (int x = 0; x < s.length(); x++) {
-                char c = s.charAt(x);
-
-                if (x == 0) {
-                    builder.append(String.valueOf(c).toUpperCase());
-                } else {
-                    builder.append(String.valueOf(c).toLowerCase());
-                }
-
-            }
-
-            builder.append(" ");
-
-        }
-
-        return builder.toString().trim();
-
-    }
-
     /**
      * @param p Player
      * @return Returns a {@link PlayerUtil} of a certain player. If one doesn't
@@ -211,7 +153,7 @@ public class ZetaCore extends ZetaPlugin {
      * used if you are interacting with this plugins method. I still do
      * not suggest messing with those menus though.
      */
-    public static PlayerUtil getPlayerMenuUtility(Player p) {
+    public PlayerUtil getPlayerMenuUtility(Player p) {
 
         PlayerUtil util;
 
@@ -225,92 +167,34 @@ public class ZetaCore extends ZetaPlugin {
 
     }
 
-    public static String[] fromListString(List<String> list) {
-
-        String[] array = new String[list.size()];
-
-        for (int x = 0; x < list.size(); x++) {
-            array[x] = list.get(x);
-        }
-
-        return array;
-
-    }
-
-    public static <T> T[] fromGenericList(T[] arrayA, List<T> list) {
-
-        T[] array = Arrays.copyOf(arrayA, list.size());
-
-        for (int x = 0; x < list.size(); x++) {
-            array[x] = list.get(x);
-        }
-
-        return array;
-
-    }
-
-    public static int[] fromListInt(List<Integer> list) {
-
-        int[] array = new int[list.size()];
-
-        for (int x = 0; x < list.size(); x++) {
-            array[x] = list.get(x);
-        }
-
-        return array;
-
-    }
-
-    public static List<String> getLore(ItemMeta meta) {
-
-        List<String> empty = new ArrayList<>();
-
-        if (meta == null) {
-            return empty;
-        }
-
-        if (meta.getLore() != null) {
-            return meta.getLore();
-        }
-
-        return empty;
-
-    }
-
-    public static void registerPlugin(ZetaPlugin plugin) {
+    public void registerPlugin(ZetaPlugin plugin) {
 
         registeredPlugins.put(plugin.getName(), plugin);
 
     }
 
-    public static boolean pluginEnabled(String plugin) {
+    public boolean pluginEnabled(String plugin) {
 
         return getPlugin(plugin) != null && getPlugin(plugin).isEnabled();
 
     }
 
-    public static ZetaPlugin getPlugin(String pluginName) {
+    public ZetaPlugin getPlugin(String pluginName) {
 
         return registeredPlugins.get(pluginName);
 
     }
 
-    public static List<ZetaPlugin> getPlugins() {
+    public List<ZetaPlugin> getPlugins() {
         return new ArrayList<>(registeredPlugins.values());
     }
 
-    public static ConsoleLogger getLogger(String pluginName) {
-
-        return getPlugin(pluginName).getPluginLogger();
-
-    }
-
-    public static void registerDataHandler(DataStorer storer) {
+    public void registerDataHandler(DataStorer storer) {
 
         ZetaPlugin plugin = storer.getPlugin();
-        LOGGER.debug("Registering data handler for file, " + storer.getFileName() + ", for " + plugin.getName());
+        logger.debug("Registering data handler for file, " + storer.getFileName() + ", for " + plugin.getName());
 
-        if (storer instanceof ISQLTableHandler && ZetaCore.INSTANCE.localSettings.initialized) {
+        if (storer instanceof ISQLTableHandler && ZetaCore.getInstance().localSettings.initialized) {
 
             if (!databaseDataHandlers.containsKey(plugin)) {
                 databaseDataHandlers.put(plugin, new ArrayList<>());
@@ -331,25 +215,25 @@ public class ZetaCore extends ZetaPlugin {
 
     }
 
-    public static List<DataStorer> getDataHandlers(ZetaPlugin plugin) {
+    public List<DataStorer> getDataHandlers(ZetaPlugin plugin) {
 
         return dataHandlers.get(plugin);
 
     }
 
-    public static List<ISQLTableHandler<?>> getDatabaseDataHandlers(ZetaPlugin plugin) {
+    public List<ISQLTableHandler<?>> getDatabaseDataHandlers(ZetaPlugin plugin) {
 
         return databaseDataHandlers.get(plugin);
 
     }
 
-    public static HashMap<ZetaPlugin, List<ISQLTableHandler<?>>> getDatabaseDataHandlers() {
+    public HashMap<ZetaPlugin, List<ISQLTableHandler<?>>> getDatabaseDataHandlers() {
 
         return databaseDataHandlers;
 
     }
 
-    public static HashMap<ZetaPlugin, List<DataStorer>> getDataHandlers() {
+    public HashMap<ZetaPlugin, List<DataStorer>> getDataHandlers() {
 
         return dataHandlers;
 
@@ -360,7 +244,7 @@ public class ZetaCore extends ZetaPlugin {
 
         localSettings = new LocalData(this);
         localSettings.setup();
-        LOGGER.debug("Database and local settings initialized");
+        logger.debug("Database and local settings initialized");
 
     }
 
@@ -435,19 +319,15 @@ public class ZetaCore extends ZetaPlugin {
 
     }
 
-    public static String getBooleanColor(boolean bool) {
-        return "Current: " + (bool ? ChatColor.GREEN.toString() + true : ChatColor.RED.toString() + false);
-    }
-
     public boolean isConnectedToDatabase() {
         return localSettings.initialized && localSettings.client != null && localSettings.client.isConnected();
     }
 
-    public static void registerSuperConfig(ZetaPlugin plugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> superConfigFactory) {
+    public void registerSuperConfig(ZetaPlugin plugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> superConfigFactory) {
         superConfigs.put(plugin, superConfigFactory);
     }
 
-    public static Optional<AbstractGUIMenu> getSuperConfig(ZetaPlugin plugin, PlayerUtil utility, LocalSettingsMenu.PluginEditMenu menu) {
+    public Optional<AbstractGUIMenu> getSuperConfig(ZetaPlugin plugin, PlayerUtil utility, LocalSettingsMenu.PluginEditMenu menu) {
         if (superConfigs.containsKey(plugin)) {
             BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> constructorFunction = superConfigs.get(plugin);
             return Optional.of(constructorFunction.apply(utility, menu));
@@ -455,8 +335,12 @@ public class ZetaCore extends ZetaPlugin {
         return Optional.empty();
     }
 
-    public static boolean hasSuperConfig(ZetaPlugin plugin) {
+    public boolean hasSuperConfig(ZetaPlugin plugin) {
         return superConfigs.containsKey(plugin);
+    }
+
+    public static ZetaCore getInstance() {
+        return instance;
     }
 
 }

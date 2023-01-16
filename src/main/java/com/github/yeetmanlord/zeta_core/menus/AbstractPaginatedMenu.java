@@ -1,6 +1,6 @@
 package com.github.yeetmanlord.zeta_core.menus;
 
-import com.github.yeetmanlord.zeta_core.api.uitl.PlayerUtil;
+import com.github.yeetmanlord.zeta_core.api.util.input.PlayerUtil;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -41,8 +41,12 @@ public abstract class AbstractPaginatedMenu<T> extends AbstractGUIMenu {
     public void setItems() {
         renderPage();
         createCloser();
-        this.inv.setItem(this.getSlots() - 1, this.makeItem(Material.ARROW, "&aNext Page"));
-        this.inv.setItem(this.getSlots() - 9, this.makeItem(Material.ARROW, "&aPrevious Page"));
+        if (page + 1 < this.getMaxPages()) {
+            this.inv.setItem(this.getSlots() - 1, this.makeItem(Material.ARROW, "&aNext Page"));
+        }
+        if (page > 0) {
+            this.inv.setItem(this.getSlots() - 9, this.makeItem(Material.ARROW, "&aPrevious Page"));
+        }
     }
 
     @Override

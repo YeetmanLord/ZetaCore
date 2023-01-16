@@ -8,6 +8,9 @@ import com.github.yeetmanlord.reflection_api.world.NMSWorldServerReflection;
 
 public class NMSPlayerInteractManagerReflection extends NMSObjectReflection {
 
+	/**
+	 * As of 1.17, this is no longer a part of nms code. This means that this class cannot be used.
+	 */
 	public NMSPlayerInteractManagerReflection(NMSWorldServerReflection worldServer) {
 
 		super(instance(worldServer));
@@ -27,10 +30,18 @@ public class NMSPlayerInteractManagerReflection extends NMSObjectReflection {
 	}
 
 	public static Object instance(NMSWorldServerReflection worldServer) {
+		if (ReflectionApi.version.isNewer(ReflectionApi.v1_17)) {
+			throw new UnsupportedOperationException("As of 1.17, this class, PlayerInteractManager, is no longer a part of nms code. This means that this class cannot be used.");
+		}
 
 		try {
-			Constructor<?> managerConstructor = staticClass.getConstructor(worldServer.getNmsWorldServer().getClass().getSuperclass());
-			return managerConstructor.newInstance(ReflectionApi.getNMSClass("World").cast(worldServer.getNmsWorldServer()));
+			Class worldClass = ReflectionApi.getNMSClass("WorldServer");
+			if (ReflectionApi.version.isOlder(ReflectionApi.v1_14)) {
+				worldClass = ReflectionApi.getNMSClass("World");
+			}
+			Constructor<?> managerConstructor = staticClass.getConstructor(worldClass);
+			assert worldClass != null;
+			return managerConstructor.newInstance(worldClass.cast(worldServer.getNmsWorldServer()));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -40,12 +51,18 @@ public class NMSPlayerInteractManagerReflection extends NMSObjectReflection {
 
 	}
 
-	public static final Class<?> staticClass = ReflectionApi.getNMSClass("PlayerInteractManager");
+	public static Class<?> staticClass;
+
+	static {
+		if (ReflectionApi.version.isOlder(ReflectionApi.v1_17)) {
+			staticClass = ReflectionApi.getNMSClass("PlayerInteractManager");
+		}
+	}
 
 	public static NMSPlayerInteractManagerReflection cast(NMSObjectReflection refl) {
 
-		if (staticClass.isInstance(refl.getNmsObject())) {
-			return new NMSPlayerInteractManagerReflection(refl.getNmsObject());
+		if (staticClass.isInstance(refl.getNMSObject())) {
+			return new NMSPlayerInteractManagerReflection(refl.getNMSObject());
 		}
 
 		throw new ClassCastException("Cannot cast " + refl.toString() + " to NMSPlayerInteractManagerReflection");

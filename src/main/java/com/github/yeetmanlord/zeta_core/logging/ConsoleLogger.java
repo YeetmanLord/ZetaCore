@@ -8,7 +8,8 @@ import org.bukkit.ChatColor;
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
 
 /**
- * Custom {@link ZetaPlugin} logger
+ * Custom {@link ZetaPlugin} logger. It supports colors and formatting unlike Log4J logger.
+ * Technically a wrapper for Bukkit's logger. But I want it to sound cool.
  *
  * @author YeetManLord
  * @zeta.usage INTERNAL
@@ -45,61 +46,61 @@ public class ConsoleLogger {
 
     public void info(Object... args) {
 
-        Bukkit.getConsoleSender().sendMessage(defaultColor + "[" + plugin.getClass().getName() + "/INFO] " + ChatColor.translateAlternateColorCodes('&', convertToString(args)));
+        Bukkit.getConsoleSender().sendMessage(defaultColor + "[" + plugin.getClass().getSimpleName() + "/INFO] " + ChatColor.translateAlternateColorCodes('&', convertToString(args)));
 
     }
 
     public void debug(Object... args) {
         if (debug) {
-            Bukkit.getConsoleSender().sendMessage((defaultColor + "[" + plugin.getClass().getName() + "/DEBUG] " + ChatColor.translateAlternateColorCodes('&', convertToString(args))));
+            Bukkit.getConsoleSender().sendMessage((defaultColor + "[" + plugin.getClass().getSimpleName() + "/DEBUG] " + ChatColor.translateAlternateColorCodes('&', convertToString(args))));
         }
     }
 
     public void warn(Object... args) {
-        Bukkit.getConsoleSender().sendMessage((ChatColor.GOLD + "[" + plugin.getClass().getName() + "/WARN] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
+        Bukkit.getConsoleSender().sendMessage((ChatColor.GOLD + "[" + plugin.getClass().getSimpleName() + "/WARN] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
     }
 
     public void warn(Throwable throwable, Object... args) {
 
-        Bukkit.getConsoleSender().sendMessage((ChatColor.GOLD + "[" + plugin.getClass().getName() + "/WARN] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
+        Bukkit.getConsoleSender().sendMessage((ChatColor.GOLD + "[" + plugin.getClass().getSimpleName() + "/WARN] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
         String[] exc = getStackTrace(throwable);
 
         for (String string : exc) {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + "[" + plugin.getClass().getName() + "/WARN] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string)));
+            Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + "[" + plugin.getClass().getSimpleName() + "/WARN] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string)));
         }
 
     }
 
     public void error(Object... args) {
 
-        Bukkit.getConsoleSender().sendMessage((ChatColor.RED + "[" + plugin.getClass().getName() + "/ERROR] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
+        Bukkit.getConsoleSender().sendMessage((ChatColor.RED + "[" + plugin.getClass().getSimpleName() + "/ERROR] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
 
     }
 
     public void fatal(Object... args) {
 
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[" + plugin.getClass().getName() + "/FATAL] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args))));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[" + plugin.getClass().getSimpleName() + "/FATAL] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args))));
 
     }
 
     public void error(Throwable throwable, Object... args) {
 
-        Bukkit.getConsoleSender().sendMessage((ChatColor.RED + "[" + plugin.getClass().getName() + "/ERROR] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
+        Bukkit.getConsoleSender().sendMessage((ChatColor.RED + "[" + plugin.getClass().getSimpleName() + "/ERROR] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args)))));
         String[] exc = getStackTrace(throwable);
 
         for (String string : exc) {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[" + plugin.getClass().getName() + "/ERROR] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string)));
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "[" + plugin.getClass().getSimpleName() + "/ERROR] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string)));
         }
 
     }
 
     public void fatal(Throwable throwable, Object... args) {
 
-        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[" + plugin.getClass().getName() + "/FATAL] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args))));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[" + plugin.getClass().getSimpleName() + "/FATAL] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', convertToString(args))));
         String[] exc = getStackTrace(throwable);
 
         for (String string : exc) {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[" + plugin.getClass().getName() + "/FATAL] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string)));
+            Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "[" + plugin.getClass().getSimpleName() + "/FATAL] " + ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', string)));
         }
 
     }
