@@ -369,6 +369,75 @@ This command is registered like any other command using `getCommand("command").s
 
 ## ISQL Objects
 These are objects that can be translated and stored into an SQL database.
+### Object
+```java
+public class MyObject implements ISQL<MyObject> {
+  private int id;
+  private String name;
+  private boolean allowed;
+  
+  public MyObject(int id, String name, boolean allowed) {
+    this.id = id;
+    this.name = name;
+    this.allowed = allowed;
+  }
+  
+  •••
+  
+  public ISQLObjectHandler<MyObject> getHandler() {
+    return HANDLER;
+  }
+  
+  public static final Handler HANDLER = new Handler();
+}
+```
 
+### Handler
+This is inside of the MyObject class
+```java
+public static class Handler implements ISQLObjectHandler<MyObject> {
+  public Row translateDataToSQL(MyObject obj) {
+    Row row = new Row();
+    // Keys should reference keys in table
+    row.put("ID", obj.id);
+    row.put("NAME", obj.name);
+    row.put("ALLOWED", obj.allowed);
+    return row;
+  }
+  
+  public MyObject load(Row data) {
+    int id = row.getInt("ID");
+    String name = row.getString("NAME");
+    boolean allowed = row.getBoolean("ALLOWED");
+    return new MyObject(id, name, allowed);
+  }
+}
+```
 
+### Data Storer
+```java
+public class MyObjectHandler extends AbstractSQLDataStorer<Integer> {
+  ••• Implementation and stuff
+  private List<MyObject> myObjects;
+  
+  @Override
+  public void readDB() {
+    for (Row row : this.table.getRows()) {
+      this.myObjects.add(this.getHandler().load(row));      
+    }
+  }
+  
+  @Override 
+  public void writeDB() {
+    for (MyObject obj : this.myObjects) {
+      this.table.writeValue(obj.getHandler().translateDataToSQL(obj)) // Just in case there is some class extending
+    }
+  }
+  
+  @Override
+  public MyObject.Handler getHandler() {
+    return MyObject.HANDLER;
+  }
+}
+```
 
