@@ -1,6 +1,5 @@
 package com.github.yeetmanlord.zeta_core.sql;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,6 +8,7 @@ import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
+import com.github.yeetmanlord.zeta_core.sql.values.RowList;
 
 /**
  * Represents and interacts with a specific SQL table
@@ -100,7 +100,7 @@ public interface ISQLTable {
 
     void setPrimaryKey(String key);
 
-    List<Row> getRows();
+    RowList getRows();
 
     void setColumns(List<SQLColumn<?>> column);
 
@@ -254,7 +254,7 @@ public interface ISQLTable {
      *
      * @param async Whether to run on async thread or main thread. True indicates running on an async thread
      * @implNote When using {@link ISQLTableHandler SQL table handlers} you can also use {@link ISQLTableHandler#writeToDB()} to commit automatically.
-     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row, boolean) for implementation of batching.
+     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row) (Row) for implementation of batching.
      */
     void commit(boolean async);
 
@@ -263,7 +263,7 @@ public interface ISQLTable {
      * you must use this to commit the changes to the database. Not committing will lead to data being lost.
      *
      * @implNote When using {@link ISQLTableHandler SQL table handlers} you can also use {@link ISQLTableHandler#writeToDB()} to commit automatically.
-     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row, boolean) for implementation of batching.
+     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row) for implementation of batching.
      */
     void commit();
 

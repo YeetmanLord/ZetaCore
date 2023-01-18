@@ -11,6 +11,7 @@ import com.github.yeetmanlord.zeta_core.sql.types.ColumnSettings;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
+import com.github.yeetmanlord.zeta_core.sql.values.RowList;
 
 public class SQLTable implements ISQLTable {
 
@@ -82,7 +83,7 @@ public class SQLTable implements ISQLTable {
     }
 
     @Override
-    public List<Row> getRows() {
+    public RowList getRows() {
 
         return this.handler.getAllData(this);
 

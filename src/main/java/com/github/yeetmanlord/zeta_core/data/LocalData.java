@@ -11,23 +11,23 @@ import java.util.List;
 
 public class LocalData extends DataStorer {
 
-    public boolean shouldDebug;
+    private boolean shouldDebug;
 
-    public HashMap<String, PluginSetting> pluginSettings;
+    private HashMap<String, PluginSetting> pluginSettings;
 
-    public SQLClient client;
+    private SQLClient client;
 
-    public String ipAddress;
+    private String ipAddress;
 
-    public String username;
+    private String username;
 
-    public String password;
+    private String password;
 
-    public boolean initialized;
+    private boolean initialized;
 
-    public int port;
+    private int port;
 
-    public String databaseName;
+    private String databaseName;
 
     public LocalData(ZetaCore instance) {
 
@@ -119,6 +119,78 @@ public class LocalData extends DataStorer {
         if (!this.config.contains("databaseName")) {
             config.set("databaseName", "zeta_data");
         }
+    }
+
+    public boolean isShouldDebug() {
+        return shouldDebug;
+    }
+
+    public void setShouldDebug(boolean shouldDebug) {
+        this.shouldDebug = shouldDebug;
+    }
+
+    public HashMap<String, PluginSetting> getPluginSettings() {
+        return pluginSettings;
+    }
+
+    public void setPluginSettings(HashMap<String, PluginSetting> pluginSettings) {
+        this.pluginSettings = pluginSettings;
+    }
+
+    public SQLClient getClient() {
+        return client;
+    }
+
+    public void setClient(SQLClient client) {
+        this.client = client;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void setInitialized(boolean initialized) {
+        this.initialized = initialized;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
     public class PluginSetting {

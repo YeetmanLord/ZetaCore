@@ -16,7 +16,7 @@ import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 
 /**
  * Same as {@link AbstractSQLDataStorer} except this does not hava a physical
- * file and only manages an SQL table
+ * file and only manages an SQL table. This is what you would use to create a related sub table.
  *
  * @param <PrimaryKeyType> The type of the primary key. Usually either String or
  *                         int

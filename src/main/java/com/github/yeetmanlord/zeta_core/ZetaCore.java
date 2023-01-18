@@ -49,7 +49,7 @@ public class ZetaCore extends ZetaPlugin {
 
     private final HashMap<String, ZetaPlugin> registeredPlugins = new HashMap<>();
 
-    public LocalData localSettings;
+    private LocalData localSettings;
 
     private final HashMap<Player, PlayerUtil> playerUtils = new HashMap<>();
 
@@ -133,7 +133,7 @@ public class ZetaCore extends ZetaPlugin {
 
         if (this.isConnectedToDatabase()) {
             logger.debug("Disconnecting database client");
-            localSettings.client.disconnect();
+            localSettings.getClient().disconnect();
         }
 
     }
@@ -194,7 +194,7 @@ public class ZetaCore extends ZetaPlugin {
         ZetaPlugin plugin = storer.getPlugin();
         logger.debug("Registering data handler for file, " + storer.getFileName() + ", for " + plugin.getName());
 
-        if (storer instanceof ISQLTableHandler && ZetaCore.getInstance().localSettings.initialized) {
+        if (storer instanceof ISQLTableHandler && ZetaCore.getInstance().localSettings.isInitialized()) {
 
             if (!databaseDataHandlers.containsKey(plugin)) {
                 databaseDataHandlers.put(plugin, new ArrayList<>());
@@ -320,7 +320,7 @@ public class ZetaCore extends ZetaPlugin {
     }
 
     public boolean isConnectedToDatabase() {
-        return localSettings.initialized && localSettings.client != null && localSettings.client.isConnected();
+        return localSettings.isInitialized() && localSettings.getClient() != null && localSettings.getClient().isConnected();
     }
 
     public void registerSuperConfig(ZetaPlugin plugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> superConfigFactory) {
@@ -343,4 +343,11 @@ public class ZetaCore extends ZetaPlugin {
         return instance;
     }
 
+    public LocalData getLocalSettings() {
+        return localSettings;
+    }
+
+    public void setLocalSettings(LocalData localSettings) {
+        this.localSettings = localSettings;
+    }
 }

@@ -2,6 +2,7 @@ package com.github.yeetmanlord.zeta_core.menus;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -97,7 +98,26 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
                 this.makeFiller();
             }
 
-            MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
+
+            if (ZetaCore.getInstance().getLocalSettings().isShouldDebug()) {
+                for (int i = 0; i < this.slots; ++i) {
+                    ItemStack stack = this.inv.getItem(i);
+                    if (stack != null && stack.getType() != Material.AIR) {
+                        ItemMeta meta = stack.getItemMeta();
+                        if (meta.hasDisplayName()) {
+                            String name = meta.getDisplayName();
+                            name += " §7(Slot" + i + ")";
+                            meta.setDisplayName(name);
+                        } else {
+                            List<String> lore = PluginUtilities.getLore(meta);
+                            lore.add(ChatColor.translateAlternateColorCodes('&', "&7Slot: " + i));
+                            meta.setLore(lore);
+                        }
+                    }
+                }
+            }
+
+            CommonEventFactory.onMenuSetItems(this);
 
             this.owner.openInventory(inv);
             this.menuUtil.setGUIMenu(true);

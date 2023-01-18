@@ -2,6 +2,7 @@ package com.github.yeetmanlord.zeta_core.menus;
 
 import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
+import com.github.yeetmanlord.zeta_core.api.util.PluginUtilities;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,6 +12,9 @@ import org.bukkit.inventory.ItemStack;
 
 import com.github.yeetmanlord.zeta_core.CommonEventFactory;
 import com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu.MenuSetItemsEvent;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 
 public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventoryInputable {
 
@@ -72,7 +76,26 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
                 this.makeFiller();
             }
 
-            MenuSetItemsEvent event = CommonEventFactory.onMenuSetItems(this);
+            if (ZetaCore.getInstance().getLocalSettings().isShouldDebug()) {
+                for (int i = 0; i < this.slots; ++i) {
+                    ItemStack stack = this.inv.getItem(i);
+                    if (stack != null && stack.getType() != Material.AIR) {
+                        ItemMeta meta = stack.getItemMeta();
+                        if (meta.hasDisplayName()) {
+                            String name = meta.getDisplayName();
+                            name += " §7(Slot" + i + ")";
+                            meta.setDisplayName(name);
+                        } else {
+                            List<String> lore = PluginUtilities.getLore(meta);
+                            lore.add(ChatColor.translateAlternateColorCodes('&', "&7Slot: " + i));
+                            meta.setLore(lore);
+                        }
+                    }
+                }
+            }
+
+            CommonEventFactory.onMenuSetItems(this);
+
             this.owner.openInventory(inv);
             this.menuUtil.setGUIMenu(true);
             this.menuUtil.setMenuToInputTo(this);

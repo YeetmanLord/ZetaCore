@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -14,6 +13,7 @@ import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
+import com.github.yeetmanlord.zeta_core.sql.values.RowList;
 import org.bukkit.Bukkit;
 
 /**
@@ -324,9 +324,9 @@ public class SQLHandler {
 
     }
 
-    public List<Row> getRowsWhere(ISQLTable table, String column, Object whereEquals) {
+    public RowList getRowsWhere(ISQLTable table, String column, Object whereEquals) {
 
-        List<Row> list = new ArrayList<>();
+        RowList list = new RowList();
 
         if (this.client.isConnected()) {
 
@@ -379,8 +379,8 @@ public class SQLHandler {
     }
 
 
-    public ArrayList<Row> getAllData(ISQLTable table) {
-        ArrayList<Row> rows = new ArrayList<>();
+    public RowList getAllData(ISQLTable table) {
+        RowList rows = new RowList();
         if (client != null) {
             if (this.client.isConnected()) {
                 try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM `" + table.getName() + "`;")) {
