@@ -2,7 +2,6 @@ package com.github.yeetmanlord.zeta_core.menus;
 
 import com.github.yeetmanlord.zeta_core.CommonEventFactory;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
-import com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu.MenuSetItemsEvent;
 import com.github.yeetmanlord.zeta_core.api.util.PluginUtilities;
 import com.github.yeetmanlord.zeta_core.api.util.input.PlayerUtil;
 import org.bukkit.Bukkit;
@@ -58,7 +57,7 @@ public abstract class HopperMenu extends AbstractGUIMenu {
                 this.makeFiller();
             }
 
-            if (ZetaCore.getInstance().getLocalSettings().isShouldDebug()) {
+            if (ZetaCore.getInstance().getLocalSettings().isDevFeatures()) {
                 for (int i = 0; i < this.slots; ++i) {
                     ItemStack stack = this.inv.getItem(i);
                     if (stack != null && stack.getType() != Material.AIR) {
@@ -72,6 +71,7 @@ public abstract class HopperMenu extends AbstractGUIMenu {
                             lore.add(ChatColor.translateAlternateColorCodes('&', "&7Slot: " + i));
                             meta.setLore(lore);
                         }
+                        this.inv.setItem(i, stack);
                     }
                 }
             }

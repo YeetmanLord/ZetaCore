@@ -99,7 +99,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
             }
 
 
-            if (ZetaCore.getInstance().getLocalSettings().isShouldDebug()) {
+            if (ZetaCore.getInstance().getLocalSettings().isDevFeatures()) {
                 for (int i = 0; i < this.slots; ++i) {
                     ItemStack stack = this.inv.getItem(i);
                     if (stack != null && stack.getType() != Material.AIR) {

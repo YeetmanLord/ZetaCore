@@ -1,6 +1,5 @@
 package com.github.yeetmanlord.zeta_core.menus;
 
-import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.api.util.PluginUtilities;
 import org.bukkit.Bukkit;
@@ -11,7 +10,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import com.github.yeetmanlord.zeta_core.CommonEventFactory;
-import com.github.yeetmanlord.zeta_core.api.api_event_hooks.menu.MenuSetItemsEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
@@ -76,7 +74,7 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
                 this.makeFiller();
             }
 
-            if (ZetaCore.getInstance().getLocalSettings().isShouldDebug()) {
+            if (ZetaCore.getInstance().getLocalSettings().isDevFeatures()) {
                 for (int i = 0; i < this.slots; ++i) {
                     ItemStack stack = this.inv.getItem(i);
                     if (stack != null && stack.getType() != Material.AIR) {

@@ -7,11 +7,10 @@ import com.google.common.collect.ImmutableMap;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.HashMap;
-import java.util.List;
 
 public class LocalData extends DataStorer {
 
-    private boolean shouldDebug;
+    private boolean devFeatures;
 
     private HashMap<String, PluginSetting> pluginSettings;
 
@@ -45,7 +44,7 @@ public class LocalData extends DataStorer {
 
     @Override
     public void write() {
-        this.config.set("should_debug", this.shouldDebug);
+        this.config.set("should_debug", this.devFeatures);
         for (ZetaPlugin plugin : ZetaCore.getInstance().getPlugins()) {
             PluginSetting settings = plugin.getSettings();
             String path = "plugins." + plugin.getPluginName() + ".";
@@ -66,7 +65,7 @@ public class LocalData extends DataStorer {
 
     @Override
     public void read() {
-        this.shouldDebug = this.config.getBoolean("should_debug");
+        this.devFeatures = this.config.getBoolean("should_debug");
         ConfigurationSection plugins = this.config.getConfigurationSection("plugins");
         if (plugins != null) {
             for (String key : plugins.getKeys(false)) {
@@ -121,12 +120,12 @@ public class LocalData extends DataStorer {
         }
     }
 
-    public boolean isShouldDebug() {
-        return shouldDebug;
+    public boolean isDevFeatures() {
+        return devFeatures;
     }
 
-    public void setShouldDebug(boolean shouldDebug) {
-        this.shouldDebug = shouldDebug;
+    public void setDevFeatures(boolean devFeatures) {
+        this.devFeatures = devFeatures;
     }
 
     public HashMap<String, PluginSetting> getPluginSettings() {

@@ -34,7 +34,7 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
 
     @Override
     public void setItems() {
-        this.inv.setItem(11, makeItem(Material.REDSTONE_BLOCK, "&cDebug Logging", "", "&aDetermine whether ZetaCore should add in debug logs to console.", "&aThis can help when trying to find problems or reporting bugs", "&6" + PluginUtilities.getBooleanColor(ZetaCore.getInstance().getLocalSettings().isShouldDebug())));
+        this.inv.setItem(11, makeItem(Material.REDSTONE_BLOCK, "&cDeveloper Features", "", "&aDetermine whether ZetaCore should add in debug logs to console.", "&aThis can help when trying to find problems or reporting bugs", "&6Also enables debug features for menus", "&6" + PluginUtilities.getBooleanColor(ZetaCore.getInstance().getLocalSettings().isDevFeatures())));
         this.inv.setItem(13, makeItem(Material.REDSTONE, "&6Configure Plugins", "", "&aConfigure different aspects of Zeta series plugins.", "&aincluding disabling them, enabling debug logging, or", "&adetermining if they should sync to the database.", "&6If the option is available, you can also configure", "&6other aspects of that plugin."));
         this.inv.setItem(15, makeItem(Material.ENDER_CHEST, "&6Configure MySQL", "", "&aConfigure database connection settings and", "&adisable, enable, or sync data with a MySQL database."));
     }
@@ -43,7 +43,7 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
     public void handleClick(InventoryClickEvent e) {
         switch (e.getSlot()) {
             case 11:
-                ZetaCore.getInstance().getLocalSettings().setShouldDebug(!ZetaCore.getInstance().getLocalSettings().isShouldDebug());
+                ZetaCore.getInstance().getLocalSettings().setDevFeatures(!ZetaCore.getInstance().getLocalSettings().isDevFeatures());
                 this.refresh();
                 break;
 
@@ -96,21 +96,11 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
             switch (mat) {
 
                 case OBSIDIAN:
-                    this.setInputType(InputType.STRING3);
-                    this.menuUtil.setGUIMenu(true);
-                    this.menuUtil.setMenuToInputTo(this);
-                    this.menuUtil.setTakingChatInput(true);
-                    owner.closeInventory();
-                    this.sendTitlePackets("&6Input the database user's password");
+                    this.setInput(InputType.STRING3, "&6Input the database user's password");
                     break;
 
                 case CHEST:
-                    this.setInputType(InputType.STRING2);
-                    this.menuUtil.setGUIMenu(true);
-                    this.menuUtil.setMenuToInputTo(this);
-                    this.menuUtil.setTakingChatInput(true);
-                    owner.closeInventory();
-                    this.sendTitlePackets("&6Input the database name");
+                    this.setInput(InputType.STRING2, "&6Input the database name");
                     break;
 
                 case BARRIER:
@@ -189,26 +179,11 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
                             ZetaCore.getInstance().getLocalSettings().setInitialized(false);
                         });
                     } else if (mat == VersionMaterial.COMMAND_BLOCK.getMaterial()) {
-                        this.setInputType(InputType.NUMBER);
-                        this.menuUtil.setGUIMenu(true);
-                        this.menuUtil.setMenuToInputTo(this);
-                        this.menuUtil.setTakingChatInput(true);
-                        owner.closeInventory();
-                        this.sendTitlePackets("&6Input the database IP port", "", "&6Default: 3306");
+                        this.setInput(InputType.NUMBER, "&6Input the database IP port", "&cLeft click to cancel", "&6Default: 3306");
                     } else if (mat == VersionMaterial.OAK_SIGN.getMaterial()) {
-                        this.setInputType(InputType.STRING1);
-                        this.menuUtil.setGUIMenu(true);
-                        this.menuUtil.setMenuToInputTo(this);
-                        this.menuUtil.setTakingChatInput(true);
-                        owner.closeInventory();
-                        this.sendTitlePackets("&6Input the username to login to the database with", "", "&6Default: root");
+                        this.setInput(InputType.STRING1, "&6Input the username to login to the database with", "&cLeft click to cancel", "&6Default: root");
                     } else if (mat == VersionMaterial.PLAYER_HEAD.getMaterial()) {
-                        this.setInputType(InputType.STRING);
-                        this.menuUtil.setGUIMenu(true);
-                        this.menuUtil.setMenuToInputTo(this);
-                        this.menuUtil.setTakingChatInput(true);
-                        owner.closeInventory();
-                        this.sendTitlePackets("&6Input the database IP", "", "&6Default: localhost");
+                        this.setInput(InputType.STRING, "&6Input the database IP", "&cLeft click to cancel", "&6Default: localhost");
                     }
 
                     break;
