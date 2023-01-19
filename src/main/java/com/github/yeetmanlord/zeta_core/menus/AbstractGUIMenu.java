@@ -393,4 +393,22 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
             this.owner.closeInventory();
         });
     }
+
+    public void setInput(InputType type, String title) {
+        menuUtil.setGUIMenu(true);
+        menuUtil.setMenuToInputTo(this);
+        menuUtil.setTakingChatInput(true);
+        this.setInputType(type);
+        this.sendTitlePackets(title);
+        this.syncClose();
+    }
+
+    public void setInput(InputType type, String title, String subTitle, String actionBar) {
+        menuUtil.setGUIMenu(true);
+        menuUtil.setMenuToInputTo(this);
+        menuUtil.setTakingChatInput(true);
+        this.setInputType(type);
+        this.sendTitlePackets(title, subTitle, actionBar);
+        this.syncClose();
+    }
 }
