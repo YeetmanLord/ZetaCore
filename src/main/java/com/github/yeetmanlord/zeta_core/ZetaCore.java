@@ -10,6 +10,10 @@ import com.github.yeetmanlord.zeta_core.events.HandleMenuInteractionEvent;
 import com.github.yeetmanlord.zeta_core.events.LeftClickEvent;
 import com.github.yeetmanlord.zeta_core.logging.ConsoleLogger;
 import com.github.yeetmanlord.zeta_core.menus.AbstractGUIMenu;
+import com.github.yeetmanlord.zeta_core.menus.animation.AnimatedItem;
+import com.github.yeetmanlord.zeta_core.menus.animation.BuiltinAnimation;
+import com.github.yeetmanlord.zeta_core.menus.animation.ComplexAnimatedItem;
+import com.github.yeetmanlord.zeta_core.menus.animation.IAnimatable;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -115,6 +119,34 @@ public class ZetaCore extends ZetaPlugin {
             }
             return true;
         });
+
+        List<String> lorePre = new ArrayList<>();
+        lorePre.add("&6Preview:");
+        lorePre.add("");
+
+        List<String> lorePost = new ArrayList<>();
+        lorePost.add("");
+        lorePost.add("&7END");
+
+        List<String> scroll = new ArrayList<>();
+        scroll.add("&1This is a test");
+        scroll.add("&2This is a test");
+        scroll.add("&3This is a test");
+        scroll.add("&4This is a test");
+        scroll.add("&5This is a test");
+        scroll.add("&6This is a test");
+        scroll.add("&7This is a test");
+        scroll.add("&8This is a test");
+        scroll.add("&9This is a test");
+        scroll.add("&aThis is a test");
+        scroll.add("&bThis is a test");
+        scroll.add("&cThis is a test");
+        scroll.add("&dThis is a test");
+        scroll.add("&eThis is a test");
+        scroll.add("&fThis is a test");
+
+        ComplexAnimatedItem item = BuiltinAnimation.scrollingLore(0, new ItemStack(Material.DIAMOND), null, 3, lorePre, lorePost, scroll);
+        item.test();
 
     }
 
