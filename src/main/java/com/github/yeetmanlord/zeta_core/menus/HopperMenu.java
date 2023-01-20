@@ -71,8 +71,9 @@ public abstract class HopperMenu extends AbstractGUIMenu {
                             lore.add(ChatColor.translateAlternateColorCodes('&', "&7Slot: " + i));
                             meta.setLore(lore);
                         }
-                        this.inv.setItem(i, stack);
+                        stack.setItemMeta(meta);
                     }
+                    this.inv.setItem(i, stack);
                 }
             }
 

@@ -88,7 +88,9 @@ public class PlayerInputMenu extends AbstractGUIMenu implements IPlayerInventory
                             lore.add(ChatColor.translateAlternateColorCodes('&', "&7Slot: " + i));
                             meta.setLore(lore);
                         }
+                        stack.setItemMeta(meta);
                     }
+                    this.inv.setItem(i, stack);
                 }
             }
 

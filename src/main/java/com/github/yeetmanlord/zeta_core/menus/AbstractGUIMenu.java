@@ -113,7 +113,9 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
                             lore.add(ChatColor.translateAlternateColorCodes('&', "&7Slot: " + i));
                             meta.setLore(lore);
                         }
+                        stack.setItemMeta(meta);
                     }
+                    this.inv.setItem(i, stack);
                 }
             }
 
