@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.api.util.PluginUtilities;
+import com.github.yeetmanlord.zeta_core.menus.animation.IAnimatable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -124,9 +125,17 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
             this.owner.openInventory(inv);
             this.menuUtil.setGUIMenu(true);
             this.menuUtil.setMenuToInputTo(this);
+            this.onOpenFinish();
         });
+    }
 
-
+    /**
+     * Called once the menu is opened and items are loaded.
+     */
+    public void onOpenFinish() {
+        if (this instanceof IAnimatable) {
+            ((IAnimatable) this).updateInventory();
+        }
     }
 
     /**
@@ -413,4 +422,9 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
         this.sendTitlePackets(title, subTitle, actionBar);
         this.syncClose();
     }
+
+    public boolean isOpen() {
+        return this.menuUtil.isGUIMenu() && !this.menuUtil.isTakingChatInput() && this.menuUtil.getMenuToInputTo() == this;
+    }
+
 }

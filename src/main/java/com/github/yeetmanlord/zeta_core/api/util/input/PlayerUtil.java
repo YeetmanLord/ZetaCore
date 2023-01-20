@@ -1,5 +1,7 @@
 package com.github.yeetmanlord.zeta_core.api.util.input;
 
+import com.github.yeetmanlord.zeta_core.ZetaCore;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.github.yeetmanlord.zeta_core.menus.AbstractGUIMenu;
