@@ -82,11 +82,11 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
         this.table.initializeTable(handler);
 
         if (this.table.getRows().isEmpty()) {
-            this.read();
-            this.writeToDB();
+            Bukkit.getScheduler().runTask(this.instance, () -> {
+                this.read();
+                Bukkit.getScheduler().runTaskAsynchronously(this.instance, this::writeToDB);
+            });
         }
-
-        this.readDB();
 
     }
 
