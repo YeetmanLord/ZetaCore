@@ -12,6 +12,7 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
 import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
+import org.bukkit.Bukkit;
 
 /**
  * This is a type of {@link ISQLTableHandler} where there is no associated
@@ -74,8 +75,10 @@ public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataS
         this.table.initializeTable(handler);
 
         if (this.table.getRows().isEmpty()) {
-            this.read();
-            this.writeToDB();
+            Bukkit.getScheduler().runTask(this.instance, () -> {
+                this.read();
+                Bukkit.getScheduler().runTaskAsynchronously(this.instance, this::writeToDB);
+            });
         }
 
     }

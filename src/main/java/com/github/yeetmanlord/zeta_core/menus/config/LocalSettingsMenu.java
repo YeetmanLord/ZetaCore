@@ -76,7 +76,7 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
             this.inv.setItem(23, this.makeItem(Material.OBSIDIAN, "&aSet login password", "", "&cType in NO to set the password to empty"));
             this.inv.setItem(25, this.makeItem(Material.CHEST, "&aSet database name", "", "&aCurrent: " + ZetaCore.getInstance().getLocalSettings().getDatabaseName()));
 
-            this.inv.setItem(31, this.makeItem(VersionMaterial.COMMAND_BLOCK.getMaterial(), "", "&aSet port", "&6Set the database's connection port", "&aDefault: 3306", "&aCurrrent: " + ZetaCore.getInstance().getLocalSettings().getPort()));
+            this.inv.setItem(31, this.makeItem(VersionMaterial.COMMAND_BLOCK.getMaterial(), "&aSet port", "&6Set the database's connection port", "&aDefault: 3306", "&aCurrrent: " + ZetaCore.getInstance().getLocalSettings().getPort()));
 
             if (ZetaCore.getInstance().getLocalSettings().isInitialized()) {
                 this.inv.setItem(50, this.makeItemFromExisting(VersionMaterial.RED_WOOL.getItem(), "&cDeactivate Database", "&cWill stop syncing with database"));
@@ -290,8 +290,7 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
                 this.inv.setItem(11, makeItem(Material.REDSTONE_BLOCK, "&cDebug Logging", "", "&aDetermine whether this plugin should add in debug logs to console.", "&aThis can help when trying to find problems or reporting bugs", "&6" + PluginUtilities.getBooleanColor(this.plugin.getSettings().isDebugLogging())));
                 this.inv.setItem(13, makeItem(Material.BARRIER, "&6Disable", "", "&aDisables or enables this plugin.", "&aAfterwards you must restart the server to make the changes take effect.", "&6" + PluginUtilities.getBooleanColor(this.plugin.getSettings().isDisabled())));
                 this.inv.setItem(15, makeItem(Material.ENDER_CHEST, "&6Sync with database", "", "&aDetermines whether this plugin should sync with the database.", "&aThis overrides all over forced syncs including one-time syncs", "&6" + PluginUtilities.getBooleanColor(this.plugin.getSettings().isSyncDatabase())));
-            }
-            else {
+            } else {
                 this.inv.setItem(10, makeItem(Material.REDSTONE_BLOCK, "&cDebug Logging", "", "&aDetermine whether this plugin should add in debug logs to console.", "&aThis can help when trying to find problems or reporting bugs", "&6" + PluginUtilities.getBooleanColor(this.plugin.getSettings().isDebugLogging())));
                 this.inv.setItem(12, makeItem(Material.BARRIER, "&6Disable", "", "&aDisables or enables this plugin.", "&aAfterwards you must restart the server to make the changes take effect.", "&6" + PluginUtilities.getBooleanColor(this.plugin.getSettings().isDisabled())));
                 this.inv.setItem(14, makeItem(Material.ENDER_CHEST, "&6Sync with database", "", "&aDetermines whether this plugin should sync with the database.", "&aThis overrides all over forced syncs including one-time syncs", "&6" + PluginUtilities.getBooleanColor(this.plugin.getSettings().isSyncDatabase())));

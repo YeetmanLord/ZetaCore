@@ -46,7 +46,8 @@ public class ComplexAnimatedItem extends AnimatedItem{
      * Add a new frame to the animation using the last frame as a copy
      */
     public void addCopyOfLastFrame() {
-        loreFrames.add(loreFrames.get(loreFrames.size() - 1));
+        List<String> lastFrame = new ArrayList<>(loreFrames.get(loreFrames.size() - 1));
+        loreFrames.add(lastFrame);
     }
 
     /**

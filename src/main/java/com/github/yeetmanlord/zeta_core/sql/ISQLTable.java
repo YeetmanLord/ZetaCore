@@ -76,7 +76,7 @@ public interface ISQLTable {
      * @param handler SQLHandler object to process sql requests
      */
     default void initializeTable(SQLHandler handler) {
-        initializeTable(handler, true);
+        initializeTable(handler, false);
     }
 
     /**

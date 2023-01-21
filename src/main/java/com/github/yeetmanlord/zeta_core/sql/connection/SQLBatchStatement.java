@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class SQLBatchStatement {
@@ -37,9 +38,16 @@ public class SQLBatchStatement {
     private void execute(final SQLHandler handler) {
         if (handler != null && handler.getClient().isConnected()) {
             try (Connection conn = handler.getClient().getSource().getConnection(); PreparedStatement statement = conn.prepareStatement(this.statement)) {
-                for (List<Object> args : batches) {
-                    for (int x = 0; x < args.size(); x++) {
-                        statement.setObject(x + 1, args.get(x));
+                Iterator<List<Object>> batchIter = new ArrayList<>(this.batches).iterator();
+
+                while (batchIter.hasNext()) {
+                    List<Object> batch = new ArrayList<>(batchIter.next());
+                    Iterator<Object> argIter = batch.iterator();
+                    int i = 1;
+                    while (argIter.hasNext()) {
+                        Object arg = argIter.next();
+                        statement.setObject(i, arg);
+                        i++;
                     }
                     statement.addBatch();
                 }
