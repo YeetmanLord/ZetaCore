@@ -154,10 +154,19 @@ public class ConsoleLogger {
         for (int x = 0; x < objects.length; x++) {
             Object obj = objects[x];
 
+
             if (x == objects.length - 1) {
-                str.append(obj.toString()).append(" ").append(defaultColor.toString());
+                if (obj == null) {
+                    str.append("null").append(defaultColor.toString());
+                } else {
+                    str.append(obj).append(" ").append(defaultColor.toString());
+                }
             } else {
-                str.append(obj.toString()).append(defaultColor.toString());
+                if (obj == null) {
+                    str.append("null").append(defaultColor.toString());
+                } else {
+                    str.append(obj).append(defaultColor.toString());
+                }
             }
 
         }

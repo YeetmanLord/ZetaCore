@@ -1,5 +1,6 @@
 package com.github.yeetmanlord.zeta_core.menus.animation;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -121,6 +122,12 @@ public class AnimatedItem {
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', frames.get(frame)));
         item.setItemMeta(meta);
         this.animatable.getInventory().setItem(slot, item);
+    }
+
+    public void test() {
+        for (String f : frames) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', f));
+        }
     }
 
 }
