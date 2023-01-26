@@ -269,4 +269,6 @@ public interface ISQLTable {
 
     void setHandler(SQLHandler handler);
 
+    boolean isEmpty(SQLHandler handler);
+
 }

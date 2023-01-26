@@ -223,4 +223,9 @@ public class SQLTable implements ISQLTable {
     public void setHandler(SQLHandler handler) {
         this.handler = handler;
     }
+
+    @Override
+    public boolean isEmpty(SQLHandler handler) {
+        return handler.getEntrySize(this.getName()) <= 0;
+    }
 }
