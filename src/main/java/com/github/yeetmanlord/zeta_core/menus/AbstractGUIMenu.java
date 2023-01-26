@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.github.yeetmanlord.reflection_api.util.VersionMaterial;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
+import com.github.yeetmanlord.zeta_core.api.util.ItemUtils;
 import com.github.yeetmanlord.zeta_core.api.util.PluginUtilities;
 import com.github.yeetmanlord.zeta_core.menus.animation.IAnimatable;
 import org.bukkit.Bukkit;
@@ -140,13 +141,15 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
     /**
      * Called whenever a player clicks on an item in the menu.
-     * @see #handleClickAnywhere(InventoryClickEvent) for handling clicks anywhere in the inventory, including empty slots.
+     *
      * @param e The InventoryClickEvent
+     * @see #handleClickAnywhere(InventoryClickEvent) for handling clicks anywhere in the inventory, including empty slots.
      */
     public abstract void handleClick(InventoryClickEvent e);
 
     /**
      * Called whenever a player clicks anywhere in the menu, including empty slots and filled slots.
+     *
      * @param e The InventoryClickEvent
      */
     public void handleClickAnywhere(InventoryClickEvent e) {
@@ -161,59 +164,12 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
     public ItemStack makeItem(Material material, String name, @Nullable String... loreArray) {
 
-        ItemStack stack = new ItemStack(material);
-        ItemMeta meta = stack.getItemMeta();
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-
-        if (loreArray != null) {
-            ArrayList<String> lore = new ArrayList<>();
-
-            for (String s : loreArray) {
-                lore.add(ChatColor.translateAlternateColorCodes('&', s));
-            }
-
-            meta.setLore(lore);
-
-        }
-
-        stack.setItemMeta(meta);
-        return stack;
+        return ItemUtils.makeItem(material, name, loreArray);
 
     }
 
     public ItemStack makeSkullWithCustomTexture(String name, @Nullable String[] loreArray, String textureURL) {
-
-        ItemStack stack = VersionMaterial.PLAYER_HEAD.getItem();
-        SkullMeta meta = (SkullMeta) stack.getItemMeta();
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-
-        if (textureURL != null) {
-            GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-            profile.getProperties().put("textures", new Property("textures", textureURL));
-
-            try {
-                Field headProfile = meta.getClass().getDeclaredField("profile");
-                headProfile.setAccessible(true);
-                headProfile.set(meta, profile);
-            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (loreArray != null) {
-            ArrayList<String> lore = new ArrayList<>();
-
-            for (String s : loreArray) {
-                lore.add(ChatColor.translateAlternateColorCodes('&', s));
-            }
-
-            meta.setLore(lore);
-        }
-
-        stack.setItemMeta(meta);
-
-        return stack;
-
+        return ItemUtils.makeSkullWithCustomTexture(name, loreArray, textureURL);
     }
 
     public ItemStack makeItem(Material material, String name) {
@@ -224,23 +180,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
 
     public ItemStack makeItemFromExisting(ItemStack base, String name, @Nullable String... loreArray) {
 
-        ItemStack stack = base.clone();
-        ItemMeta meta = stack.getItemMeta();
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-
-        if (loreArray != null) {
-            ArrayList<String> lore = new ArrayList<>();
-
-            for (String s : loreArray) {
-                lore.add(ChatColor.translateAlternateColorCodes('&', s));
-            }
-
-            meta.setLore(lore);
-        }
-
-        stack.setItemMeta(meta);
-
-        return stack;
+        return ItemUtils.makeItemFromExisting(base, name, loreArray);
 
     }
 
