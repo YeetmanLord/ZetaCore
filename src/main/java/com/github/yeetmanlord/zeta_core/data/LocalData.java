@@ -24,6 +24,8 @@ public class LocalData extends DataStorer {
 
     private boolean initialized;
 
+    private boolean firstInit;
+
     private int port;
 
     private String databaseName;
@@ -32,6 +34,7 @@ public class LocalData extends DataStorer {
 
         super(instance, "local_data");
         pluginSettings = new HashMap<>();
+        firstInit = false;
 
     }
 
@@ -174,6 +177,14 @@ public class LocalData extends DataStorer {
 
     public void setInitialized(boolean initialized) {
         this.initialized = initialized;
+    }
+
+    public boolean isFirstInit() {
+        return firstInit;
+    }
+
+    public void setFirstInit(boolean firstInit) {
+        this.firstInit = firstInit;
     }
 
     public int getPort() {

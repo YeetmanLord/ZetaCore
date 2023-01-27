@@ -14,7 +14,6 @@ import com.github.yeetmanlord.zeta_core.data.DataStorer;
  * @author YeetManLord
  * @zeta.usage INTERNAL This is only for storing and reading data from database
  */
-@SuppressWarnings("unchecked")
 public class YAMLUtil {
 
     /**

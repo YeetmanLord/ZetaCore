@@ -94,7 +94,7 @@ public class SQLHandler {
 
         String statement = "REPLACE INTO `" + tableName + "` (" + params + ") VALUES (" + value + ");";
 
-        SQLBatchStatement batch = existing == null ? new SQLBatchStatement(statement) : existing;
+        SQLBatchStatement batch = (existing == null) ? new SQLBatchStatement(statement) : existing;
 
         batch.addBatch(values);
         return batch;
@@ -399,5 +399,15 @@ public class SQLHandler {
         }
 
         return rows;
+    }
+
+    public SQLBatchStatement addUpdate(SQLBatchStatement existing, String tableName, SQLValue<Object> value, SQLValue<Object> whereValue) {
+
+        String statement = "UPDATE `" + tableName + "` SET " + value.getKey() + "=?" + " WHERE " + whereValue.getKey() + "=?;";
+
+        SQLBatchStatement batch = (existing == null) ? new SQLBatchStatement(statement) : existing;
+
+        batch.addBatch(value.getValue(), whereValue.getValue());
+        return batch;
     }
 }

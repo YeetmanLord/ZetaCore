@@ -74,7 +74,7 @@ public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataS
         this.table.setColumns(getColumns(handler));
         this.table.initializeTable(handler);
 
-        if (this.table.getRows().isEmpty()) {
+        if (this.table.isEmpty(handler)) {
             Bukkit.getScheduler().runTask(this.instance, () -> {
                 this.read();
                 Bukkit.getScheduler().runTaskAsynchronously(this.instance, this::writeToDB);

@@ -118,13 +118,14 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
                                 if (!ZetaCore.getInstance().getLocalSettings().getClient().isConnected()) {
                                     owner.sendMessage(ChatColor.GREEN + "DISCONNECTION SUCCESSFUL!");
                                 } else {
-                                    owner.sendMessage(ChatColor.DARK_RED + "AN ERROR STOPPED THE CLIENT FROM DISCONNECTING! CHECK CONSOLE LOGS FOR MORE INFORMATION!");
+                                    owner.sendMessage(ChatColor.DARK_RED + "AN ERROR STOPPED THE SERVER FROM DISCONNECTING! CHECK CONSOLE LOGS FOR MORE INFORMATION!");
                                 }
 
                                 ZetaCore.getInstance().getLocalSettings().setClient(null);
                             });
                         } else {
                             ZetaCore.getInstance().getLocalSettings().setInitialized(true);
+                            ZetaCore.getInstance().getLocalSettings().setFirstInit(true);
 
                             Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
                                 ZetaCore.getInstance().getLocalSettings().setClient(new SQLClient(ZetaCore.getInstance().getLocalSettings().getIpAddress(), ZetaCore.getInstance().getLocalSettings().getUsername(), ZetaCore.getInstance().getLocalSettings().getPassword(), ZetaCore.getInstance().getLocalSettings().getPort(), ZetaCore.getInstance().getLocalSettings().getDatabaseName()));
@@ -135,13 +136,12 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
                                 }
                                 if (ZetaCore.getInstance().getLocalSettings().getClient().isConnected()) {
                                     owner.sendMessage(ChatColor.GREEN + "CONNECTION SUCCESSFUL!");
-                                    owner.sendMessage(ChatColor.GREEN + "Restart or reload the server to ensure correct functionality.");
+                                    owner.sendMessage(ChatColor.GREEN + "Restart the server to ensure correct functionality.");
                                 } else {
                                     owner.sendMessage(ChatColor.RED + "CONNECTION FAILED! Check that the credentials you entered are correct!");
                                 }
                             });
                         }
-                        // TODO: FIX SQL NOT SYNCING PROPERLY. IT SEEMS THAT THE CLIENT IS NULL OR ISN'T CONNECTED FOR SOME REASON.
                     } else if (e.getSlot() == 51) {
                         this.close();
                         Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {

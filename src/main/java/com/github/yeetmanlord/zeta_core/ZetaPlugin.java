@@ -82,7 +82,7 @@ public abstract class ZetaPlugin extends JavaPlugin {
 
         super.onDisable();
 
-        if (ZetaCore.getInstance().getLocalSettings().isInitialized() && ZetaCore.getInstance().getLocalSettings().getClient() != null && ZetaCore.getInstance().getLocalSettings().getClient().isConnected() && this.pluginSetting.isSyncDatabase()) {
+        if (ZetaCore.getInstance().isConnectedToDatabase() && this.pluginSetting.isSyncDatabase()) {
             ZetaCore.getInstance().getLocalSettings().getClient().writeData(this);
         }
 
@@ -131,11 +131,10 @@ public abstract class ZetaPlugin extends JavaPlugin {
     }
 
     protected void writeData() {
-        LocalData db = ZetaCore.getInstance().getLocalSettings();
 
-        if (db.isInitialized() && ZetaCore.getInstance().getLocalSettings().getClient().isConnected() && this.pluginSetting.isSyncDatabase()) {
+        if (ZetaCore.getInstance().isConnectedToDatabase() && this.pluginSetting.isSyncDatabase()) {
             ZetaCore.getInstance().getDataHandlers(this).forEach(DataStorer::write);
-            db.getClient().writeData(this);
+            ZetaCore.getInstance().getLocalSettings().getClient().writeData(this);
         } else {
             ZetaCore.getInstance().getDataHandlers(this).forEach(DataStorer::write);
         }
