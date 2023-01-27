@@ -324,7 +324,7 @@ public class ZetaCore extends ZetaPlugin {
     }
 
     public boolean isConnectedToDatabase() {
-        return localSettings.isInitialized() && localSettings.getClient() != null && localSettings.getClient().isConnected();
+        return localSettings.isInitialized() && localSettings.getClient() != null && localSettings.getClient().isConnected() && !localSettings.isFirstInit();
     }
 
     public void registerSuperConfig(ZetaPlugin plugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> superConfigFactory) {
