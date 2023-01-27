@@ -25,6 +25,8 @@ public class SQLTable implements ISQLTable {
 
     private SQLBatchStatement batch;
 
+    private SQLBatchStatement updateBatch;
+
     public SQLTable(String primaryKey, String tableName, SQLHandler handler) {
 
         columns = new LinkedHashMap<>();
@@ -227,5 +229,21 @@ public class SQLTable implements ISQLTable {
     @Override
     public boolean isEmpty(SQLHandler handler) {
         return handler.getEntrySize(this.getName()) <= 0;
+    }
+
+    @Override
+    public void updateBatch(String column, Object value, String whereColumn, Object whereValue) {
+        this.updateBatch = this.handler.addUpdate(this.updateBatch, this.tableName, SQLValue.create(column, value), SQLValue.create(whereColumn, whereValue));
+    }
+
+    @Override
+    public void updateBatch(String column, Object value, Object primaryKey) {
+        this.updateBatch = this.handler.addUpdate(this.updateBatch, this.tableName, SQLValue.create(column, value), SQLValue.create(this.primaryKey, primaryKey));
+    }
+
+    @Override
+    public void commitUpdate(boolean async) {
+        if (this.updateBatch == null) return;
+        this.updateBatch.execute(this.handler, async);
     }
 }

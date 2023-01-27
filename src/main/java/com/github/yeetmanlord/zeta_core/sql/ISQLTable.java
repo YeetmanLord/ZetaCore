@@ -189,13 +189,6 @@ public interface ISQLTable {
     void update(String column, Object value, Object primaryKeyValue);
 
     /**
-     * @see #update(String, Object, Object)
-     */
-    default void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue) {
-        update(column, value.getValue(), primaryKeyValue.getValue());
-    }
-
-    /**
      * Updates a given column with new data using a primary key
      *
      * @param column          Column to update
@@ -208,8 +201,8 @@ public interface ISQLTable {
     /**
      * @see ISQLTable#update(String, Object, Object, boolean)
      */
-    default void update(String column, SQLValue<?> value, SQLValue<?> primaryKeyValue, boolean async) {
-        update(column, value.getValue(), primaryKeyValue.getValue(), async);
+    default void update(SQLValue<?> value, SQLValue<?> primaryKeyValue, boolean async) {
+        update(value.getKey(), value.getValue(), primaryKeyValue.getValue(), async);
     }
 
     /**
@@ -226,8 +219,8 @@ public interface ISQLTable {
     /**
      * @see #update(String, Object, String, Object)
      */
-    default void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue) {
-        update(column, value.getValue(), whereColumn, whereValue.getValue());
+    default void update(SQLValue<?> value, SQLValue<?> whereValue) {
+        update(value.getKey(), value.getValue(), whereValue.getKey(), whereValue.getValue());
     }
 
     /**
@@ -240,13 +233,6 @@ public interface ISQLTable {
      * @param async       Whether to run on async thread or main thread. True indicates running on an async thread
      */
     void update(String column, Object value, String whereColumn, Object whereValue, boolean async);
-
-    /**
-     * @see #update(String, Object, String, Object, boolean)
-     */
-    default void update(String column, SQLValue<?> value, String whereColumn, SQLValue<?> whereValue, boolean async) {
-        update(column, value.getValue(), whereColumn, whereValue.getValue(), async);
-    }
 
     /**
      * Since {@link #writeValue(Row)} and {@link #writeValue(Object...)} use an SQL batch statement to execute writing (in order to save performance)
@@ -263,12 +249,27 @@ public interface ISQLTable {
      * you must use this to commit the changes to the database. Not committing will lead to data being lost.
      *
      * @implNote When using {@link ISQLTableHandler SQL table handlers} you can also use {@link ISQLTableHandler#writeToDB()} to commit automatically.
-     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row) for implementation of batching.
+     * @see com.github.yeetmanlord.zeta_core.sql.impl.SQLTable#writeValue(Row) SQLTable.writeValue for implementation of batching.
      */
     void commit();
 
+    /**
+     * Sets this table's handler. Used for one-time syncs to database.
+     * @param handler Handler to use
+     */
     void setHandler(SQLHandler handler);
 
+    /**
+     * Checks if the table is empty
+     * @param handler Handler to use
+     * @return True if empty, false if not
+     */
     boolean isEmpty(SQLHandler handler);
+
+    void updateBatch(String column, Object value, String whereColumn, Object whereValue);
+
+    void updateBatch(String column, Object value, Object primaryKey);
+
+    void commitUpdate(boolean async);
 
 }
