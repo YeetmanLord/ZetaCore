@@ -310,7 +310,7 @@ public abstract class AbstractGUIMenu implements InventoryHolder {
      * with closing logic. <br>
      * @apiNote This method is called when a menu is closed by a plugin using player.closeInventory().
      * This could lead to Stack Overflows if not handled properly.
-     * @Example public boolean onClose() { <ul>
+     * @zeta.example public boolean onClose() { <ul>
      * if (this.getParent() != null) { <ul>
      * this.getParent().open(); <br>
      * return true;
