@@ -40,8 +40,8 @@ public class BuiltinAnimation {
     /**
      * Creates an animated item where a format "scrolls" across the item's name
      * The amount of text set to that format is the size of the "scroll." If you used
-     * "&c" as the format, and "Hello" as the text, with "&f" as the default. The animation would be
-     * like this. "&cH&fello", "&fH&ce&fllo", etc.
+     * "&amp;c" as the format, and "Hello" as the text, with "&amp;f" as the default. The animation would be
+     * like this. "&amp;cH&amp;fello", "&amp;fH&amp;ce&amp;fllo", etc.
      *
      * @param item    The item to add an animation to.
      * @param text            The text to scroll

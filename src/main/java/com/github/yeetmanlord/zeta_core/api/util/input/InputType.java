@@ -4,7 +4,7 @@ package com.github.yeetmanlord.zeta_core.api.util.input;
  * Represents the type of input a player should give. This doesn't necessarily mean that the input will be that type. It is more of a code readability thing.
  * In fact, you could use {@link InputType#NONE} for any input, and it would work just fine. There are so many inputs here because menus can get pretty big.
  * If you somehow run out of input types, you can probably use booleans for checking what is inputting.
- * @example <ul>boolean inputtingName = true; <br>
+ * @zeta.example <ul>boolean inputtingName = true; <br>
  *      public void processChatInput(InputType type, AsyncPlayerChatEvent event) {<ul>
  *          if (inputtingName) {<ul>
  *              // DO STUFF

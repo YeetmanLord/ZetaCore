@@ -49,6 +49,43 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.3.1</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <doclint>all,-missing,-html</doclint>
+                    <sourcepath>${project.basedir}/src/main/java</sourcepath>
+                    <outputDirectory>${project.basedir}/docs</outputDirectory>
+                    <javadocDirectory>${project.basedir}/docs</javadocDirectory>
+                    <tags>
+                        <tag>
+                            <name>zeta.usage</name>
+                            <placement>a</placement>
+                            <head>Plugin Usage:</head>
+                        </tag>
+                        <tag>
+                            <name>zeta.example</name>
+                            <placement>a</placement>
+                            <head>API Example:</head>
+                        </tag>
+                        <tag>
+                            <name>apiNote</name>
+                            <placement>a</placement>
+                            <head>API Note:</head>
+                        </tag>
+                        <tag>
+                            <name>implNote</name>
+                            <placement>a</placement>
+                            <head>Implementation Note:</head>
+                        </tag>
+                    </tags>
+                    <links>
+                        <link>https://hub.spigotmc.org/javadocs/spigot/</link>
+                    </links>
+                    <javadocVersion>1.8</javadocVersion>
+                </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
