@@ -81,6 +81,7 @@
                         </tag>
                     </tags>
                     <links>
+                        <link>https://yeetmanlord.github.io/docs/ReflectionAPI/doc/</link>
                         <link>https://hub.spigotmc.org/javadocs/spigot/</link>
                     </links>
                     <javadocVersion>1.8</javadocVersion>

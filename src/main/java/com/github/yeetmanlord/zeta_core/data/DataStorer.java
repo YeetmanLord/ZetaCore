@@ -11,108 +11,104 @@ import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
 
 /**
- * All {@link DataStorer}s are for INTERNAL USE ONLY! Refrain from using any
- * methods of {@linkplain DataStorer}s because it could likely lead to data
- * lossage, failure to save or load, etc.
- * 
- * @author YeetManLord
+ * All {@link DataStorer DataStorers} should extend this class.
+ * This class is used to store data in a file. There are also extensions of this class
+ * that store data in a database.
  *
- * @zeta.usage INTERNAL
+ * @author YeetManLord
  */
 public abstract class DataStorer {
 
-	protected File file;
+    protected File file;
 
-	protected FileConfiguration config;
+    protected FileConfiguration config;
 
-	protected String fileName;
+    protected String fileName;
 
-	protected ZetaPlugin instance;
+    protected ZetaPlugin instance;
 
-	public DataStorer(ZetaPlugin instanceIn, String name) {
+    public DataStorer(ZetaPlugin instanceIn, String name) {
 
-		this.instance = instanceIn;
-		this.fileName = name;
+        this.instance = instanceIn;
+        this.fileName = name;
 
-		file = new File(instanceIn.getDataFolder(), name + ".yml");
+        file = new File(instanceIn.getDataFolder(), name + ".yml");
 
-	}
+    }
 
-	public void setup() {
+    public void setup() {
 
-		file = new File(instance.getDataFolder(), fileName + ".yml");
+        file = new File(instance.getDataFolder(), fileName + ".yml");
 
-		if (!file.exists()) {
+        if (!file.exists()) {
 
-			try {
-				file.createNewFile();
-			}
-			catch (IOException e) {
-			}
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+            }
 
-		}
+        }
 
-		config = YamlConfiguration.loadConfiguration(file);
-		this.setDefaults();
-		this.save();
-		ZetaCore.getInstance().registerDataHandler(this);
+        config = YamlConfiguration.loadConfiguration(file);
+        this.setDefaults();
+        this.save();
+        ZetaCore.getInstance().registerDataHandler(this);
 
-	}
+    }
 
-	public FileConfiguration get() {
+    public FileConfiguration get() {
 
-		return config;
+        return config;
 
-	}
+    }
 
-	public void save() {
+    public void save() {
 
-		try {
-			config.save(file);
-		}
-		catch (IOException e) {
-			instance.getServer().getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&a[Bedwars Zeta] &4WARNING: &eCould not save config file!"));
-		}
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            instance.getServer().getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&a[Bedwars Zeta] &4WARNING: &eCould not save config file!"));
+        }
 
-	}
+    }
 
-	public void reload() {
+    public void reload() {
 
-		config = YamlConfiguration.loadConfiguration(file);
+        config = YamlConfiguration.loadConfiguration(file);
 
-	}
+    }
 
-	public void setConfig(FileConfiguration config) {
+    public void setConfig(FileConfiguration config) {
 
-		this.config = config;
-		this.save();
+        this.config = config;
+        this.save();
 
-	}
+    }
 
-	public abstract void write();
+    public abstract void write();
 
-	public abstract void read();
+    public abstract void read();
 
-	public abstract void setDefaults();
+    public abstract void setDefaults();
 
-	public String getFileName() {
+    public String getFileName() {
 
-		return fileName;
+        return fileName;
 
-	}
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public String toString() {
+    @SuppressWarnings("unchecked")
+    @Override
+    public String toString() {
 
-		return "DataStorer{" + "filename: " + fileName + ", plugin: " + instance.getPluginName() + "}";
+        return "DataStorer{" + "filename: " + fileName + ", plugin: " + instance.getPluginName() + "}";
 
-	}
+    }
 
-	public ZetaPlugin getPlugin() {
+    public ZetaPlugin getPlugin() {
 
-		return this.instance;
+        return this.instance;
 
-	}
+    }
 
 }
