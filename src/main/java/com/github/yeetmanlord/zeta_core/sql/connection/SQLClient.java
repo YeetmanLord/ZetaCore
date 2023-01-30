@@ -1,6 +1,5 @@
 package com.github.yeetmanlord.zeta_core.sql.connection;
 
-import java.sql.SQLException;
 import java.util.Properties;
 
 import com.github.yeetmanlord.zeta_core.ZetaCore;
@@ -81,8 +80,7 @@ public class SQLClient {
                         ZetaCore.getInstance().getPluginLogger().debug("&fFull Stack Trace:");
                         e.printStackTrace();
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     ZetaCore.getInstance().getPluginLogger().error(e, "Could not connect to database. Caused by the following exception:");
                     if (ZetaCore.getInstance().getPluginLogger().isDebugging()) {
                         ZetaCore.getInstance().getPluginLogger().debug("&fFull Stack Trace:");
@@ -99,7 +97,7 @@ public class SQLClient {
 
         if (isConnected()) {
 
-            ((HikariDataSource)this.dataSource).close();
+            ((HikariDataSource) this.dataSource).close();
             this.dataSource = null;
 
         }
@@ -114,13 +112,21 @@ public class SQLClient {
 
     public void readData(ZetaPlugin plugin) {
 
-        ZetaCore.getInstance().getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::readDB);
+        ZetaCore.getInstance().getDatabaseDataHandlers(plugin).forEach((handler) -> {
+            if (!handler.doesRequireDataInit()) {
+                handler.readDB();
+            }
+        });
 
     }
 
     public void readData() {
 
-        ZetaCore.getInstance().getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::readDB));
+        ZetaCore.getInstance().getDatabaseDataHandlers().values().forEach(dList -> dList.forEach((handler) -> {
+            if (!handler.doesRequireDataInit()) {
+                handler.readDB();
+            }
+        }));
 
     }
 

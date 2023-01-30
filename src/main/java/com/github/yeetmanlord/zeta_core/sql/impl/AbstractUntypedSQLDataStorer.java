@@ -10,7 +10,6 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
 import com.github.yeetmanlord.zeta_core.sql.ISQLObjectHandler;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
-import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 import org.bukkit.Bukkit;
 
@@ -27,6 +26,7 @@ public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataS
     protected ISQLTable table;
 
     protected String tableName;
+    protected boolean dataInitialized = false;
 
     public AbstractUntypedSQLDataStorer(ZetaPlugin instanceIn, String name, String tableName) {
 
@@ -76,6 +76,7 @@ public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataS
 
         if (this.table.isEmpty(handler)) {
             Bukkit.getScheduler().runTask(this.instance, () -> {
+                this.dataInitialized = true;
                 this.read();
                 Bukkit.getScheduler().runTaskAsynchronously(this.instance, this::writeToDB);
             });
@@ -103,5 +104,10 @@ public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataS
                 ", fileName='" + fileName + '\'' +
                 ", plugin=" + instance.getPluginName() +
                 '}';
+    }
+
+    @Override
+    public boolean doesRequireDataInit() {
+        return !this.dataInitialized;
     }
 }
