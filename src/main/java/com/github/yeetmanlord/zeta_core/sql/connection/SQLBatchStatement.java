@@ -38,10 +38,9 @@ public class SQLBatchStatement {
     private void execute(final SQLHandler handler) {
         if (handler != null && handler.getClient().isConnected()) {
             try (Connection conn = handler.getClient().getSource().getConnection(); PreparedStatement statement = conn.prepareStatement(this.statement)) {
-                Iterator<List<Object>> batchIter = new ArrayList<>(this.batches).iterator();
 
-                while (batchIter.hasNext()) {
-                    List<Object> batch = new ArrayList<>(batchIter.next());
+                for (List<Object> objects : new ArrayList<>(this.batches)) {
+                    List<Object> batch = new ArrayList<>(objects);
                     Iterator<Object> argIter = batch.iterator();
                     int i = 1;
                     while (argIter.hasNext()) {

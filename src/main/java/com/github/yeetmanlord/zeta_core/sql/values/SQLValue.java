@@ -1,5 +1,7 @@
 package com.github.yeetmanlord.zeta_core.sql.values;
 
+import com.github.yeetmanlord.zeta_core.api.util.CommandUtil;
+
 /**
  * Representation class for a value in an SQL table
  *
@@ -45,32 +47,26 @@ public class SQLValue<Type> {
     }
 
     public double getDouble() {
-
-        try {
-
-            return Double.parseDouble(value.toString());
-
-        } catch (NumberFormatException e) {
-
-            throw new IllegalArgumentException("Value is not a double!");
-
+        if (this.value instanceof Number) {
+            return ((Number) this.value).doubleValue();
+        } else if (this.value instanceof String) {
+            try {
+                return Double.parseDouble((String) this.value);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Value is not a double!");
+            }
         }
+        throw new IllegalArgumentException("Value is not a double!");
     }
 
     public int getInt() {
 
-        if (value instanceof Integer) {
-
-            return (int) (Object) value;
-
-        } else if (value instanceof Long) {
-
-            if ((Long) value < Integer.MAX_VALUE) {
-                return (int) (long) (Object) value;
-            } else {
-                throw new IllegalArgumentException("Value is too large to be an integer!");
+        if (value instanceof Number) {
+            try {
+                return ((Number) value).intValue();
+            } catch (ClassCastException e) {
+                throw new IllegalArgumentException("Number cannot be cast to integer!");
             }
-
         } else if (value instanceof String) {
 
             try {
@@ -87,17 +83,19 @@ public class SQLValue<Type> {
 
     public boolean getBoolean() {
 
-
         if (value instanceof Boolean) {
             return (boolean) (Object) value;
         } else if (value instanceof String) {
             return Boolean.parseBoolean((String) value);
-        } else if (value instanceof Integer) {
-            return (int) (Object) value == 1;
+        } else if (value instanceof Number) {
+            try {
+                return ((Number) value).intValue() == 1;
+            } catch (ClassCastException e) {
+                throw new IllegalArgumentException("Value is not a boolean!");
+            }
         }
 
         throw new IllegalArgumentException("Value is not a boolean!");
-
 
     }
 
@@ -117,31 +115,31 @@ public class SQLValue<Type> {
 
     public float getFloat() {
 
-        try {
-
-            return Float.parseFloat(value.toString());
-
-        } catch (NumberFormatException e) {
-
-            throw new IllegalArgumentException("Value is not a float!");
-
+        if (value instanceof Number) {
+            return ((Number) value).floatValue();
+        } else if (value instanceof String) {
+            try {
+                return Float.parseFloat((String) value);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Value is not a float!");
+            }
         }
-
+        throw new IllegalArgumentException("Value is not a float!");
 
     }
 
     public long getLong() {
 
-        try {
-
-            return Long.parseLong((String) value);
-
-        } catch (NumberFormatException e) {
-
-            throw new IllegalArgumentException("Value is not a long!");
-
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        } else if (value instanceof String) {
+            try {
+                return Long.parseLong((String) value);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Value is not a long!");
+            }
         }
-
+        throw new IllegalArgumentException("Value is not a long!");
 
     }
 

@@ -78,6 +78,19 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 
 	}
 
+	/**
+	 * Used to initialize this handler's table and if necessary its data. This is
+	 * called when the table is first created. This method is called before the
+	 * {@link #readDB()} method. You should override this method if your handler has
+	 * sub-tables that need to be initialized. Ensure that you initialize your data if one
+	 * or more of the associated tables are empty. Otherwise, you can just initialize the
+	 * table.
+	 *
+	 * @see com.github.yeetmanlord.zeta_core.sql.impl.AbstractSQLDataStorer#initializeDB(SQLHandler)
+	 * @see com.github.yeetmanlord.zeta_core.sql.impl.AbstractUntypedSQLDataStorer#initializeDB(SQLHandler)
+	 * @see com.github.yeetmanlord.zeta_core.sql.impl.AbstractSQLTableHandler#initializeDB(SQLHandler)
+	 * @param handler The {@link SQLHandler} to use to initialize the table
+	 */
 	void initializeDB(SQLHandler handler);
 
 	/**
@@ -95,5 +108,16 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 	List<ISQL<?>> getISQLsWithValue(SQLValue<?> valueToCheck);
 
 	List<SQLColumn<?>> getColumns(SQLHandler handler);
+
+	/**
+	 * <b>IMPORTANT METHOD</b> This method is used to determine if the table needs to
+	 * have its data initialized. If this method returns true, then the this handler will
+	 * <em>not</em> read from the database. Instead, it will initialize the data using local
+	 * files. By default, this is handled by {@link ISQLTableHandler#initializeDB(SQLHandler)}.
+	 * However, if you override this method, you must specify when to initialize the data.
+	 * @return If the table needs to have its data initialized return true. Otherwise, return false
+	 * (which will cause the table to read from the database)
+	 */
+	boolean doesRequireDataInit();
 
 }

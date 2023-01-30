@@ -10,7 +10,6 @@ import com.github.yeetmanlord.zeta_core.sql.ISQL;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
-import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 
@@ -104,5 +103,10 @@ public abstract class AbstractSQLTableHandler<PrimaryKeyType> implements ISQLTab
                 "table=" + table +
                 ", tableName='" + tableName + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean doesRequireDataInit() {
+        return true;
     }
 }

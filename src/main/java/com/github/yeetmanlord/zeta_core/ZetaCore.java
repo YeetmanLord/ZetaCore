@@ -100,26 +100,6 @@ public class ZetaCore extends ZetaPlugin {
             return true;
         });
 
-        getCommand("test").setExecutor((sender, command, label, args) -> {
-            if (sender.hasPermission("zeta.admin")) {
-                if (sender instanceof Player) {
-                    Player player = (Player) sender;
-                    player.sendMessage("Running reflection tests");
-                    boolean result = ReflectionApi.runReflectionTests(player);
-                    if (result) {
-                        player.sendMessage(ChatColor.GREEN + "Reflection tests passed!");
-                    }
-                    else {
-                        player.sendMessage(ChatColor.RED + "Reflection tests failed!");
-                    }
-                }
-                else {
-                    sender.sendMessage(ChatColor.RED + "This command can only be run by players!");
-                }
-            }
-            return true;
-        });
-
     }
 
     @Override
