@@ -1,5 +1,5 @@
 name: ZetaCore
-version: 1.1.1
+version: 1.1.2
 author: YeetManLord
 main: com.github.yeetmanlord.zeta_core.ZetaCore
 description: All Zeta series plugins rely on this for functioning and code consistency. This also acts as a management plugin to enable, disable, and change the settings of various Zeta plugins.
