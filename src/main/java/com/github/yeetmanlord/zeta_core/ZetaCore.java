@@ -201,13 +201,13 @@ public class ZetaCore extends ZetaPlugin {
 
     public List<DataStorer> getDataHandlers(ZetaPlugin plugin) {
 
-        return dataHandlers.get(plugin);
+        return dataHandlers.getOrDefault(plugin, new ArrayList<>());
 
     }
 
     public List<ISQLTableHandler<?>> getDatabaseDataHandlers(ZetaPlugin plugin) {
 
-        return databaseDataHandlers.get(plugin);
+        return databaseDataHandlers.getOrDefault(plugin, new ArrayList<>());
 
     }
 
