@@ -67,7 +67,7 @@ public abstract class DataStorer {
         try {
             config.save(file);
         } catch (IOException e) {
-            instance.getServer().getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&a[Bedwars Zeta] &4WARNING: &eCould not save config file!"));
+            instance.getPluginLogger().warn("Could not save config file!");
         }
 
     }
