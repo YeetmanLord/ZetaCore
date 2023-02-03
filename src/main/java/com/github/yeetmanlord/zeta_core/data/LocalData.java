@@ -1,5 +1,6 @@
 package com.github.yeetmanlord.zeta_core.data;
 
+import com.github.yeetmanlord.zeta_core.IZetaPlugin;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLClient;
@@ -30,7 +31,7 @@ public class LocalData extends DataStorer {
 
     private String databaseName;
 
-    public LocalData(ZetaCore instance) {
+    public LocalData(IZetaPlugin instance) {
 
         super(instance, "local_data");
         pluginSettings = new HashMap<>();
@@ -38,7 +39,7 @@ public class LocalData extends DataStorer {
 
     }
 
-    public PluginSetting getPluginSettings(ZetaPlugin plugin) {
+    public PluginSetting getPluginSettings(IZetaPlugin plugin) {
         if (!pluginSettings.containsKey(plugin.getPluginName())) {
             pluginSettings.put(plugin.getPluginName(), new PluginSetting(false, true, false));
         }

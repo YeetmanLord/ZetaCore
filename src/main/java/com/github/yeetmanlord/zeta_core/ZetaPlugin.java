@@ -13,12 +13,12 @@ import java.time.temporal.ChronoUnit;
 
 /**
  * Extension of {@link JavaPlugin} and is used to add some ease of use
- * functionality to all Zeta series plugins. As well as ensure standard and
+ * functionality to all Zeta series spigot plugins. As well as ensure standard and
  * default behaviors.
  *
  * @author YeetManLord
  */
-public abstract class ZetaPlugin extends JavaPlugin {
+public abstract class ZetaPlugin extends JavaPlugin implements IZetaPlugin {
 
     private ConsoleLogger logger;
     
@@ -140,14 +140,15 @@ public abstract class ZetaPlugin extends JavaPlugin {
         }
     }
 
-    /**
-     * Very important callback method that is called once asynchronous reading is completed. Use this to start any tasks relating to reading data from databases.
-     * IF database connection fails files will be read from local files.
-     */
-    public abstract void onDataReadFinish();
-
-    public abstract boolean initializedFinished();
-
     public abstract ItemStack getIcon();
 
+    @Override
+    public void scheduleAsyncTask(Runnable task) {
+        Bukkit.getScheduler().runTaskAsynchronously(this, task);
+    }
+
+    @Override
+    public void scheduleTask(Runnable task, long delay) {
+        Bukkit.getScheduler().runTaskLater(this, task, delay);
+    }
 }

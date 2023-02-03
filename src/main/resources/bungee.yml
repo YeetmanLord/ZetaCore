@@ -1,0 +1,7 @@
+author: YeetManLord
+description: BungeeCord addon for ZetaCore
+main: com.github.yeetmanlord.zeta_core.BungeeCore
+name: ZetaCore
+version: 1.3.0
+
+

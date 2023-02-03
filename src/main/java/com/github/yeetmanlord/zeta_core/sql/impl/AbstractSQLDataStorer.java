@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
  * <p>
  * Additionally, this class has a connected {@link ISQL} object. This is used to quickly load and save data to the database.
  * If you just want to store data in a table, you can use {@link AbstractUntypedSQLDataStorer}
+ *
  * @param <PrimaryKeyType> The type of the primary key of the table.
  * @author YeetManLord
  */
@@ -81,13 +82,13 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
         this.table.setPrimaryKey(this.getPrimaryKey());
         this.table.setColumns(getColumns(handler));
         this.table.initializeTable(handler);
-        
+
         if (this.table.isEmpty(handler)) {
-            Bukkit.getScheduler().runTask(this.instance, () -> {
+            this.instance.scheduleTask(() -> {
                 this.dataInitialized = true;
                 this.read();
-                Bukkit.getScheduler().runTaskAsynchronously(this.instance, this::writeToDB);
-            });
+                this.instance.scheduleAsyncTask(this::writeToDB);
+            }, 0L);
         }
 
     }

@@ -8,14 +8,10 @@ import com.github.yeetmanlord.zeta_core.data.LocalData;
 import com.github.yeetmanlord.zeta_core.events.ChatEvent;
 import com.github.yeetmanlord.zeta_core.events.HandleMenuInteractionEvent;
 import com.github.yeetmanlord.zeta_core.events.LeftClickEvent;
+import com.github.yeetmanlord.zeta_core.logging.BungeeLogger;
 import com.github.yeetmanlord.zeta_core.logging.ConsoleLogger;
 import com.github.yeetmanlord.zeta_core.menus.AbstractGUIMenu;
-import com.github.yeetmanlord.zeta_core.menus.animation.AnimatedItem;
-import com.github.yeetmanlord.zeta_core.menus.animation.BuiltinAnimation;
-import com.github.yeetmanlord.zeta_core.menus.animation.ComplexAnimatedItem;
-import com.github.yeetmanlord.zeta_core.menus.animation.IAnimatable;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +19,8 @@ import org.bukkit.inventory.ItemStack;
 import com.github.yeetmanlord.zeta_core.api.util.input.PlayerUtil;
 import com.github.yeetmanlord.zeta_core.data.DataStorer;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
+
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * The core class of all Zeta series plugins. This registers all
@@ -45,26 +43,26 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
  * @zeta.usage Zeta Core Class. Usable by other plugins
  * @implNote I would suggest using async tasks for whenever reading and writing to a database. By default, when you are loading a plugin everything will be read asynchronously. When disabling everything will be saved synchronously.
  */
-public class ZetaCore extends ZetaPlugin {
+public class BungeeCore extends ZetaBungeePlugin {
 
-    private ConsoleLogger logger;
+    private BungeeLogger logger;
 
-    private static ZetaCore instance;
+    private static BungeeCore instance;
 
-    private final HashMap<String, ZetaPlugin> registeredPlugins = new HashMap<>();
+    private final HashMap<String, ZetaBungeePlugin> registeredPlugins = new HashMap<>();
 
     private LocalData localSettings;
 
     private final HashMap<Player, PlayerUtil> playerUtils = new HashMap<>();
 
-    private final HashMap<ZetaPlugin, List<DataStorer>> dataHandlers = new HashMap<>();
+    private final HashMap<ZetaBungeePlugin, List<DataStorer>> dataHandlers = new HashMap<>();
 
-    private final HashMap<ZetaPlugin, List<ISQLTableHandler<?>>> databaseDataHandlers = new HashMap<>();
+    private final HashMap<ZetaBungeePlugin, List<ISQLTableHandler<?>>> databaseDataHandlers = new HashMap<>();
 
     /**
      * Super config constructor must have a player utility as first slot and an AbstractGUIMenu parent
      */
-    private final HashMap<ZetaPlugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu>> superConfigs = new HashMap<>();
+    private final HashMap<ZetaBungeePlugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu>> superConfigs = new HashMap<>();
 
     @Override
     public void onLoad() {
@@ -74,36 +72,19 @@ public class ZetaCore extends ZetaPlugin {
     @Override
     public void onEnable() {
 
-        logger = new ConsoleLogger(this, ChatColor.GREEN);
+        logger = new BungeeLogger(this, ChatColor.GREEN);
         this.registerDataStorers();
         logger.setDebugging(localSettings.get().getBoolean("should_debug"));
         logger.debug("Registering data handlers");
         logger.debug("Initializing ReflectionAPI");
-        ReflectionApi.init(this);
         logger.info("ZetaCore framework is initializing");
         logger.debug("Reading from local files");
         localSettings.read();
 
-        getServer().getPluginManager().registerEvents(new HandleMenuInteractionEvent(), this);
-        getServer().getPluginManager().registerEvents(new ChatEvent(), this);
-        getServer().getPluginManager().registerEvents(new LeftClickEvent(), this);
-
-        getCommand("zeta_settings").setExecutor((sender, command, label, args) -> {
-            if (sender.hasPermission("zeta.admin")) {
-                if (sender instanceof Player) {
-                    new LocalSettingsMenu(getPlayerMenuUtility((Player) sender)).open();
-                }
-                else {
-                    sender.sendMessage(ChatColor.RED + "This command can only be run by players!");
-                }
-            }
-            return true;
-        });
-
     }
 
     @Override
-    public ConsoleLogger getPluginLogger() {
+    public BungeeLogger getPluginLogger() {
 
         return logger;
 
@@ -129,56 +110,28 @@ public class ZetaCore extends ZetaPlugin {
 
     }
 
-    /**
-     * @param p Player
-     * @return Returns a {@link PlayerUtil} of a certain player. If one doesn't
-     * exist it creates a new one and returns that.
-     * @zeta.usage SPECIAL. This is INTERNAL <i>but</i> this method still can be
-     * used if you are interacting with this plugins method. I still do
-     * not suggest messing with those menus though.
-     */
-    public PlayerUtil getPlayerMenuUtility(Player p) {
-
-        PlayerUtil util;
-
-        if (playerUtils.containsKey(p)) {
-            return playerUtils.get(p);
-        }
-
-        util = new PlayerUtil(p);
-        playerUtils.put(p, util);
-        return util;
-
-    }
-
-    public void registerPlugin(ZetaPlugin plugin) {
+    public void registerPlugin(ZetaBungeePlugin plugin) {
 
         registeredPlugins.put(plugin.getPluginName(), plugin);
 
     }
 
-    public boolean pluginEnabled(String plugin) {
-
-        return getPlugin(plugin) != null && getPlugin(plugin).isEnabled();
-
-    }
-
-    public ZetaPlugin getPlugin(String pluginName) {
+    public ZetaBungeePlugin getPlugin(String pluginName) {
 
         return registeredPlugins.get(pluginName);
 
     }
 
-    public List<ZetaPlugin> getPlugins() {
+    public List<ZetaBungeePlugin> getPlugins() {
         return new ArrayList<>(registeredPlugins.values());
     }
 
     public void registerDataHandler(DataStorer storer) {
 
-        ZetaPlugin plugin = (ZetaPlugin) storer.getPlugin();
+        ZetaBungeePlugin plugin = (ZetaBungeePlugin) storer.getPlugin();
         logger.debug("Registering data handler for file, " + storer.getFileName() + ", for " + plugin.getPluginName());
 
-        if (storer instanceof ISQLTableHandler && ZetaCore.getInstance().localSettings.isInitialized()) {
+        if (storer instanceof ISQLTableHandler && localSettings.isInitialized()) {
 
             if (!databaseDataHandlers.containsKey(plugin)) {
                 databaseDataHandlers.put(plugin, new ArrayList<>());
@@ -199,25 +152,25 @@ public class ZetaCore extends ZetaPlugin {
 
     }
 
-    public List<DataStorer> getDataHandlers(ZetaPlugin plugin) {
+    public List<DataStorer> getDataHandlers(ZetaBungeePlugin plugin) {
 
         return dataHandlers.getOrDefault(plugin, new ArrayList<>());
 
     }
 
-    public List<ISQLTableHandler<?>> getDatabaseDataHandlers(ZetaPlugin plugin) {
+    public List<ISQLTableHandler<?>> getDatabaseDataHandlers(ZetaBungeePlugin plugin) {
 
         return databaseDataHandlers.getOrDefault(plugin, new ArrayList<>());
 
     }
 
-    public HashMap<ZetaPlugin, List<ISQLTableHandler<?>>> getDatabaseDataHandlers() {
+    public HashMap<ZetaBungeePlugin, List<ISQLTableHandler<?>>> getDatabaseDataHandlers() {
 
         return databaseDataHandlers;
 
     }
 
-    public HashMap<ZetaPlugin, List<DataStorer>> getDataHandlers() {
+    public HashMap<ZetaBungeePlugin, List<DataStorer>> getDataHandlers() {
 
         return dataHandlers;
 
@@ -240,11 +193,6 @@ public class ZetaCore extends ZetaPlugin {
     @Override
     public boolean initializedFinished() {
         return true;
-    }
-
-    @Override
-    public ItemStack getIcon() {
-        return new ItemStack(Material.AIR);
     }
 
     public void readAll() {
@@ -307,11 +255,11 @@ public class ZetaCore extends ZetaPlugin {
         return localSettings.isInitialized() && localSettings.getClient() != null && localSettings.getClient().isConnected() && !localSettings.isFirstInit();
     }
 
-    public void registerSuperConfig(ZetaPlugin plugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> superConfigFactory) {
+    public void registerSuperConfig(ZetaBungeePlugin plugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> superConfigFactory) {
         superConfigs.put(plugin, superConfigFactory);
     }
 
-    public Optional<AbstractGUIMenu> getSuperConfig(ZetaPlugin plugin, PlayerUtil utility, LocalSettingsMenu.PluginEditMenu menu) {
+    public Optional<AbstractGUIMenu> getSuperConfig(ZetaBungeePlugin plugin, PlayerUtil utility, LocalSettingsMenu.PluginEditMenu menu) {
         if (superConfigs.containsKey(plugin)) {
             BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu> constructorFunction = superConfigs.get(plugin);
             return Optional.of(constructorFunction.apply(utility, menu));
@@ -319,11 +267,11 @@ public class ZetaCore extends ZetaPlugin {
         return Optional.empty();
     }
 
-    public boolean hasSuperConfig(ZetaPlugin plugin) {
+    public boolean hasSuperConfig(ZetaBungeePlugin plugin) {
         return superConfigs.containsKey(plugin);
     }
 
-    public static ZetaCore getInstance() {
+    public static BungeeCore getInstance() {
         return instance;
     }
 

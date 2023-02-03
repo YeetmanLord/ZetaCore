@@ -1,0 +1,39 @@
+package com.github.yeetmanlord.zeta_core;
+
+import com.github.yeetmanlord.zeta_core.data.LocalData;
+import com.github.yeetmanlord.zeta_core.logging.ConsoleLogger;
+import com.github.yeetmanlord.zeta_core.logging.IPluginLogger;
+import net.md_5.bungee.api.plugin.Plugin;
+
+import java.io.File;
+
+/**
+ * Represents a ZetaPlugin. Either a Bukkit or BungeeCord plugin.
+ */
+public interface IZetaPlugin {
+
+    File getDataFolder();
+
+    void onEnable();
+
+    void onDisable();
+
+    String getPluginName();
+
+    IPluginLogger getPluginLogger();
+    /**
+     * Very important callback method that is called once asynchronous reading is completed. Use this to start any tasks relating to reading data from databases.
+     * IF database connection fails files will be read from local files.
+     */
+    void onDataReadFinish();
+
+    boolean initializedFinished();
+
+    LocalData.PluginSetting getSettings();
+
+    void scheduleTask(Runnable task, long delay);
+
+    void scheduleAsyncTask(Runnable task);
+
+
+}

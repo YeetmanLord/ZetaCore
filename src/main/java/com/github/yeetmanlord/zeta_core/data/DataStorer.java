@@ -3,6 +3,7 @@ package com.github.yeetmanlord.zeta_core.data;
 import java.io.File;
 import java.io.IOException;
 
+import com.github.yeetmanlord.zeta_core.IZetaPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -25,9 +26,9 @@ public abstract class DataStorer {
 
     protected String fileName;
 
-    protected ZetaPlugin instance;
+    protected IZetaPlugin instance;
 
-    public DataStorer(ZetaPlugin instanceIn, String name) {
+    public DataStorer(IZetaPlugin instanceIn, String name) {
 
         this.instance = instanceIn;
         this.fileName = name;
@@ -45,6 +46,7 @@ public abstract class DataStorer {
             try {
                 file.createNewFile();
             } catch (IOException e) {
+                e.printStackTrace();
             }
 
         }
@@ -97,7 +99,6 @@ public abstract class DataStorer {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public String toString() {
 
@@ -105,7 +106,7 @@ public abstract class DataStorer {
 
     }
 
-    public ZetaPlugin getPlugin() {
+    public IZetaPlugin getPlugin() {
 
         return this.instance;
 

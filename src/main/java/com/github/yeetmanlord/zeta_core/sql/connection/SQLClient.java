@@ -2,6 +2,8 @@ package com.github.yeetmanlord.zeta_core.sql.connection;
 
 import java.util.Properties;
 
+import com.github.yeetmanlord.zeta_core.BungeeCore;
+import com.github.yeetmanlord.zeta_core.ZetaBungeePlugin;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
@@ -120,9 +122,31 @@ public class SQLClient {
 
     }
 
+    public void readData(ZetaBungeePlugin plugin) {
+
+        BungeeCore.getInstance().getDatabaseDataHandlers(plugin).forEach((handler) -> {
+            if (!handler.doesRequireDataInit()) {
+                handler.readDB();
+            }
+        });
+
+    }
+
+
+
     public void readData() {
 
         ZetaCore.getInstance().getDatabaseDataHandlers().values().forEach(dList -> dList.forEach((handler) -> {
+            if (!handler.doesRequireDataInit()) {
+                handler.readDB();
+            }
+        }));
+
+    }
+
+    public void readDataBungee() {
+
+        BungeeCore.getInstance().getDatabaseDataHandlers().values().forEach(dList -> dList.forEach((handler) -> {
             if (!handler.doesRequireDataInit()) {
                 handler.readDB();
             }
@@ -136,9 +160,21 @@ public class SQLClient {
 
     }
 
+    public void writeDataBungee() {
+
+        BungeeCore.getInstance().getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::writeToDB));
+
+    }
+
     public void writeData(ZetaPlugin plugin) {
 
         ZetaCore.getInstance().getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeToDB);
+
+    }
+
+    public void writeData(ZetaBungeePlugin plugin) {
+
+        BungeeCore.getInstance().getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeToDB);
 
     }
 

@@ -2,8 +2,8 @@ package com.github.yeetmanlord.zeta_core.logging;
 
 import javax.annotation.Nullable;
 
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
 
@@ -14,7 +14,7 @@ import com.github.yeetmanlord.zeta_core.ZetaPlugin;
  * @author YeetManLord
  * @zeta.usage INTERNAL
  */
-public class ConsoleLogger {
+public class ConsoleLogger implements IPluginLogger {
 
     private ZetaPlugin plugin;
 
@@ -26,6 +26,14 @@ public class ConsoleLogger {
 
         this.plugin = plugin;
         this.defaultColor = defaultColor;
+        debug = false;
+
+    }
+    
+    public ConsoleLogger(ZetaPlugin plugin, org.bukkit.ChatColor defaultColor) {
+
+        this.plugin = plugin;
+        this.defaultColor = defaultColor.asBungee();
         debug = false;
 
     }
@@ -105,93 +113,6 @@ public class ConsoleLogger {
 
     }
 
-    public void log(LogType type, @Nullable Throwable error, Object... args) {
-
-        switch (type) {
-            case INFO:
-                info(args);
-                break;
-
-            case DEBUG:
-                debug(args);
-                break;
-
-            case WARN:
-                if (error != null) {
-                    warn(error, args);
-                } else {
-                    warn(args);
-                }
-                break;
-
-            case ERROR:
-                if (error != null) {
-                    error(error, args);
-                } else {
-                    error(args);
-                }
-                break;
-
-            case FATAL:
-                if (error != null) {
-                    fatal(error, args);
-                } else {
-                    fatal(args);
-                }
-                break;
-        }
-
-    }
-
-    private String convertToString(Object... objects) {
-
-        if (objects == null || objects.length == 0 || objects[0] == null) {
-            return "null";
-        }
-
-        StringBuilder str = new StringBuilder();
-
-        for (int x = 0; x < objects.length; x++) {
-            Object obj = objects[x];
-
-
-            if (x == objects.length - 1) {
-                if (obj == null) {
-                    str.append("null").append(defaultColor.toString());
-                } else {
-                    str.append(obj).append(" ").append(defaultColor.toString());
-                }
-            } else {
-                if (obj == null) {
-                    str.append("null").append(defaultColor.toString());
-                } else {
-                    str.append(obj).append(defaultColor.toString());
-                }
-            }
-
-        }
-
-        return str.toString();
-
-    }
-
-    private String[] getStackTrace(Throwable exc) {
-
-        String exception = exc.toString();
-
-        for (StackTraceElement elem : exc.getStackTrace()) {
-            exception += "\n\tat" + elem.toString();
-        }
-
-        return exception.split("\n");
-
-    }
-
-    public enum LogType {
-        INFO, DEBUG, ERROR, FATAL, WARN;
-    }
-
-
     public void setColor(ChatColor defaultColor) {
 
         this.defaultColor = defaultColor;
@@ -200,5 +121,9 @@ public class ConsoleLogger {
 
     public ChatColor getColor() {
         return defaultColor;
+    }
+
+    public void setColor(org.bukkit.ChatColor color) {
+        this.defaultColor = color.asBungee();
     }
 }
