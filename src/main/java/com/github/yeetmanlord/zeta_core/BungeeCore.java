@@ -3,28 +3,22 @@ package com.github.yeetmanlord.zeta_core;
 import java.util.*;
 import java.util.function.BiFunction;
 
-import com.github.yeetmanlord.reflection_api.ReflectionApi;
+import com.github.yeetmanlord.zeta_core.data.BungeeDataStorer;
+import com.github.yeetmanlord.zeta_core.data.BungeeLocalData;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
-import com.github.yeetmanlord.zeta_core.events.ChatEvent;
-import com.github.yeetmanlord.zeta_core.events.HandleMenuInteractionEvent;
-import com.github.yeetmanlord.zeta_core.events.LeftClickEvent;
 import com.github.yeetmanlord.zeta_core.logging.BungeeLogger;
-import com.github.yeetmanlord.zeta_core.logging.ConsoleLogger;
 import com.github.yeetmanlord.zeta_core.menus.AbstractGUIMenu;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.github.yeetmanlord.zeta_core.api.util.input.PlayerUtil;
-import com.github.yeetmanlord.zeta_core.data.DataStorer;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
 
 import net.md_5.bungee.api.ChatColor;
 
 /**
  * The core class of all Zeta series plugins. This registers all
- * {@link DataStorer DataStorers}, handles all SQL interactions, as well as
+ * {@link BungeeDataStorer DataStorers}, handles all SQL interactions, as well as
  * registers and connects all Zeta series plugins. This also contains helper
  * methods for Zeta plugins as well as APIs. Most of ZetaCore is strictly
  * internal use except for the api package and the sql package for when creating
@@ -51,11 +45,11 @@ public class BungeeCore extends ZetaBungeePlugin {
 
     private final HashMap<String, ZetaBungeePlugin> registeredPlugins = new HashMap<>();
 
-    private LocalData localSettings;
+    private BungeeLocalData localSettings;
 
     private final HashMap<Player, PlayerUtil> playerUtils = new HashMap<>();
 
-    private final HashMap<ZetaBungeePlugin, List<DataStorer>> dataHandlers = new HashMap<>();
+    private final HashMap<ZetaBungeePlugin, List<BungeeDataStorer>> dataHandlers = new HashMap<>();
 
     private final HashMap<ZetaBungeePlugin, List<ISQLTableHandler<?>>> databaseDataHandlers = new HashMap<>();
 
@@ -126,9 +120,9 @@ public class BungeeCore extends ZetaBungeePlugin {
         return new ArrayList<>(registeredPlugins.values());
     }
 
-    public void registerDataHandler(DataStorer storer) {
+    public void registerDataHandler(BungeeDataStorer storer) {
 
-        ZetaBungeePlugin plugin = (ZetaBungeePlugin) storer.getPlugin();
+        ZetaBungeePlugin plugin = storer.getPlugin();
         logger.debug("Registering data handler for file, " + storer.getFileName() + ", for " + plugin.getPluginName());
 
         if (storer instanceof ISQLTableHandler && localSettings.isInitialized()) {
@@ -145,14 +139,14 @@ public class BungeeCore extends ZetaBungeePlugin {
             dataHandlers.put(plugin, new ArrayList<>());
         }
 
-        List<DataStorer> handlers = dataHandlers.get(plugin);
+        List<BungeeDataStorer> handlers = dataHandlers.get(plugin);
 
         handlers.add(storer);
 
 
     }
 
-    public List<DataStorer> getDataHandlers(ZetaBungeePlugin plugin) {
+    public List<BungeeDataStorer> getDataHandlers(ZetaBungeePlugin plugin) {
 
         return dataHandlers.getOrDefault(plugin, new ArrayList<>());
 
@@ -170,7 +164,7 @@ public class BungeeCore extends ZetaBungeePlugin {
 
     }
 
-    public HashMap<ZetaBungeePlugin, List<DataStorer>> getDataHandlers() {
+    public HashMap<ZetaBungeePlugin, List<BungeeDataStorer>> getDataHandlers() {
 
         return dataHandlers;
 
@@ -179,7 +173,7 @@ public class BungeeCore extends ZetaBungeePlugin {
     @Override
     protected void registerDataStorers() {
 
-        localSettings = new LocalData(this);
+        localSettings = new BungeeLocalData(this);
         localSettings.setup();
         logger.debug("Database and local settings initialized");
 
@@ -207,7 +201,7 @@ public class BungeeCore extends ZetaBungeePlugin {
 
             dataHandlers.values().forEach(list -> {
 
-                list.forEach(DataStorer::read);
+                list.forEach(BungeeDataStorer::read);
 
             });
 
@@ -215,7 +209,7 @@ public class BungeeCore extends ZetaBungeePlugin {
 
             dataHandlers.values().forEach(list -> {
 
-                list.forEach(DataStorer::read);
+                list.forEach(BungeeDataStorer::read);
 
             });
 
@@ -235,7 +229,7 @@ public class BungeeCore extends ZetaBungeePlugin {
 
             dataHandlers.values().forEach(list -> {
 
-                list.forEach(DataStorer::write);
+                list.forEach(BungeeDataStorer::write);
 
             });
 
@@ -243,7 +237,7 @@ public class BungeeCore extends ZetaBungeePlugin {
 
             dataHandlers.values().forEach(list -> {
 
-                list.forEach(DataStorer::write);
+                list.forEach(BungeeDataStorer::write);
 
             });
 
@@ -275,11 +269,8 @@ public class BungeeCore extends ZetaBungeePlugin {
         return instance;
     }
 
-    public LocalData getLocalSettings() {
+    public BungeeLocalData getLocalSettings() {
         return localSettings;
     }
 
-    public void setLocalSettings(LocalData localSettings) {
-        this.localSettings = localSettings;
-    }
 }

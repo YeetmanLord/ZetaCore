@@ -1,24 +1,14 @@
 package com.github.yeetmanlord.zeta_core.data;
 
-import java.io.File;
-import java.io.IOException;
-
-import com.github.yeetmanlord.zeta_core.IZetaPlugin;
+import com.github.yeetmanlord.zeta_core.BungeeCore;
 import com.github.yeetmanlord.zeta_core.ZetaBungeePlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.github.yeetmanlord.zeta_core.ZetaCore;
-import com.github.yeetmanlord.zeta_core.ZetaPlugin;
+import java.io.File;
+import java.io.IOException;
 
-/**
- * All {@link DataStorer DataStorers} for spigot plugins should extend this class.
- * This class is used to store data in a file. There are also extensions of this class
- * that store data in a database.
- *
- * @author YeetManLord
- */
-public abstract class DataStorer {
+public abstract class BungeeDataStorer {
 
     protected File file;
 
@@ -26,9 +16,9 @@ public abstract class DataStorer {
 
     protected String fileName;
 
-    protected ZetaPlugin instance;
+    protected ZetaBungeePlugin instance;
 
-    public DataStorer(ZetaPlugin instanceIn, String name) {
+    public BungeeDataStorer(ZetaBungeePlugin instanceIn, String name) {
 
         this.instance = instanceIn;
         this.fileName = name;
@@ -54,7 +44,7 @@ public abstract class DataStorer {
         config = YamlConfiguration.loadConfiguration(file);
         this.setDefaults();
         this.save();
-        ZetaCore.getInstance().registerDataHandler(this);
+        BungeeCore.getInstance().registerDataHandler(this);
 
     }
 
@@ -96,11 +86,11 @@ public abstract class DataStorer {
     @Override
     public String toString() {
 
-        return "DataStorer{" + "filename: " + fileName + ", plugin: " + instance.getPluginName() + "}";
+        return "BungeeDataStorer{" + "filename: " + fileName + ", plugin: " + instance.getPluginName() + "}";
 
     }
 
-    public ZetaPlugin getPlugin() {
+    public ZetaBungeePlugin getPlugin() {
 
         return this.instance;
 

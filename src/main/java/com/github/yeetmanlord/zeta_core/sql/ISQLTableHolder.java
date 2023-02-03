@@ -81,4 +81,9 @@ public interface ISQLTableHolder extends ISQLTableHandler<Void> {
 	default String getTableName() {
 		return "";
 	}
+
+	@Override
+	default boolean doesRequireDataInit() {
+		return false;
+	}
 }

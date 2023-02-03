@@ -1,18 +1,20 @@
 package com.github.yeetmanlord.zeta_core.data;
 
 import com.github.yeetmanlord.zeta_core.IZetaPlugin;
+import com.github.yeetmanlord.zeta_core.ZetaBungeePlugin;
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.ZetaPlugin;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLClient;
+import com.google.common.collect.ImmutableMap;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.HashMap;
 
-public class LocalData extends DataStorer {
+public class BungeeLocalData extends BungeeDataStorer {
 
     private boolean devFeatures;
 
-    private HashMap<String, PluginSetting> pluginSettings;
+    private HashMap<String, com.github.yeetmanlord.zeta_core.data.PluginSetting> pluginSettings;
 
     private SQLClient client;
 
@@ -30,7 +32,7 @@ public class LocalData extends DataStorer {
 
     private String databaseName;
 
-    public LocalData(ZetaPlugin instance) {
+    public BungeeLocalData(ZetaBungeePlugin instance) {
 
         super(instance, "local_data");
         pluginSettings = new HashMap<>();
@@ -38,7 +40,7 @@ public class LocalData extends DataStorer {
 
     }
 
-    public PluginSetting getPluginSettings(IZetaPlugin plugin) {
+    public com.github.yeetmanlord.zeta_core.data.PluginSetting getPluginSettings(IZetaPlugin plugin) {
         if (!pluginSettings.containsKey(plugin.getPluginName())) {
             pluginSettings.put(plugin.getPluginName(), new PluginSetting(false, true, false));
         }
@@ -49,7 +51,7 @@ public class LocalData extends DataStorer {
     public void write() {
         this.config.set("should_debug", this.devFeatures);
         for (ZetaPlugin plugin : ZetaCore.getInstance().getPlugins()) {
-            PluginSetting settings = plugin.getSettings();
+            com.github.yeetmanlord.zeta_core.data.PluginSetting settings = plugin.getSettings();
             String path = "plugins." + plugin.getPluginName() + ".";
             this.config.set(path + "disabled", settings.isDisabled());
             this.config.set(path + "sync_database", settings.isSyncDatabase());
@@ -76,7 +78,7 @@ public class LocalData extends DataStorer {
                 boolean disabled = config.getBoolean(path + "disabled");
                 boolean syncDatabase = config.getBoolean(path + "sync_database");
                 boolean debug = config.getBoolean(path + "debug");
-                this.pluginSettings.put(key, new PluginSetting(disabled, syncDatabase, debug));
+                this.pluginSettings.put(key, new com.github.yeetmanlord.zeta_core.data.PluginSetting(disabled, syncDatabase, debug));
             }
         }
         this.initialized = config.getBoolean("initialized");
@@ -131,11 +133,11 @@ public class LocalData extends DataStorer {
         this.devFeatures = devFeatures;
     }
 
-    public HashMap<String, PluginSetting> getPluginSettings() {
+    public HashMap<String, com.github.yeetmanlord.zeta_core.data.PluginSetting> getPluginSettings() {
         return pluginSettings;
     }
 
-    public void setPluginSettings(HashMap<String, PluginSetting> pluginSettings) {
+    public void setPluginSettings(HashMap<String, com.github.yeetmanlord.zeta_core.data.PluginSetting> pluginSettings) {
         this.pluginSettings = pluginSettings;
     }
 

@@ -1,7 +1,9 @@
 package com.github.yeetmanlord.zeta_core;
 
-import com.github.yeetmanlord.zeta_core.data.DataStorer;
+import com.github.yeetmanlord.zeta_core.data.BungeeDataStorer;
+import com.github.yeetmanlord.zeta_core.data.BungeeLocalData;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
+import com.github.yeetmanlord.zeta_core.data.PluginSetting;
 import com.github.yeetmanlord.zeta_core.logging.BungeeLogger;
 import com.github.yeetmanlord.zeta_core.logging.IPluginLogger;
 import net.md_5.bungee.api.ProxyServer;
@@ -22,7 +24,7 @@ public abstract class ZetaBungeePlugin extends Plugin implements IZetaPlugin {
 
     private BungeeLogger logger;
 
-    private LocalData.PluginSetting pluginSetting;
+    private PluginSetting pluginSetting;
 
     public ZetaBungeePlugin() {
         super();
@@ -59,7 +61,7 @@ public abstract class ZetaBungeePlugin extends Plugin implements IZetaPlugin {
 
     protected void readData() {
 
-        final LocalData db = BungeeCore.getInstance().getLocalSettings();
+        final BungeeLocalData db = BungeeCore.getInstance().getLocalSettings();
         this.logger.info("Reading data for " + this.getPluginName());
 
         final LocalDateTime end = LocalDateTime.now().plus(3200, ChronoUnit.MILLIS);
@@ -74,11 +76,11 @@ public abstract class ZetaBungeePlugin extends Plugin implements IZetaPlugin {
                     db.getClient().readData(this);
                 } else {
                     logger.debug("[ASYNC] Connection to database failed. Reading data from local files");
-                    ProxyServer.getInstance().getScheduler().schedule(this, () -> BungeeCore.getInstance().getDataHandlers(this).forEach(DataStorer::read), 0, TimeUnit.MILLISECONDS);
+                    ProxyServer.getInstance().getScheduler().schedule(this, () -> BungeeCore.getInstance().getDataHandlers(this).forEach(BungeeDataStorer::read), 0, TimeUnit.MILLISECONDS);
                 }
             } else {
                 logger.debug("[ASYNC] Reading data from local files");
-                ProxyServer.getInstance().getScheduler().schedule(this, () -> BungeeCore.getInstance().getDataHandlers(this).forEach(DataStorer::read), 0, TimeUnit.MILLISECONDS);
+                ProxyServer.getInstance().getScheduler().schedule(this, () -> BungeeCore.getInstance().getDataHandlers(this).forEach(BungeeDataStorer::read), 0, TimeUnit.MILLISECONDS);
             }
             logger.debug("[ASYNC] Data read finished.");
             ProxyServer.getInstance().getScheduler().schedule(this, this::onDataReadFinish, 0, TimeUnit.MILLISECONDS);
@@ -89,10 +91,10 @@ public abstract class ZetaBungeePlugin extends Plugin implements IZetaPlugin {
     protected void writeData() {
 
         if (BungeeCore.getInstance().isConnectedToDatabase()) {
-            BungeeCore.getInstance().getDataHandlers(this).forEach(DataStorer::write);
+            BungeeCore.getInstance().getDataHandlers(this).forEach(BungeeDataStorer::write);
             BungeeCore.getInstance().getLocalSettings().getClient().writeData(this);
         } else {
-            BungeeCore.getInstance().getDataHandlers(this).forEach(DataStorer::write);
+            BungeeCore.getInstance().getDataHandlers(this).forEach(BungeeDataStorer::write);
         }
     }
 
@@ -118,7 +120,7 @@ public abstract class ZetaBungeePlugin extends Plugin implements IZetaPlugin {
     }
 
     @Override
-    public LocalData.PluginSetting getSettings() {
+    public PluginSetting getSettings() {
         return this.pluginSetting;
     }
 

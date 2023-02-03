@@ -1,9 +1,7 @@
 package com.github.yeetmanlord.zeta_core;
 
-import com.github.yeetmanlord.zeta_core.data.LocalData;
-import com.github.yeetmanlord.zeta_core.logging.ConsoleLogger;
+import com.github.yeetmanlord.zeta_core.data.PluginSetting;
 import com.github.yeetmanlord.zeta_core.logging.IPluginLogger;
-import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.File;
 
@@ -29,7 +27,7 @@ public interface IZetaPlugin {
 
     boolean initializedFinished();
 
-    LocalData.PluginSetting getSettings();
+    PluginSetting getSettings();
 
     void scheduleTask(Runnable task, long delay);
 

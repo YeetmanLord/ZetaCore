@@ -2,6 +2,7 @@ package com.github.yeetmanlord.zeta_core;
 
 import com.github.yeetmanlord.zeta_core.data.DataStorer;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
+import com.github.yeetmanlord.zeta_core.data.PluginSetting;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,7 +23,7 @@ public abstract class ZetaPlugin extends JavaPlugin implements IZetaPlugin {
 
     private ConsoleLogger logger;
     
-    private LocalData.PluginSetting pluginSetting;
+    private PluginSetting pluginSetting;
 
     public ZetaPlugin() {
         super();
@@ -48,7 +49,7 @@ public abstract class ZetaPlugin extends JavaPlugin implements IZetaPlugin {
 
     }
     
-    public LocalData.PluginSetting getSettings() {
+    public PluginSetting getSettings() {
         if (this.pluginSetting == null) {
             return ZetaCore.getInstance().getLocalSettings().getPluginSettings(this);
         }
