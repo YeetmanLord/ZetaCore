@@ -2,10 +2,7 @@ package com.github.yeetmanlord.zeta_core.sql.connection;
 
 import java.util.Properties;
 
-import com.github.yeetmanlord.zeta_core.BungeeCore;
-import com.github.yeetmanlord.zeta_core.ZetaBungeePlugin;
-import com.github.yeetmanlord.zeta_core.ZetaCore;
-import com.github.yeetmanlord.zeta_core.ZetaPlugin;
+import com.github.yeetmanlord.zeta_core.*;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
 import com.google.common.collect.ImmutableMap;
 import com.zaxxer.hikari.HikariConfig;
@@ -19,7 +16,7 @@ import javax.sql.DataSource;
  *
  * @author YeetManLord
  */
-public class SQLClient {
+public class SQLClient<T extends IZetaPlugin> {
 
     private int port;
 
@@ -34,16 +31,19 @@ public class SQLClient {
     private DataSource dataSource;
 
     public SQLHandler handler;
+    
+    private IZetaCore<T, ?> zetaCore;
 
     private boolean validated = false;
 
-    public SQLClient(String hostname, String username, String password, int port, String database) {
+    public SQLClient(String hostname, String username, String password, int port, String database, IZetaCore<T, ?> zetaCore) {
 
         this.hostname = hostname;
         this.username = username;
         this.password = password;
         this.port = port;
         this.database = database;
+        this.zetaCore = zetaCore;
 
         this.connect();
 
@@ -58,7 +58,7 @@ public class SQLClient {
     public void connect() {
 
         if (!isConnected()) {
-            Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
+            zetaCore.scheduleAsyncTask(() -> {
                 Properties props = new Properties();
                 props.setProperty("dataSourceClassName", "org.mariadb.jdbc.MariaDbDataSource");
                 props.setProperty("dataSource.url", String.format("jdbc:%s://%s:%s/%s", "mariadb", hostname, port, database));
@@ -74,18 +74,20 @@ public class SQLClient {
                     handler = new SQLHandler(this);
 
                     validated = this.dataSource.getConnection().isValid(3);
-                    ZetaCore.getInstance().getPluginLogger().info("&aDatabase is connected!");
+                    zetaCore.getPluginLogger().info("&aDatabase is connected!");
+                    ZetaCore.getInstance().testStorer.initializeDB(handler);
+                    ZetaCore.getInstance().testStorer.readDB();
                 } catch (RuntimeException e) {
-                    ZetaCore.getInstance().getPluginLogger().error("Pool Initialization Failed! In most cases this means that the database service isn't running or the database connection information is wrong");
-                    ZetaCore.getInstance().getPluginLogger().error("To enable a full stacktrace please enable debug mode.");
-                    if (ZetaCore.getInstance().getPluginLogger().isDebugging()) {
-                        ZetaCore.getInstance().getPluginLogger().debug("&fFull Stack Trace:");
+                    zetaCore.getPluginLogger().error("Pool Initialization Failed! In most cases this means that the database service isn't running or the database connection information is wrong");
+                    zetaCore.getPluginLogger().error("To enable a full stacktrace please enable debug mode.");
+                    if (zetaCore.getPluginLogger().isDebugging()) {
+                        zetaCore.getPluginLogger().debug("&fFull Stack Trace:");
                         e.printStackTrace();
                     }
                 } catch (Exception e) {
-                    ZetaCore.getInstance().getPluginLogger().error(e, "Could not connect to database. Caused by the following exception:");
-                    if (ZetaCore.getInstance().getPluginLogger().isDebugging()) {
-                        ZetaCore.getInstance().getPluginLogger().debug("&fFull Stack Trace:");
+                    zetaCore.getPluginLogger().error(e, "Could not connect to database. Caused by the following exception:");
+                    if (zetaCore.getPluginLogger().isDebugging()) {
+                        zetaCore.getPluginLogger().debug("&fFull Stack Trace:");
                         e.printStackTrace();
                     }
                     validated = false;
@@ -112,31 +114,19 @@ public class SQLClient {
 
     }
 
-    public void readData(ZetaPlugin plugin) {
+    public void readData(T plugin) {
 
-        ZetaCore.getInstance().getDatabaseDataHandlers(plugin).forEach((handler) -> {
+        zetaCore.getDatabaseDataHandlers(plugin).forEach((handler) -> {
             if (!handler.doesRequireDataInit()) {
                 handler.readDB();
             }
         });
 
     }
-
-    public void readData(ZetaBungeePlugin plugin) {
-
-        BungeeCore.getInstance().getDatabaseDataHandlers(plugin).forEach((handler) -> {
-            if (!handler.doesRequireDataInit()) {
-                handler.readDB();
-            }
-        });
-
-    }
-
-
 
     public void readData() {
 
-        ZetaCore.getInstance().getDatabaseDataHandlers().values().forEach(dList -> dList.forEach((handler) -> {
+        zetaCore.getDatabaseDataHandlers().values().forEach(dList -> dList.forEach((handler) -> {
             if (!handler.doesRequireDataInit()) {
                 handler.readDB();
             }
@@ -156,7 +146,7 @@ public class SQLClient {
 
     public void writeData() {
 
-        ZetaCore.getInstance().getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::writeToDB));
+        zetaCore.getDatabaseDataHandlers().values().forEach(dList -> dList.forEach(ISQLTableHandler::writeToDB));
 
     }
 
@@ -166,15 +156,9 @@ public class SQLClient {
 
     }
 
-    public void writeData(ZetaPlugin plugin) {
+    public void writeData(T plugin) {
 
-        ZetaCore.getInstance().getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeToDB);
-
-    }
-
-    public void writeData(ZetaBungeePlugin plugin) {
-
-        BungeeCore.getInstance().getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeToDB);
+        zetaCore.getDatabaseDataHandlers(plugin).forEach(ISQLTableHandler::writeToDB);
 
     }
 

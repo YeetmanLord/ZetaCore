@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 
 import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
+import com.github.yeetmanlord.zeta_core.sql.types.SQLColumn;
 import com.github.yeetmanlord.zeta_core.sql.values.Row;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 import com.github.yeetmanlord.zeta_core.sql.values.RowList;
@@ -24,7 +25,7 @@ import org.bukkit.Bukkit;
  */
 public class SQLHandler {
 
-    private SQLClient client;
+    private final SQLClient client;
 
     public SQLHandler(SQLClient client) {
 
@@ -111,23 +112,21 @@ public class SQLHandler {
 
     public void removeRow(String tableName, String checkColumn, Object value, boolean async) {
         if (this.client.isConnected()) {
-            if (client != null) {
-                if (async) {
-                    Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
-                        try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;")) {
-                            statement.setObject(1, value);
-                            statement.executeUpdate();
-                        } catch (SQLException exc) {
-                            exc.printStackTrace();
-                        }
-                    });
-                } else {
+            if (async) {
+                Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
                     try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;")) {
                         statement.setObject(1, value);
                         statement.executeUpdate();
                     } catch (SQLException exc) {
                         exc.printStackTrace();
                     }
+                });
+            } else {
+                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("DELETE FROM `" + tableName + "` WHERE " + checkColumn + "=?;")) {
+                    statement.setObject(1, value);
+                    statement.executeUpdate();
+                } catch (SQLException exc) {
+                    exc.printStackTrace();
                 }
             }
         }
@@ -186,12 +185,10 @@ public class SQLHandler {
 
         if (this.client.isConnected()) {
 
-            if (client != null) {
-                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement(sqlCode)) {
-                    statement.executeUpdate();
-                } catch (SQLException exc) {
-                    exc.printStackTrace();
-                }
+            try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement(sqlCode)) {
+                statement.executeUpdate();
+            } catch (SQLException exc) {
+                exc.printStackTrace();
             }
 
         }
@@ -308,13 +305,10 @@ public class SQLHandler {
                 ResultSet result = statement.executeQuery();
 
                 while (result.next()) {
-                    for (String col : table.getColumns().keySet()) {
-                        row.put(col, result.getObject(col));
+                    for (SQLColumn<?> col : table.getColumns().values()) {
+                        row.put(col.getKey(), result.getObject(col.getKey()));
                     }
                 }
-
-
-                statement.close();
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }
@@ -354,30 +348,19 @@ public class SQLHandler {
 
     public void updateWhere(String table, SQLValue<?> value, SQLValue<?> whereValue, boolean async) {
         if (this.client.isConnected()) {
-            if (client != null) {
-                if (async) {
-                    Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
-                        try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + value.getKey() + "=?" + " WHERE " + whereValue.getKey() + "=?;")) {
-                            statement.setObject(1, value.getValue());
-                            statement.setObject(2, whereValue.getValue());
-                            statement.executeUpdate();
-                        } catch (SQLException exc) {
-                            exc.printStackTrace();
-                        }
-                    });
-                }
-            } else {
-                try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + value.getKey() + "=?" + " WHERE " + whereValue.getKey() + "=?;")) {
-                    statement.setObject(1, value.getValue());
-                    statement.setObject(2, whereValue.getValue());
-                    statement.executeUpdate();
-                } catch (SQLException exc) {
-                    exc.printStackTrace();
-                }
+            if (async) {
+                Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
+                    try (Connection conn = client.getSource().getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE `" + table + "` SET " + value.getKey() + "=?" + " WHERE " + whereValue.getKey() + "=?;")) {
+                        statement.setObject(1, value.getValue());
+                        statement.setObject(2, whereValue.getValue());
+                        statement.executeUpdate();
+                    } catch (SQLException exc) {
+                        exc.printStackTrace();
+                    }
+                });
             }
         }
     }
-
 
     public RowList getAllData(ISQLTable table) {
         RowList rows = new RowList();

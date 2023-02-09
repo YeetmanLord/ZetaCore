@@ -5,12 +5,14 @@ import java.util.function.BiFunction;
 
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
+import com.github.yeetmanlord.zeta_core.data.TestStorer;
 import com.github.yeetmanlord.zeta_core.events.ChatEvent;
 import com.github.yeetmanlord.zeta_core.events.HandleMenuInteractionEvent;
 import com.github.yeetmanlord.zeta_core.events.LeftClickEvent;
 import com.github.yeetmanlord.zeta_core.logging.ConsoleLogger;
 import com.github.yeetmanlord.zeta_core.menus.AbstractGUIMenu;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
+import com.github.yeetmanlord.zeta_core.sql.connection.SQLClient;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -41,7 +43,7 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTableHandler;
  * @zeta.usage Zeta Core Class. Usable by other plugins
  * @implNote I would suggest using async tasks for whenever reading and writing to a database. By default, when you are loading a plugin everything will be read asynchronously. When disabling everything will be saved synchronously.
  */
-public class ZetaCore extends ZetaPlugin {
+public class ZetaCore extends ZetaPlugin implements IZetaCore<ZetaPlugin, DataStorer> {
 
     private ConsoleLogger logger;
 
@@ -61,6 +63,8 @@ public class ZetaCore extends ZetaPlugin {
      * Super config constructor must have a player utility as first slot and an AbstractGUIMenu parent
      */
     private final HashMap<ZetaPlugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu>> superConfigs = new HashMap<>();
+
+    public TestStorer testStorer;
 
     @Override
     public void onLoad() {
@@ -110,6 +114,7 @@ public class ZetaCore extends ZetaPlugin {
 
         logger.info("ZetaCore framework is disabling");
         localSettings.write();
+        testStorer.writeToDB();
 
         if (this.isConnectedToDatabase()) {
             logger.debug("Disconnecting database client");
@@ -221,11 +226,12 @@ public class ZetaCore extends ZetaPlugin {
 
     @Override
     protected void registerDataStorers() {
-
         localSettings = new LocalData(this);
         localSettings.setup();
         logger.debug("Database and local settings initialized");
 
+        testStorer = new TestStorer(this);
+        testStorer.setup();
     }
 
     @Override
@@ -327,7 +333,9 @@ public class ZetaCore extends ZetaPlugin {
         return localSettings;
     }
 
-    public void setLocalSettings(LocalData localSettings) {
-        this.localSettings = localSettings;
+    @Override
+    public SQLClient getSQLClient() {
+        return localSettings.getClient();
     }
+
 }

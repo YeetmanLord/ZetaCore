@@ -5,10 +5,10 @@ import java.util.function.BiFunction;
 
 import com.github.yeetmanlord.zeta_core.data.BungeeDataStorer;
 import com.github.yeetmanlord.zeta_core.data.BungeeLocalData;
-import com.github.yeetmanlord.zeta_core.data.LocalData;
 import com.github.yeetmanlord.zeta_core.logging.BungeeLogger;
 import com.github.yeetmanlord.zeta_core.menus.AbstractGUIMenu;
 import com.github.yeetmanlord.zeta_core.menus.config.LocalSettingsMenu;
+import com.github.yeetmanlord.zeta_core.sql.connection.SQLClient;
 import org.bukkit.entity.Player;
 
 import com.github.yeetmanlord.zeta_core.api.util.input.PlayerUtil;
@@ -37,7 +37,7 @@ import net.md_5.bungee.api.ChatColor;
  * @zeta.usage Zeta Core Class. Usable by other plugins
  * @implNote I would suggest using async tasks for whenever reading and writing to a database. By default, when you are loading a plugin everything will be read asynchronously. When disabling everything will be saved synchronously.
  */
-public class BungeeCore extends ZetaBungeePlugin {
+public class BungeeCore extends ZetaBungeePlugin implements IZetaCore<ZetaBungeePlugin, BungeeDataStorer> {
 
     private BungeeLogger logger;
 
@@ -66,6 +66,7 @@ public class BungeeCore extends ZetaBungeePlugin {
     @Override
     public void onEnable() {
 
+        this.enabled = true;
         logger = new BungeeLogger(this, ChatColor.GREEN);
         this.registerDataStorers();
         logger.setDebugging(localSettings.get().getBoolean("should_debug"));
@@ -87,6 +88,7 @@ public class BungeeCore extends ZetaBungeePlugin {
     @Override
     public void onDisable() {
 
+        this.enabled = false;
         logger.info("ZetaCore framework is disabling");
         localSettings.write();
 
@@ -273,4 +275,8 @@ public class BungeeCore extends ZetaBungeePlugin {
         return localSettings;
     }
 
+    @Override
+    public SQLClient getSQLClient() {
+        return localSettings.getClient();
+    }
 }

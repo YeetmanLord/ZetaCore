@@ -116,7 +116,7 @@ public interface ISQLTable {
     void writeValue(Row row);
 
     /**
-     * Writes a row to an SQL table
+     * Writes a row to an SQL table,
      *
      * @param args Array of data to write (in order)
      * @implNote This is very important for server performance. When writing to a database

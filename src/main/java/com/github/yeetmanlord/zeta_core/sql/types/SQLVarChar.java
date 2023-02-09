@@ -2,60 +2,73 @@ package com.github.yeetmanlord.zeta_core.sql.types;
 
 import java.util.ArrayList;
 
-import com.github.yeetmanlord.zeta_core.ZetaCore;
 import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 
 public class SQLVarChar extends SQLColumn<String> {
 
-	private int textMaxLength;
+    private int textMaxLength;
 
-	public SQLVarChar(String key, ISQLTable table, int textMaxLength) {
+    public SQLVarChar(String key, ISQLTable table, int textMaxLength) {
 
-		super(key, table);
-		this.textMaxLength = textMaxLength;
+        super(key, table);
+        this.textMaxLength = textMaxLength;
 
-	}
+    }
 
-	public SQLVarChar(String key, ISQLTable table, int textMaxLength, ColumnSettings settings) {
+    public SQLVarChar(String key, ISQLTable table, int textMaxLength, ColumnSettings settings) {
 
-		super(key, table, settings);
-		this.textMaxLength = textMaxLength;
+        super(key, table, settings);
+        this.textMaxLength = textMaxLength;
 
-	}
+    }
 
-	@Override
-	public ArrayList<SQLValue<String>> load(SQLHandler handler) {
+    @Override
+    public ArrayList<SQLValue<String>> load(SQLHandler handler) {
 
-		if (handler != null) {
-			ArrayList<SQLValue<String>> returnable = new ArrayList<>();
-			ArrayList<SQLValue<?>> list = handler.getColumnEntries(this.getTable().getName(), getKey());
+        if (handler != null) {
+            ArrayList<SQLValue<String>> returnable = new ArrayList<>();
+            ArrayList<SQLValue<?>> list = handler.getColumnEntries(this.getTable().getName(), getKey());
 
-			for (SQLValue<?> sqlValue : list) {
-				returnable.add(new SQLValue<String>(sqlValue.getKey(), (String) sqlValue.getValue()));
-			}
+            for (SQLValue<?> sqlValue : list) {
+                returnable.add(new SQLValue<String>(sqlValue.getKey(), (String) sqlValue.getValue()));
+            }
 
-			return returnable;
+            return returnable;
 
-		}
+        }
 
-		return null;
+        return null;
 
-	}
+    }
 
-	@Override
-	public String initialize() {
+    @Override
+    public String initialize() {
 
-		return this.getKey() + " VARCHAR(" + String.valueOf(textMaxLength) + ")";
+        return this.getKey() + " VARCHAR(" + String.valueOf(textMaxLength) + ")";
 
-	}
+    }
 
-	@Override
-	public <PrimaryKeyValue> SQLValue<String> get(PrimaryKeyValue value) {
+    @Override
+    public <PrimaryKeyValue> SQLValue<String> get(PrimaryKeyValue value) {
 
-		return new SQLValue<String>(this.getKey(), (String) getTable().get(value, getKey()).getValue());
+        return new SQLValue<String>(this.getKey(), (String) getTable().get(value, getKey()).getValue());
 
-	}
+    }
+
+    @Override
+    public String load(Object value) {
+        if (value instanceof String) {
+            return value.toString();
+        } else if (value instanceof Number) {
+            return String.valueOf(value);
+        } else if (value instanceof Boolean) {
+            return String.valueOf(value);
+        } else if (value instanceof Character) {
+            return String.valueOf(value);
+        }
+        throw new IllegalArgumentException("Cannot safely convert from " + value.getClass().getName() + " to String!");
+    }
 
 }

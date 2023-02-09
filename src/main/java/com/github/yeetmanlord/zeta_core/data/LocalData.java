@@ -88,7 +88,7 @@ public class LocalData extends DataStorer {
 
         if (initialized) {
             instance.getPluginLogger().debug("Initializing database");
-            this.client = new SQLClient(ipAddress, username, password, port, databaseName);
+            this.client = new SQLClient(ipAddress, username, password, port, databaseName, ZetaCore.getInstance());
         }
     }
 

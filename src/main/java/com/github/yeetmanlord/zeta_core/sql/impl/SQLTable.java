@@ -1,5 +1,6 @@
 package com.github.yeetmanlord.zeta_core.sql.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -67,14 +68,33 @@ public class SQLTable implements ISQLTable {
 
     public <PrimaryKeyType> SQLValue<?> get(PrimaryKeyType primaryKeyValue, String columnToGet) {
 
-        return handler.queryFirst(getPrimary(), primaryKeyValue, getName(), columnToGet);
+        SQLValue<?> queryResult = handler.queryFirst(getPrimary(), primaryKeyValue, getName(), columnToGet);
+
+        if (queryResult != null) {
+            SQLColumn<?> col = this.columns.get(columnToGet);
+            if (col != null) {
+                return new SQLValue<>(columnToGet, col.load(queryResult.getValue()));
+            }
+        }
+
+        return null;
 
     }
 
     @Override
     public <PrimaryKeyType> Row getRow(PrimaryKeyType primaryKeyValue) {
 
-        return handler.getRow(this, primaryKeyValue);
+        Row raw = handler.getRow(this, primaryKeyValue);
+        Row wrapped = new Row();
+
+        for (String key : raw.keySet()) {
+            SQLColumn<?> col = this.columns.get(key);
+            if (col != null) {
+                wrapped.put(key, col.load(raw.get(key).getValue()));
+            }
+        }
+
+        return wrapped;
 
     }
 
@@ -87,7 +107,21 @@ public class SQLTable implements ISQLTable {
     @Override
     public RowList getRows() {
 
-        return this.handler.getAllData(this);
+        RowList raw = this.handler.getAllData(this);
+        RowList wrapped = new RowList();
+
+        for (Row row : raw) {
+            Row newRow = new Row();
+            for (String key : row.keySet()) {
+                SQLColumn<?> col = this.columns.get(key);
+                if (col != null) {
+                    newRow.put(key, col.load(row.get(key).getValue()));
+                }
+            }
+            wrapped.add(newRow);
+        }
+
+        return wrapped;
 
     }
 
@@ -110,12 +144,14 @@ public class SQLTable implements ISQLTable {
     public void writeValue(Object... args) {
 
         String params = "";
+        Object[] translatedArgs = new Object[args.length];
 
         int x = 0;
 
         for (String key : columns.keySet()) {
             SQLColumn<?> col = columns.get(key);
 
+            translatedArgs[x] = col.write(args[x]);
             if (x == columns.size() - 1) {
                 params += col.getKey();
             } else {
@@ -126,7 +162,7 @@ public class SQLTable implements ISQLTable {
         }
 
         params = params.trim();
-        this.batch = this.handler.addReplaceInto(this.batch, tableName, params, args);
+        this.batch = this.handler.addReplaceInto(this.batch, tableName, params, translatedArgs);
 
     }
 
@@ -139,7 +175,8 @@ public class SQLTable implements ISQLTable {
         for (String key : row.keySet()) {
 
             SQLValue<?> value = row.get(key);
-            values[x] = value.getValue();
+            SQLColumn<?> col = columns.get(key);
+            values[x] = col.write(value.getValue());
 
             if (x == row.size() - 1) {
                 params += value.getKey();
@@ -173,7 +210,15 @@ public class SQLTable implements ISQLTable {
 
     public List<SQLValue<?>> getColumn(String column) {
 
-        return this.handler.getColumnEntries(this.tableName, column);
+        List<SQLValue<?>> values = this.handler.getColumnEntries(this.tableName, column);
+        List<SQLValue<?>> translated = new ArrayList<>();
+
+        SQLColumn<?> col = this.columns.get(column);
+        for (SQLValue<?> value : values) {
+            translated.add(new SQLValue<>(value.getKey(), col.load(value.getValue())));
+        }
+
+        return translated;
 
     }
 
@@ -182,7 +227,8 @@ public class SQLTable implements ISQLTable {
     }
 
     public void removeRow(Object primaryKeyValue, boolean async) {
-        this.handler.removeRow(this.tableName, this.primaryKey, primaryKeyValue, async);
+        SQLColumn<?> col = this.columns.get(this.primaryKey);
+        this.handler.removeRow(this.tableName, this.primaryKey, col.write(primaryKeyValue), async);
     }
 
     public void removeRowWhere(String column, Object value) {
@@ -190,7 +236,8 @@ public class SQLTable implements ISQLTable {
     }
 
     public void removeRowWhere(String column, Object value, boolean async) {
-        this.handler.removeRow(this.tableName, column, value, async);
+        SQLColumn<?> col = this.columns.get(column);
+        this.handler.removeRow(this.tableName, column, col.write(value), async);
     }
 
     public void drop() {
@@ -206,7 +253,9 @@ public class SQLTable implements ISQLTable {
     }
 
     public void update(String column, Object value, Object primaryKeyValue, boolean async) {
-        this.handler.updateWhere(this.tableName, new SQLValue<>(column, value), SQLValue.create(this.primaryKey, primaryKeyValue), async);
+        SQLColumn<?> col = this.columns.get(column);
+        SQLColumn<?> whereCol = this.columns.get(this.primaryKey);
+        this.handler.updateWhere(this.tableName, new SQLValue<>(column, col.write(value)), SQLValue.create(this.primaryKey, whereCol.write(primaryKeyValue)), async);
     }
 
     public void update(String column, Object value, String whereColumn, Object whereValue) {
@@ -214,7 +263,10 @@ public class SQLTable implements ISQLTable {
     }
 
     public void update(String column, Object value, String whereColumn, Object whereValue, boolean async) {
-        this.handler.updateWhere(this.tableName, new SQLValue<>(column, value), SQLValue.create(whereColumn, whereValue), async);
+        SQLColumn<?> col = this.columns.get(column);
+        SQLColumn<?> whereCol = this.columns.get(whereColumn);
+        this.handler.updateWhere(this.tableName, SQLValue.create(column, col.write(value)),
+                SQLValue.create(whereColumn, whereCol.write(whereValue)), async);
     }
 
     @Override
@@ -233,12 +285,18 @@ public class SQLTable implements ISQLTable {
 
     @Override
     public void updateBatch(String column, Object value, String whereColumn, Object whereValue) {
-        this.updateBatch = this.handler.addUpdate(this.updateBatch, this.tableName, SQLValue.create(column, value), SQLValue.create(whereColumn, whereValue));
+        SQLColumn<?> col = this.columns.get(column);
+        SQLColumn<?> whereCol = this.columns.get(whereColumn);
+        this.updateBatch = this.handler.addUpdate(this.updateBatch, this.tableName,
+                SQLValue.create(column, col.write(value)), SQLValue.create(whereColumn, whereCol.write(whereValue)));
     }
 
     @Override
     public void updateBatch(String column, Object value, Object primaryKey) {
-        this.updateBatch = this.handler.addUpdate(this.updateBatch, this.tableName, SQLValue.create(column, value), SQLValue.create(this.primaryKey, primaryKey));
+        SQLColumn<?> col = this.columns.get(column);
+        SQLColumn<?> whereCol = this.columns.get(this.primaryKey);
+        this.updateBatch = this.handler.addUpdate(this.updateBatch, this.tableName,
+                SQLValue.create(column, col.write(value)), SQLValue.create(this.primaryKey, whereCol.write(primaryKey)));
     }
 
     @Override

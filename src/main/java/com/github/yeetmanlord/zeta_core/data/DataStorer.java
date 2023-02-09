@@ -18,7 +18,7 @@ import com.github.yeetmanlord.zeta_core.ZetaPlugin;
  *
  * @author YeetManLord
  */
-public abstract class DataStorer {
+public abstract class DataStorer implements IDataStorer {
 
     protected File file;
 

@@ -26,6 +26,8 @@ public abstract class ZetaBungeePlugin extends Plugin implements IZetaPlugin {
 
     private PluginSetting pluginSetting;
 
+    protected boolean enabled = false;
+
     public ZetaBungeePlugin() {
         super();
         this.logger = new BungeeLogger(this);
@@ -33,6 +35,7 @@ public abstract class ZetaBungeePlugin extends Plugin implements IZetaPlugin {
 
     @Override
     public void onEnable() {
+        enabled = true;
         super.onEnable();
         this.pluginSetting = BungeeCore.getInstance().getLocalSettings().getPluginSettings(this);
         BungeeCore.getInstance().registerPlugin(this);
@@ -40,6 +43,12 @@ public abstract class ZetaBungeePlugin extends Plugin implements IZetaPlugin {
         this.registerDataStorers();
         BungeeCore.getInstance().getPluginLogger().debug("Initializing databases for " + this.getPluginName() +  " if necessary ");
         this.initDB();
+    }
+
+    @Override
+    public void onDisable() {
+        enabled = false;
+        super.onDisable();
     }
 
     @Override
@@ -132,5 +141,10 @@ public abstract class ZetaBungeePlugin extends Plugin implements IZetaPlugin {
     @Override
     public void scheduleTask(Runnable task, long delay) {
         ProxyServer.getInstance().getScheduler().schedule(this, task, delay, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 }

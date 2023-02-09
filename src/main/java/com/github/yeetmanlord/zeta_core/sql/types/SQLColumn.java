@@ -6,7 +6,7 @@ import com.github.yeetmanlord.zeta_core.sql.ISQLTable;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLHandler;
 import com.github.yeetmanlord.zeta_core.sql.values.SQLValue;
 
-public abstract class SQLColumn<Type> {
+public abstract class SQLColumn<T> {
 
 	/**
 	 * This column's settings
@@ -45,11 +45,11 @@ public abstract class SQLColumn<Type> {
 
 	}
 
-	public abstract ArrayList<SQLValue<Type>> load(SQLHandler handler);
+	public abstract ArrayList<SQLValue<T>> load(SQLHandler handler);
 
 	public abstract String initialize();
 
-	public abstract <PrimaryKeyValue> SQLValue<Type> get(PrimaryKeyValue value);
+	public abstract <PrimaryKeyValue> SQLValue<T> get(PrimaryKeyValue value);
 
 	public String addSettings() {
 
@@ -105,4 +105,12 @@ public abstract class SQLColumn<Type> {
 	public String toString() {
 		return "SQLColumn{settings: " + settings + ", table: " + table.getName() + ", key: " + key + ", type: " + this.getClass().getSimpleName() + "}";
 	}
+
+	public abstract T load(Object value);
+
+	public Object write(Object value) {
+		// By default, these methods will be the same
+		return load(value);
+	}
+
 }

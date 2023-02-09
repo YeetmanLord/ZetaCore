@@ -56,4 +56,15 @@ public class SQLLong extends SQLColumn<Long> {
         return new SQLValue<Long>(this.getKey(), (Long) getTable().get(value, getKey()).getValue());
 
     }
+
+    @Override
+    public Long load(Object value) {
+        if (value instanceof Number) {
+            return ((Number)value).longValue();
+        } else if (value instanceof String) {
+            return Long.valueOf((String)value);
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + value.getClass().getName() + " to Long");
+        }
+    }
 }

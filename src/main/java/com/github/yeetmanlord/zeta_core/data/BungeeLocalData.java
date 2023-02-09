@@ -1,9 +1,6 @@
 package com.github.yeetmanlord.zeta_core.data;
 
-import com.github.yeetmanlord.zeta_core.IZetaPlugin;
-import com.github.yeetmanlord.zeta_core.ZetaBungeePlugin;
-import com.github.yeetmanlord.zeta_core.ZetaCore;
-import com.github.yeetmanlord.zeta_core.ZetaPlugin;
+import com.github.yeetmanlord.zeta_core.*;
 import com.github.yeetmanlord.zeta_core.sql.connection.SQLClient;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.configuration.ConfigurationSection;
@@ -90,7 +87,7 @@ public class BungeeLocalData extends BungeeDataStorer {
 
         if (initialized) {
             instance.getPluginLogger().debug("Initializing database");
-            this.client = new SQLClient(ipAddress, username, password, port, databaseName);
+            this.client = new SQLClient(ipAddress, username, password, port, databaseName, BungeeCore.getInstance());
         }
     }
 

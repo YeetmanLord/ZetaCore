@@ -57,4 +57,17 @@ public class SQLInteger extends SQLColumn<Integer> {
 
 	}
 
+	@Override
+	public Integer load(Object value) {
+		if (value instanceof SQLValue<?>) {
+			value = ((SQLValue<?>)value).getValue();
+		}
+		if (value instanceof Number) {
+			return ((Number)value).intValue();
+		} else if (value instanceof String) {
+			return Integer.valueOf((String)value);
+		} else {
+			throw new IllegalArgumentException("Cannot convert " + value.getClass().getName() + " to Integer");
+		}
+	}
 }

@@ -58,7 +58,7 @@ public class SQLText extends SQLColumn<String> {
 	@Override
 	public <PrimaryKeyValue> SQLValue<String> get(PrimaryKeyValue value) {
 
-		return new SQLValue<String>(this.getKey(), (String) getTable().get(value, getKey()).getValue());
+		return new SQLValue<>(this.getKey(), (String) getTable().get(value, getKey()).getValue());
 
 	}
 
@@ -71,8 +71,7 @@ public class SQLText extends SQLColumn<String> {
 
 			if (this.settings.isUnique()) {
 				index = "UNIQUE INDEX `" + this.getKey() + "_UNIQUE` (`" + this.getKey() + "(" + String.valueOf(this.textMaxLength) + ")` ASC) VISIBLE";
-			}
-			else {
+			} else {
 				index = "INDEX `" + this.getKey() + "_INDEX` (`" + this.getKey() + "` (" + String.valueOf(this.textMaxLength) + ") ASC) INVISIBLE";
 			}
 
@@ -82,4 +81,17 @@ public class SQLText extends SQLColumn<String> {
 
 	}
 
+	@Override
+	public String load(Object value) {
+		if (value instanceof String) {
+			return value.toString();
+		} else if (value instanceof Number) {
+			return String.valueOf(value);
+		} else if (value instanceof Boolean) {
+			return String.valueOf(value);
+		} else if (value instanceof Character) {
+			return String.valueOf(value);
+		}
+		throw new IllegalArgumentException("Cannot safely convert from " + value.getClass().getName() + " to String!");
+	}
 }

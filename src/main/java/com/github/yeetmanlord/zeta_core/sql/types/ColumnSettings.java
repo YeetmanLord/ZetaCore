@@ -1,5 +1,8 @@
 package com.github.yeetmanlord.zeta_core.sql.types;
 
+import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * This is to add special settings to columns. Whether that be making that
  * column nonNull or unsigned.
@@ -152,8 +155,6 @@ public class ColumnSettings {
             return new ColumnSettings(nonNull, unique, unsigned, index);
 
         }
-
-
     }
 
     @Override

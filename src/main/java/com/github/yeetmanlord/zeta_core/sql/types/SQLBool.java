@@ -58,4 +58,17 @@ public class SQLBool extends SQLColumn<Boolean> {
         return null;
     }
 
+    @Override
+    public Boolean load(Object value) {
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        } else if (value instanceof Integer) {
+            return (Integer) value == 1;
+        } else if (value instanceof String) {
+            return Boolean.valueOf(value.toString());
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + value.getClass().getName() + " to Boolean");
+        }
+    }
+
 }

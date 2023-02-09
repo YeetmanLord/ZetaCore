@@ -128,7 +128,7 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
                             ZetaCore.getInstance().getLocalSettings().setFirstInit(true);
 
                             Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
-                                ZetaCore.getInstance().getLocalSettings().setClient(new SQLClient(ZetaCore.getInstance().getLocalSettings().getIpAddress(), ZetaCore.getInstance().getLocalSettings().getUsername(), ZetaCore.getInstance().getLocalSettings().getPassword(), ZetaCore.getInstance().getLocalSettings().getPort(), ZetaCore.getInstance().getLocalSettings().getDatabaseName()));
+                                ZetaCore.getInstance().getLocalSettings().setClient(new SQLClient(ZetaCore.getInstance().getLocalSettings().getIpAddress(), ZetaCore.getInstance().getLocalSettings().getUsername(), ZetaCore.getInstance().getLocalSettings().getPassword(), ZetaCore.getInstance().getLocalSettings().getPort(), ZetaCore.getInstance().getLocalSettings().getDatabaseName(), ZetaCore.getInstance()));
 
                                 LocalDateTime timeout = LocalDateTime.now().plus(3, ChronoUnit.SECONDS);
                                 while (!ZetaCore.getInstance().getLocalSettings().getClient().isConnected()) {
@@ -146,7 +146,7 @@ public class LocalSettingsMenu extends AbstractGUIMenu {
                         this.close();
                         Bukkit.getScheduler().runTaskAsynchronously(ZetaCore.getInstance(), () -> {
                             ZetaCore.getInstance().getLocalSettings().setInitialized(true);
-                            ZetaCore.getInstance().getLocalSettings().setClient(new SQLClient(ZetaCore.getInstance().getLocalSettings().getIpAddress(), ZetaCore.getInstance().getLocalSettings().getUsername(), ZetaCore.getInstance().getLocalSettings().getPassword(), ZetaCore.getInstance().getLocalSettings().getPort(), ZetaCore.getInstance().getLocalSettings().getDatabaseName()));
+                            ZetaCore.getInstance().getLocalSettings().setClient(new SQLClient(ZetaCore.getInstance().getLocalSettings().getIpAddress(), ZetaCore.getInstance().getLocalSettings().getUsername(), ZetaCore.getInstance().getLocalSettings().getPassword(), ZetaCore.getInstance().getLocalSettings().getPort(), ZetaCore.getInstance().getLocalSettings().getDatabaseName(), ZetaCore.getInstance()));
 
                             LocalDateTime timeout = LocalDateTime.now().plus(3, ChronoUnit.SECONDS);
                             while (!ZetaCore.getInstance().getLocalSettings().getClient().isConnected()) {

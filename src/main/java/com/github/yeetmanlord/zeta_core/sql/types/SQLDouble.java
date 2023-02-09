@@ -50,15 +50,25 @@ public class SQLDouble extends SQLColumn<Double> {
 	@Override
 	public String initialize() {
 
-		return this.getKey() + " DOUBLE(" + String.valueOf(digits) + ", " + String.valueOf(afterDecimal) + ")";
+		return this.getKey() + " DOUBLE(" + digits + ", " + afterDecimal + ")";
 
 	}
 
 	@Override
 	public <PrimaryKeyValue> SQLValue<Double> get(PrimaryKeyValue value) {
 
-		return new SQLValue<Double>(this.getKey(), (Double) getTable().get(value, getKey()).getValue());
+		return new SQLValue<>(this.getKey(), (Double) getTable().get(value, getKey()).getValue());
 
 	}
 
+	@Override
+	public Double load(Object value) {
+		if (value instanceof Number) {
+			return ((Number)value).doubleValue();
+		} else if (value instanceof String) {
+			return Double.valueOf((String)value);
+		} else {
+			throw new IllegalArgumentException("Cannot convert " + value.getClass().getName() + " to Double");
+		}
+	}
 }

@@ -8,7 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 
-public abstract class BungeeDataStorer {
+public abstract class BungeeDataStorer implements IDataStorer {
 
     protected File file;
 

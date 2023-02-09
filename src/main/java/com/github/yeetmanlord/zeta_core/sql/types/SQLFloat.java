@@ -57,4 +57,14 @@ public class SQLFloat extends SQLColumn<Float> {
 
 	}
 
+	@Override
+	public Float load(Object value) {
+		if (value instanceof Number) {
+			return ((Number)value).floatValue();
+		} else if (value instanceof String) {
+			return Float.valueOf((String)value);
+		} else {
+			throw new IllegalArgumentException("Cannot convert " + value.getClass().getName() + " to Float");
+		}
+	}
 }

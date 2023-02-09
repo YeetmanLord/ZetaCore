@@ -33,5 +33,7 @@ public interface IZetaPlugin {
 
     void scheduleAsyncTask(Runnable task);
 
+    boolean isEnabled();
+
 
 }
