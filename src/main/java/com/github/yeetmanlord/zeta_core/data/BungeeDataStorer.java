@@ -36,7 +36,6 @@ public abstract class BungeeDataStorer implements IDataStorer {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
             }
 
         }

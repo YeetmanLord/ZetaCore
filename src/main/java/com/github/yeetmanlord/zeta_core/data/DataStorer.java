@@ -46,7 +46,6 @@ public abstract class DataStorer implements IDataStorer {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
             }
 
         }
