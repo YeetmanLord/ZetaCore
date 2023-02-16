@@ -75,8 +75,6 @@ public class SQLClient<T extends IZetaPlugin> {
 
                     validated = this.dataSource.getConnection().isValid(3);
                     zetaCore.getPluginLogger().info("&aDatabase is connected!");
-                    ZetaCore.getInstance().testStorer.initializeDB(handler);
-                    ZetaCore.getInstance().testStorer.readDB();
                 } catch (RuntimeException e) {
                     zetaCore.getPluginLogger().error("Pool Initialization Failed! In most cases this means that the database service isn't running or the database connection information is wrong");
                     zetaCore.getPluginLogger().error("To enable a full stacktrace please enable debug mode.");

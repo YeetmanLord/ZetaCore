@@ -108,6 +108,6 @@ public abstract class AbstractUntypedSQLDataStorer<PrimaryKeyType> extends DataS
 
     @Override
     public boolean doesRequireDataInit() {
-        return !this.dataInitialized;
+        return this.dataInitialized;
     }
 }

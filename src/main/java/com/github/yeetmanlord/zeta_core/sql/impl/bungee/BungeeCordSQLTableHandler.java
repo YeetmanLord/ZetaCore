@@ -109,6 +109,6 @@ public abstract class BungeeCordSQLTableHandler<PrimaryKeyType> implements ISQLT
 
     @Override
     public boolean doesRequireDataInit() {
-        return true;
+        return false;
     }
 }

@@ -5,7 +5,6 @@ import java.util.function.BiFunction;
 
 import com.github.yeetmanlord.reflection_api.ReflectionApi;
 import com.github.yeetmanlord.zeta_core.data.LocalData;
-import com.github.yeetmanlord.zeta_core.data.TestStorer;
 import com.github.yeetmanlord.zeta_core.events.ChatEvent;
 import com.github.yeetmanlord.zeta_core.events.HandleMenuInteractionEvent;
 import com.github.yeetmanlord.zeta_core.events.LeftClickEvent;
@@ -64,8 +63,6 @@ public class ZetaCore extends ZetaPlugin implements IZetaCore<ZetaPlugin, DataSt
      */
     private final HashMap<ZetaPlugin, BiFunction<PlayerUtil, AbstractGUIMenu, AbstractGUIMenu>> superConfigs = new HashMap<>();
 
-    public TestStorer testStorer;
-
     @Override
     public void onLoad() {
         instance = this;
@@ -114,7 +111,6 @@ public class ZetaCore extends ZetaPlugin implements IZetaCore<ZetaPlugin, DataSt
 
         logger.info("ZetaCore framework is disabling");
         localSettings.write();
-        testStorer.writeToDB();
 
         if (this.isConnectedToDatabase()) {
             logger.debug("Disconnecting database client");
@@ -229,9 +225,6 @@ public class ZetaCore extends ZetaPlugin implements IZetaCore<ZetaPlugin, DataSt
         localSettings = new LocalData(this);
         localSettings.setup();
         logger.debug("Database and local settings initialized");
-
-        testStorer = new TestStorer(this);
-        testStorer.setup();
     }
 
     @Override

@@ -271,7 +271,7 @@ public class SQLTable implements ISQLTable {
 
     @Override
     public String toString() {
-        return "SQLTable{primaryKey: " + primaryKey + ", tableName: " + tableName + ", columns: " + columns + "}";
+        return "SQLTable{primaryKey: " + primaryKey + ", tableName: " + tableName + "}";
     }
 
     public void setHandler(SQLHandler handler) {

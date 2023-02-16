@@ -125,6 +125,6 @@ public abstract class AbstractSQLDataStorer<PrimaryKeyType> extends DataStorer i
     }
 
     public boolean doesRequireDataInit() {
-        return !dataInitialized;
+        return dataInitialized;
     }
 }

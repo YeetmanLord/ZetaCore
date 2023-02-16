@@ -110,6 +110,6 @@ public abstract class BungeeCordUntypedSQLDataStorer<PrimaryKeyType> extends Bun
 
     @Override
     public boolean doesRequireDataInit() {
-        return !this.dataInitialized;
+        return this.dataInitialized;
     }
 }

@@ -107,6 +107,6 @@ public abstract class AbstractSQLTableHandler<PrimaryKeyType> implements ISQLTab
 
     @Override
     public boolean doesRequireDataInit() {
-        return true;
+        return false;
     }
 }

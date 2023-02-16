@@ -125,6 +125,6 @@ public abstract class BungeeCordSQLDataStorer<PrimaryKeyType> extends BungeeData
     }
 
     public boolean doesRequireDataInit() {
-        return !dataInitialized;
+        return dataInitialized;
     }
 }

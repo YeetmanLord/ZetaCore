@@ -14,7 +14,7 @@ public class LocalData extends DataStorer {
 
     private HashMap<String, PluginSetting> pluginSettings;
 
-    private SQLClient client;
+    private SQLClient<ZetaPlugin> client;
 
     private String ipAddress;
 
@@ -30,7 +30,7 @@ public class LocalData extends DataStorer {
 
     private String databaseName;
 
-    public LocalData(ZetaPlugin instance) {
+    public LocalData(ZetaCore instance) {
 
         super(instance, "local_data");
         pluginSettings = new HashMap<>();
@@ -139,11 +139,11 @@ public class LocalData extends DataStorer {
         this.pluginSettings = pluginSettings;
     }
 
-    public SQLClient getClient() {
+    public SQLClient<ZetaPlugin> getClient() {
         return client;
     }
 
-    public void setClient(SQLClient client) {
+    public void setClient(SQLClient<ZetaPlugin>  client) {
         this.client = client;
     }
 

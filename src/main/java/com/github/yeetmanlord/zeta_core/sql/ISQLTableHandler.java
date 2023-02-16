@@ -111,7 +111,7 @@ public interface ISQLTableHandler<PrimaryKeyType> {
 
 	/**
 	 * <b>IMPORTANT METHOD</b> This method is used to determine if the table needs to
-	 * have its data initialized. If this method returns true, then the this handler will
+	 * have its data initialized. If this method returns true, then this handler will
 	 * <em>not</em> read from the database. Instead, it will initialize the data using local
 	 * files. By default, this is handled by {@link ISQLTableHandler#initializeDB(SQLHandler)}.
 	 * However, if you override this method, you must specify when to initialize the data.

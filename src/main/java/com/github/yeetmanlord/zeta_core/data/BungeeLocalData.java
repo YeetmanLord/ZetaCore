@@ -13,7 +13,7 @@ public class BungeeLocalData extends BungeeDataStorer {
 
     private HashMap<String, com.github.yeetmanlord.zeta_core.data.PluginSetting> pluginSettings;
 
-    private SQLClient client;
+    private SQLClient<ZetaBungeePlugin> client;
 
     private String ipAddress;
 
@@ -29,7 +29,7 @@ public class BungeeLocalData extends BungeeDataStorer {
 
     private String databaseName;
 
-    public BungeeLocalData(ZetaBungeePlugin instance) {
+    public BungeeLocalData(BungeeCore instance) {
 
         super(instance, "local_data");
         pluginSettings = new HashMap<>();
@@ -87,7 +87,7 @@ public class BungeeLocalData extends BungeeDataStorer {
 
         if (initialized) {
             instance.getPluginLogger().debug("Initializing database");
-            this.client = new SQLClient(ipAddress, username, password, port, databaseName, BungeeCore.getInstance());
+            this.client = new SQLClient<>(ipAddress, username, password, port, databaseName, BungeeCore.getInstance());
         }
     }
 
@@ -138,11 +138,11 @@ public class BungeeLocalData extends BungeeDataStorer {
         this.pluginSettings = pluginSettings;
     }
 
-    public SQLClient getClient() {
+    public SQLClient<ZetaBungeePlugin> getClient() {
         return client;
     }
 
-    public void setClient(SQLClient client) {
+    public void setClient(SQLClient<ZetaBungeePlugin> client) {
         this.client = client;
     }
 
